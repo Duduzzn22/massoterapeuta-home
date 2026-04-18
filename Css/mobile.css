@@ -44,7 +44,7 @@
   }
 
   .hero-overlay {
-    background: linear-gradient(180deg, rgb(20 14 9 / 52%) 0%, rgb(20 14 9 / 78%) 35%, rgb(20 14 9 / 88%) 100%);
+    background: linear-gradient(180deg, rgb(20 14 9 / 38%) 0%, rgb(20 14 9 / 56%) 35%, rgb(20 14 9 / 68%) 100%);
   }
 
   .service-grid,
@@ -62,5 +62,75 @@
 
   .footer-content {
     text-align: center;
+  }
+}
+
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .main-nav {
+    position: absolute;
+    top: 80px;
+    right: 0;
+    background: #2b1d12;
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+
+  .main-nav a {
+    color: #fff;
+  }
+
+  .main-nav.active {
+    display: flex;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-section .hero-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .hero-copy {
+    max-width: 100%;
+  }
+
+  .hero-actions {
+    justify-content: center;
+  }
+
+  .hero-panel {
+    margin-top: 1.5rem;
+  }
+}
+
+
+@media (max-width: 900px) {
+  .localizacao-container {
+    grid-template-columns: 1fr;
+  }
+
+  .localizacao-texto h2 {
+    font-size: 32px;
+  }
+
+  .localizacao-mapa {
+    height: 350px;
   }
 }

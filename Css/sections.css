@@ -1,6 +1,7 @@
 .hero-section {
   align-items: stretch;
-  background-image: url("../assets/hero_image.jpg");
+  background-image: url("../assets/hero-bg-massagem.jpg"), url("../assets/hero_image.jpg");
+  background-color: #2b1d12;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -12,7 +13,7 @@
 
 /* Camada de contraste para manter o conteúdo legível sem perder a imagem de fundo. */
 .hero-overlay {
-  background: linear-gradient(105deg, rgb(20 14 9 / 78%) 10%, rgb(42 27 15 / 65%) 55%, rgb(16 12 10 / 48%) 100%);
+  background: linear-gradient(105deg, rgb(20 14 9 / 56%) 10%, rgb(42 27 15 / 44%) 55%, rgb(16 12 10 / 30%) 100%);
   inset: 0;
   pointer-events: none;
   position: absolute;
@@ -140,6 +141,40 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+
+.service-card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.service-card-image {
+  display: block;
+  height: 190px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.service-card h3,
+.service-card p {
+  padding-left: 1.4rem;
+  padding-right: 1.4rem;
+}
+
+.service-card h3 {
+  margin-top: 1.15rem;
+}
+
+.service-card p {
+  margin-bottom: 1.4rem;
+}
+
+.service-image-relaxante { object-position: center 32%; }
+.service-image-terapeutica { object-position: center 40%; }
+.service-image-pedras { object-position: center 60%; }
+.service-image-ventosa { object-position: center 28%; }
+.service-image-drenagem { object-position: center 48%; }
+.service-image-personalizada { object-position: center 36%; }
+
 .timeline {
   display: grid;
   gap: 1rem;
@@ -155,4 +190,267 @@
   gap: 1rem;
   grid-template-columns: auto 1fr;
   padding: 1rem;
+}
+
+.plan-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 1.2rem;
+}
+
+.plan-card {
+  padding: 1.4rem;
+  position: relative;
+}
+
+.plan-tag {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--secondary-color);
+  margin-bottom: 0.6rem;
+}
+
+.plan-price {
+  margin: 0.9rem 0 1rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.plan-price strong {
+  font-size: 1.35rem;
+  color: var(--marrom-escuro);
+}
+
+.plan-price span {
+  font-size: 0.95rem;
+  color: var(--text-color);
+  opacity: 0.85;
+}
+
+.plan-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.2rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.plan-benefits li {
+  padding-left: 1.1rem;
+  position: relative;
+  color: var(--text-color);
+}
+
+.plan-benefits li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 800;
+  color: var(--bronze);
+}
+
+.plan-card-featured {
+  border: 1px solid rgb(250 249 246 / 60%);
+  background: linear-gradient(155deg, rgb(250 249 246 / 96%) 0%, rgb(223 200 188 / 90%) 100%);
+  box-shadow: 0 22px 46px rgb(22 14 9 / 22%);
+}
+
+@media (max-width: 900px) {
+  .plan-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.localizacao {
+  padding: 80px 20px;
+  background: linear-gradient(to bottom, #f8f5f1, #ffffff);
+}
+
+.localizacao-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.localizacao-texto .subtitulo {
+  display: inline-block;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #9c7b5d;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.localizacao-texto h2 {
+  font-size: 42px;
+  color: #2f2a26;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.localizacao-texto p {
+  font-size: 17px;
+  color: #5f5a55;
+  line-height: 1.8;
+  margin-bottom: 25px;
+}
+
+.info-box {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.info-item {
+  background: #ffffff;
+  padding: 18px 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.info-item h3 {
+  font-size: 18px;
+  color: #2f2a26;
+  margin-bottom: 6px;
+}
+
+.info-item p {
+  margin: 0;
+  font-size: 15px;
+  color: #666;
+}
+
+.btn-localizacao {
+  display: inline-block;
+  padding: 14px 28px;
+  background-color: #9c7b5d;
+  color: white;
+  text-decoration: none;
+  border-radius: 30px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.btn-localizacao:hover {
+  background-color: #7d6249;
+  transform: translateY(-2px);
+}
+
+.localizacao-mapa {
+  height: 500px;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+.localizacao-mapa iframe {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* =============================================
+   CARROSSEL DE DEPOIMENTOS — loop infinito
+   Arquivo: Css/depoimentos.css
+   ============================================= */
+
+#depoimentos {
+  overflow: hidden;
+}
+
+.carousel-track-wrap {
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 1.5rem;
+  width: max-content;
+  animation: slide-loop 28s linear infinite;
+}
+
+.carousel-track:hover {
+  animation-play-state: paused;
+}
+
+/* Cada card de depoimento */
+.testimonial {
+  background: var(--color-surface, #fff);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 300px;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.testimonial-stars {
+  color: #c9a87c;
+  font-size: 13px;
+  letter-spacing: 2px;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.testimonial blockquote {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  font-style: italic;
+  color: var(--color-text, #333);
+  margin: 0 0 1.25rem;
+  padding: 0;
+  border: none;
+}
+
+.testimonial figcaption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #777);
+}
+
+/* Avatar com inicial */
+.testimonial figcaption::before {
+  content: attr(data-inicial);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f0e8de;
+  color: #8a6a4a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* Animação do loop */
+@keyframes slide-loop {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(calc(-50%)); }
+}
+
+/* Respeita preferência de movimento reduzido (acessibilidade) */
+@media (prefers-reduced-motion: reduce) {
+  .carousel-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .testimonial {
+    width: 100%;
+  }
 }

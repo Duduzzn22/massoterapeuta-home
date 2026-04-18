@@ -54,3 +54,29 @@
 .card-accent {
   background: linear-gradient(135deg, #fff 0%, #f5ece5 100%);
 }
+
+button {
+  background: #9c7b5d;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 12px 24px;
+  border-radius: 10px;
+}
+
+button:hover {
+  background: #7c614a;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: #f3eee8;
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 10px;
+}
