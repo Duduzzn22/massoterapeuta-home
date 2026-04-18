@@ -14,11 +14,9 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
     rel="stylesheet"
   />
-  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="alternate icon" href="assets/favicon.ico" />
 
-  <!-- Open Graph / Compartilhamento social -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Carla Almeida Lira | Massoterapia Spa" />
   <meta property="og:description" content="Protocolos personalizados para aliviar dores, desacelerar a mente e restaurar sua energia com atendimento humanizado e profissional no conforto da sua casa." />
@@ -26,7 +24,6 @@
   <meta property="og:image:alt" content="Carla Almeida Lira - Massoterapia Spa" />
   <meta property="og:locale" content="pt_BR" />
 
-  <!-- WhatsApp / Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Carla Almeida Lira | Massoterapia Spa" />
   <meta name="twitter:description" content="Protocolos personalizados para aliviar dores, desacelerar a mente e restaurar sua energia." />
@@ -38,8 +35,7 @@
   <link rel="stylesheet" href="Css/sections.css" />
   <link rel="stylesheet" href="Css/mobile.css" />
   <link rel="stylesheet" href="Css/pages.css" />
-  <link rel="stylesheet" href="Css/sobre.css" />
-  <link rel="stylesheet" href="Css/depoimentos.css" />
+  <link rel="stylesheet" href="Css/agendamento.css" />
 </head>
 <body>
   <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
@@ -54,9 +50,7 @@
         </span>
       </a>
 
-      <button class="menu-toggle" aria-label="Abrir menu">
-        ☰
-      </button>
+      <button class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
 
       <nav class="main-nav" aria-label="Navegação principal">
         <a href="#sobre">Sobre</a>
@@ -72,7 +66,9 @@
     </div>
   </header>
 
-   <main id="main-content">
+  <main id="main-content">
+
+    <!-- HERO -->
     <section class="hero-section" aria-label="Sessão principal">
       <div class="hero-overlay" aria-hidden="true"></div>
 
@@ -98,7 +94,7 @@
           <dl class="hero-metrics">
             <div>
               <dt>Formato</dt>
-              <dd>in-person service</dd>
+              <dd>Presencial</dd>
             </div>
             <div>
               <dt>Duração</dt>
@@ -170,6 +166,7 @@
       </div>
     </section>
 
+    <!-- SERVIÇOS -->
     <section class="section" id="servicos">
       <div class="container">
         <header class="section-head">
@@ -215,40 +212,8 @@
         </div>
       </div>
     </section>
-<div class="container">
-    <h1>Agendamento do Spa</h1>
 
-    <form id="form-agendamento">
-      <input type="text" id="nome" placeholder="Seu nome" required>
-
-      <select id="servico" required>
-        <option value="">Selecione um serviço</option>
-        <option value="Massagem Relaxante">Massagem Relaxante</option>
-        <option value="Limpeza de Pele">Limpeza de Pele</option>
-        <option value="Banho Terapêutico">Banho Terapêutico</option>
-      </select>
-
-      <input type="date" id="data" required>
-
-      <select id="horario" required>
-        <option value="">Selecione um horário</option>
-        <option value="09:00">09:00</option>
-        <option value="10:00">10:00</option>
-        <option value="11:00">11:00</option>
-        <option value="14:00">14:00</option>
-        <option value="15:00">15:00</option>
-        <option value="16:00">16:00</option>
-      </select>
-
-      <button type="submit">Agendar</button>
-    </form>
-
-    <h2>Agendamentos</h2>
-    <ul id="lista-agendamentos"></ul>
-  </div>
-
-     <!--COMO-FUNCIONA -->
-
+    <!-- COMO FUNCIONA -->
     <section class="section section-muted" id="processo">
       <div class="container">
         <header class="section-head">
@@ -275,7 +240,7 @@
             <span>03</span>
             <div>
               <h3>Atendimento no local</h3>
-              <p>Execução no  ambiente com estrutura organizada e protocolo de higiene.</p>
+              <p>Execução no ambiente com estrutura organizada e protocolo de higiene.</p>
             </div>
           </li>
           <li>
@@ -289,8 +254,7 @@
       </div>
     </section>
 
-    <!--BENEFÍCIOS -->
-
+    <!-- BENEFÍCIOS -->
     <section class="section" id="beneficios">
       <div class="container two-column">
         <div>
@@ -312,103 +276,97 @@
       </div>
     </section>
 
-    <!--PLANOS-->
-
+    <!-- PLANOS -->
     <section class="section" id="planos">
-  <div class="container">
-    <header class="section-head">
-      <p class="eyebrow">planos</p>
-      <h2>Planos  (valores a partir de)</h2>
-      <p>
-        Escolha o formato ideal para seu objetivo. Valores variam conforme duração e região.
-      </p>
-    </header>
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">planos</p>
+          <h2>Planos (valores a partir de)</h2>
+          <p>
+            Escolha o formato ideal para seu objetivo. Valores variam conforme duração e região.
+          </p>
+        </header>
 
-    <div class="plan-grid">
-      <!-- Avulsa -->
-      <article class="card plan-card">
-        <p class="plan-tag">para conhecer</p>
-        <h3>Plano Avulsa</h3>
+        <div class="plan-grid">
+          <article class="card plan-card">
+            <p class="plan-tag">para conhecer</p>
+            <h3>Plano Avulsa</h3>
 
-        <p class="plan-price">
-          <strong>A partir de R$ 00</strong>
-          <span>por sessão</span>
-        </p>
+            <p class="plan-price">
+              <strong>A partir de R$ 00</strong>
+              <span>por sessão</span>
+            </p>
 
-        <ul class="plan-benefits">
-          <li>60–90 min</li>
-          <li>Ideal para conhecer</li>
-          <li>Suporte pós-sessão</li>
-        </ul>
+            <ul class="plan-benefits">
+              <li>60–90 min</li>
+              <li>Ideal para conhecer</li>
+              <li>Suporte pós-sessão</li>
+            </ul>
 
-        <a
-          class="button button-secondary button-full"
-          href="https://wa.me/5500000000000?text=Olá,%20Carla!%20Quero%20agendar%20o%20Plano%20Avulsa.%0A%0A📌%20Serviço:%20%0A📅%20Data%20preferida:%20%0A⏰%20Horário:%20%0A📍%20Bairro/Cidade:%20"
-          target="_blank"
-          rel="noopener"
-        >
-          Quero esse plano
-        </a>
-      </article>
+            <a
+              class="button button-secondary button-full"
+              href="https://wa.me/5519993297780?text=Olá,%20Carla!%20Quero%20agendar%20o%20Plano%20Avulsa.%0A%0A📌%20Serviço:%20%0A📅%20Data%20preferida:%20%0A⏰%20Horário:%20%0A📍%20Bairro/Cidade:%20"
+              target="_blank"
+              rel="noopener"
+            >
+              Quero esse plano
+            </a>
+          </article>
 
-      <!-- 4 sessões -->
-      <article class="card plan-card plan-card-featured">
-        <p class="plan-tag">mais escolhido</p>
-        <h3>Pacote 4 Sessões</h3>
+          <article class="card plan-card plan-card-featured">
+            <p class="plan-tag">mais escolhido</p>
+            <h3>Pacote 4 Sessões</h3>
 
-        <p class="plan-price">
-          <strong>A partir de R$ 00</strong>
-          <span>por pacote</span>
-        </p>
+            <p class="plan-price">
+              <strong>A partir de R$ 00</strong>
+              <span>por pacote</span>
+            </p>
 
-        <ul class="plan-benefits">
-          <li>1 sessão/semana</li>
-          <li>Melhor para dor/tensão recorrente</li>
-          <li>Prioridade de horários</li>
-        </ul>
+            <ul class="plan-benefits">
+              <li>1 sessão/semana</li>
+              <li>Melhor para dor/tensão recorrente</li>
+              <li>Prioridade de horários</li>
+            </ul>
 
-        <a
-          class="button button-primary button-full"
-          href="https://wa.me/5519993297780?text=Olá,%20Carla!%20Quero%20agendar%20o%20Pacote%204%20Sessões.%0A%0A📌%20Serviço:%20%0A📅%20Melhor%20dia%20da%20semana:%20%0A⏰%20Horário:%20%0A📍%20Bairro/Cidade:%20"
-          target="_blank"
-          rel="noopener"
-        >
-          Quero esse plano
-        </a>
-      </article>
+            <a
+              class="button button-primary button-full"
+              href="https://wa.me/5519993297780?text=Olá,%20Carla!%20Quero%20agendar%20o%20Pacote%204%20Sessões.%0A%0A📌%20Serviço:%20%0A📅%20Melhor%20dia%20da%20semana:%20%0A⏰%20Horário:%20%0A📍%20Bairro/Cidade:%20"
+              target="_blank"
+              rel="noopener"
+            >
+              Quero esse plano
+            </a>
+          </article>
 
-      <!-- 8 sessões -->
-      <article class="card plan-card">
-        <p class="plan-tag">custo-benefício</p>
-        <h3>Pacote 8 Sessões</h3>
+          <article class="card plan-card">
+            <p class="plan-tag">custo-benefício</p>
+            <h3>Pacote 8 Sessões</h3>
 
-        <p class="plan-price">
-          <strong>A partir de R$ 00</strong>
-          <span>por pacote</span>
-        </p>
+            <p class="plan-price">
+              <strong>A partir de R$ 00</strong>
+              <span>por pacote</span>
+            </p>
 
-        <ul class="plan-benefits">
-          <li>2 sessões/semana ou personalizado</li>
-          <li>Melhor custo-benefício</li>
-          <li>Bônus: avaliação + acompanhamento</li>
-        </ul>
+            <ul class="plan-benefits">
+              <li>2 sessões/semana ou personalizado</li>
+              <li>Melhor custo-benefício</li>
+              <li>Bônus: avaliação + acompanhamento</li>
+            </ul>
 
-        <a
-          class="button button-secondary button-full"
-          href="https://wa.me/5519993297780?text=Olá,%20Carla!%20Quero%20agendar%20o%20Pacote%208%20Sessões.%0A%0A📌%20Serviço:%20%0A📅%20Frequência%20preferida%20(1x/2x%20semana):%20%0A⏰%20Horário:%20%0A📍%20Bairro/Cidade:%20"
-          target="_blank"
-          rel="noopener"
-        >
-          Quero esse plano
-        </a>
-      </article>
-    </div>
-  </div>
-</section>
+            <a
+              class="button button-secondary button-full"
+              href="https://wa.me/5519993297780?text=Olá,%20Carla!%20Quero%20agendar%20o%20Pacote%208%20Sessões.%0A%0A📌%20Serviço:%20%0A📅%20Frequência%20preferida%20(1x/2x%20semana):%20%0A⏰%20Horário:%20%0A📍%20Bairro/Cidade:%20"
+              target="_blank"
+              rel="noopener"
+            >
+              Quero esse plano
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
 
-
-     <!--DEPOIMENTOS-->
-
+    <!-- DEPOIMENTOS -->
     <section class="section section-muted" id="depoimentos">
       <div class="container">
         <header class="section-head">
@@ -422,71 +380,65 @@
 
           <figure class="testimonial">
             <span class="testimonial-stars">★★★★★</span>
-            <blockquote>“Cheguei com dor nas costas e saí muito mais leve. Atendimento acolhedor e técnico.”</blockquote>
+            <blockquote>"Cheguei com dor nas costas e saí muito mais leve. Atendimento acolhedor e técnico."</blockquote>
             <figcaption data-inicial="A">Cliente — sessão terapêutica</figcaption>
           </figure>
 
           <figure class="testimonial">
             <span class="testimonial-stars">★★★★★</span>
-            <blockquote>“A sessão em casa mudou tudo. Sem correria e com foco total no meu conforto.”</blockquote>
+            <blockquote>"A sessão em casa mudou tudo. Sem correria e com foco total no meu conforto."</blockquote>
             <figcaption data-inicial="B">Cliente — sessão relaxante</figcaption>
           </figure>
 
           <figure class="testimonial">
             <span class="testimonial-stars">★★★★★</span>
-            <blockquote>“Percebi melhora no sono já na primeira semana após iniciar o acompanhamento.”</blockquote>
+            <blockquote>"Percebi melhora no sono já na primeira semana após iniciar o acompanhamento."</blockquote>
             <figcaption data-inicial="C">Cliente — acompanhamento mensal</figcaption>
           </figure>
 
           <figure class="testimonial">
             <span class="testimonial-stars">★★★★★</span>
-            <blockquote>“Profissional incrível, muito atenciosa e técnica. Já agendei mais sessões!”</blockquote>
+            <blockquote>"Profissional incrível, muito atenciosa e técnica. Já agendei mais sessões!"</blockquote>
             <figcaption data-inicial="D">Cliente — drenagem linfática</figcaption>
           </figure>
 
           <figure class="testimonial">
             <span class="testimonial-stars">★★★★★</span>
-            <blockquote>“As pedras quentes foram uma experiência única. Saí completamente renovada.”</blockquote>
+            <blockquote>"As pedras quentes foram uma experiência única. Saí completamente renovada."</blockquote>
             <figcaption data-inicial="E">Cliente — pedras quentes</figcaption>
           </figure>
 
           <!-- Duplicatas para loop contínuo -->
           <figure class="testimonial" aria-hidden="true">
             <span class="testimonial-stars">★★★★★</span>
-            <blockquote>“Cheguei com dor nas costas e saí muito mais leve. Atendimento acolhedor e técnico.”</blockquote>
+            <blockquote>"Cheguei com dor nas costas e saí muito mais leve. Atendimento acolhedor e técnico."</blockquote>
             <figcaption data-inicial="A">Cliente — sessão terapêutica</figcaption>
           </figure>
-
           <figure class="testimonial" aria-hidden="true">
             <span class="testimonial-stars">★★★★★</span>
-            <blockquote>“A sessão em casa mudou tudo. Sem correria e com foco total no meu conforto.”</blockquote>
+            <blockquote>"A sessão em casa mudou tudo. Sem correria e com foco total no meu conforto."</blockquote>
             <figcaption data-inicial="B">Cliente — sessão relaxante</figcaption>
           </figure>
-
           <figure class="testimonial" aria-hidden="true">
             <span class="testimonial-stars">★★★★★</span>
-            <blockquote>“Percebi melhora no sono já na primeira semana após iniciar o acompanhamento.”</blockquote>
+            <blockquote>"Percebi melhora no sono já na primeira semana após iniciar o acompanhamento."</blockquote>
             <figcaption data-inicial="C">Cliente — acompanhamento mensal</figcaption>
           </figure>
-
           <figure class="testimonial" aria-hidden="true">
             <span class="testimonial-stars">★★★★★</span>
-            <blockquote>“Profissional incrível, muito atenciosa e técnica. Já agendei mais sessões!”</blockquote>
+            <blockquote>"Profissional incrível, muito atenciosa e técnica. Já agendei mais sessões!"</blockquote>
             <figcaption data-inicial="D">Cliente — drenagem linfática</figcaption>
           </figure>
-
           <figure class="testimonial" aria-hidden="true">
             <span class="testimonial-stars">★★★★★</span>
-            <blockquote>“As pedras quentes foram uma experiência única. Saí completamente renovada.”</blockquote>
+            <blockquote>"As pedras quentes foram uma experiência única. Saí completamente renovada."</blockquote>
             <figcaption data-inicial="E">Cliente — pedras quentes</figcaption>
           </figure>
-
         </div>
       </div>
     </section>
 
-    <!--DÚVIDAS-FREQ -->
-
+    <!-- DÚVIDAS FREQUENTES -->
     <section class="section" id="faq">
       <div class="container">
         <header class="section-head">
@@ -496,26 +448,39 @@
 
         <div class="faq-list">
           <details>
-            <summary>Massoterapia é indicada para qualquer pessoa?</summary>
+            <summary>
+              <span>Massoterapia é indicada para qualquer pessoa?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </summary>
             <p>
               Na maioria dos casos, sim. Antes do atendimento, é feita uma triagem para identificar
               restrições e garantir segurança.
             </p>
           </details>
           <details>
-            <summary>Preciso preparar algo em casa?</summary>
+            <summary>
+              <span>Por que deve agendar uma colsulta com a Carla?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </summary>
             <p>
-              Apenas um espaço livre e silencioso. Todo o restante é alinhado durante o contato.
+              A Carla tem formação especializada, atendimento humanizado e foco em resultados reais
+              para cada cliente, proporcionando uma experiência de cuidado única e personalizada.
             </p>
           </details>
           <details>
-            <summary>Como escolher a técnica ideal?</summary>
+            <summary>
+              <span>Como escolher a técnica ideal?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </summary>
             <p>
               A escolha é feita em conjunto, considerando seu objetivo principal e sensibilidade.
             </p>
           </details>
           <details>
-            <summary>Posso ajustar a pressão durante a sessão?</summary>
+            <summary>
+              <span>Posso ajustar a pressão durante a sessão?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </summary>
             <p>
               Sim. O nível de pressão é sempre adaptado para manter conforto e eficiência.
             </p>
@@ -524,75 +489,269 @@
       </div>
     </section>
 
-    <!--LOCALIZAÇÃO-->
-  
-<section id="localizacao" class="localizacao">
-  <div class="localizacao-container">
-    <div class="localizacao-texto">
-      <span class="subtitulo">Nosso Espaço</span>
-      <h2>Venha viver sua experiência de bem-estar</h2>
-      <p>
-        Estamos em um ambiente pensado para proporcionar conforto, tranquilidade
-        e cuidado em cada detalhe. Visite nosso spa e encontre seu momento de pausa.
-      </p>
+    <!-- LOCALIZAÇÃO -->
+    <section id="localizacao" class="localizacao">
+      <div class="localizacao-container">
+        <div class="localizacao-texto">
+          <span class="subtitulo">Nosso Espaço</span>
+          <h2>Venha viver sua experiência de bem-estar</h2>
+          <p>
+            Estamos em um ambiente pensado para proporcionar conforto, tranquilidade
+            e cuidado em cada detalhe. Visite nosso spa e encontre seu momento de pausa.
+          </p>
 
-      <div class="info-box">
-        <div class="info-item">
-          <h3>Endereço</h3>
-          <p>R. Samuel Fragoso Coimbra, 483 - Valinhos - SP</p>
+          <div class="info-box">
+            <div class="info-item">
+              <h3>Endereço</h3>
+              <p>R. Samuel Fragoso Coimbra, 483 - Valinhos - SP</p>
+            </div>
+            <div class="info-item">
+              <h3>Horário</h3>
+              <p>Segunda a Sábado, das 9h às 19h</p>
+            </div>
+            <div class="info-item">
+              <h3>Contato</h3>
+              <p>(19) 99329-7780</p>
+            </div>
+          </div>
+
+          <a
+            href="https://maps.app.goo.gl/5Q9zJYDfP93uPMvt5"
+            target="_blank"
+            class="btn-localizacao"
+          >
+            Ver rota no Google Maps
+          </a>
         </div>
 
-        <div class="info-item">
-          <h3>Horário</h3>
-          <p>Segunda a Sábado, das 9h às 19h</p>
-        </div>
-
-        <div class="info-item">
-          <h3>Contato</h3>
-          <p>55 (19)99329-7780</p>
+        <div class="localizacao-mapa">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3673.3991544451824!2d-47.00777338831667!3d-22.97234514013218!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c8cde6d8aa4993%3A0x31dd1a80e3b90931!2sSpa%20Carla%20Lira!5e0!3m2!1spt-BR!2sbr!4v1776534964548!5m2!1spt-BR!2sbr"
+            width="600"
+            height="450"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Localização do Spa Carla Lira no Google Maps"
+          ></iframe>
         </div>
       </div>
+    </section>
 
-      <a 
-        href="https://maps.app.goo.gl/5Q9zJYDfP93uPMvt5" 
-        target="_blank" 
-        class="btn-localizacao"
-      >
-        Ver rota no Google Maps
-      </a>
-    </div>
+    <!-- ==============================
+         AGENDAMENTO — NOVO FORMULÁRIO
+         ============================== -->
+    <section class="section agendamento-section" id="agendar">
+      <div class="container">
+        <div class="agendamento-wrapper">
 
-    <div class="localizacao-mapa">
-      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3673.3991544451824!2d-47.00777338831667!3d-22.97234514013218!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c8cde6d8aa4993%3A0x31dd1a80e3b90931!2sSpa%20Carla%20Lira!5e0!3m2!1spt-BR!2sbr!4v1776534964548!5m2!1spt-BR!2sbr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-    </div>
-  </div>
-</section>
+          <!-- Coluna esquerda: texto -->
+          <div class="agendamento-intro">
+            <p class="eyebrow">agendamento</p>
+            <h2>Pronta para começar sua jornada de bem-estar?</h2>
+            <p>
+              Preencha o formulário ao lado. Ao confirmar, você será direcionada diretamente
+              para o WhatsApp com todas as informações já organizadas — sem complicação.
+            </p>
 
+            <div class="agendamento-info-cards">
+              <div class="agendamento-info-card">
+                <span class="agendamento-info-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                </span>
+                <div>
+                  <strong>Resposta rápida</strong>
+                  <span>Em até 1 hora em horário comercial</span>
+                </div>
+              </div>
+              <div class="agendamento-info-card">
+                <span class="agendamento-info-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                  </svg>
+                </span>
+                <div>
+                  <strong>Atendimento home care</strong>
+                  <span>Vou até você, na sua cidade</span>
+                </div>
+              </div>
+              <div class="agendamento-info-card">
+                <span class="agendamento-info-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+                  </svg>
+                </span>
+                <div>
+                  <strong>Sem compromisso</strong>
+                  <span>Consulte disponibilidade sem custo</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-    <!--AGENDAMENTO -->
+          <!-- Coluna direita: formulário -->
+          <div class="agendamento-form-wrap">
+            <form class="agendamento-form" id="form-agendamento" novalidate>
 
-<section class="section cta-section" id="agendar">
-  <div class="container cta-box">
-    <p class="eyebrow">agendamento</p>
-    <h2>Pronta para começar sua jornada de bem-estar?</h2>
-    <p>
-      Clique no botão abaixo e envie uma mensagem com seu objetivo. Você receberá orientação
-      personalizada para definir a sessão ideal.
-    </p>
+              <!-- Seleção de serviço por card -->
+              <div class="form-group">
+                <label class="form-label">Qual serviço você deseja?</label>
+                <div class="servico-grid" role="radiogroup" aria-label="Selecione o serviço">
+                  <label class="servico-card">
+                    <input type="radio" name="servico" value="Massagem Sueca" required />
+                    <span class="servico-card-icon">
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
+                        <path d="M12 8c-1.5 1-2 2.5-2 4s.5 3 2 4c1.5-1 2-2.5 2-4s-.5-3-2-4z"/>
+                      </svg>
+                    </span>
+                    <span class="servico-card-nome">Massagem Sueca</span>
+                  </label>
+                  <label class="servico-card">
+                    <input type="radio" name="servico" value="Massagem Terapêutica" />
+                    <span class="servico-card-icon">
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 19V8.5A4.5 4.5 0 0 1 8.5 4v0A4.5 4.5 0 0 1 13 8.5V14"/>
+                        <path d="M13 14c1.5 0 3 .5 4 2l3 3"/>
+                        <path d="M7 14h6"/>
+                      </svg>
+                    </span>
+                    <span class="servico-card-nome">Massagem Terapêutica</span>
+                  </label>
+                  <label class="servico-card">
+                    <input type="radio" name="servico" value="Pedras Quentes" />
+                    <span class="servico-card-icon">
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <ellipse cx="12" cy="14" rx="8" ry="5"/>
+                        <path d="M8 14c0-3 1.5-5.5 4-7 2.5 1.5 4 4 4 7"/>
+                        <path d="M9 9.5c1-.8 2-1.3 3-1.5 1 .2 2 .7 3 1.5"/>
+                      </svg>
+                    </span>
+                    <span class="servico-card-nome">Pedras Quentes</span>
+                  </label>
+                  <label class="servico-card">
+                    <input type="radio" name="servico" value="Ventosoterapia" />
+                    <span class="servico-card-icon">
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 19a7 7 0 1 0 0-14 7 7 0 0 0 0 14z"/>
+                        <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                        <path d="M12 5V3M12 21v-2M5 12H3M21 12h-2"/>
+                      </svg>
+                    </span>
+                    <span class="servico-card-nome">Ventosoterapia</span>
+                  </label>
+                  <label class="servico-card">
+                    <input type="radio" name="servico" value="Drenagem Linfática" />
+                    <span class="servico-card-icon">
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 2c0 6-6 8-6 14a6 6 0 0 0 12 0c0-6-6-8-6-14z"/>
+                        <path d="M9 16.5c.8 1 1.8 1.5 3 1.5"/>
+                      </svg>
+                    </span>
+                    <span class="servico-card-nome">Drenagem Linfática</span>
+                  </label>
+                  <label class="servico-card">
+                    <input type="radio" name="servico" value="Miracle Face" />
+                    <span class="servico-card-icon">
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9"/>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                        <line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2.5"/>
+                        <line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2.5"/>
+                        <path d="M12 3c0 2-1.5 3-1.5 3M12 3c0 2 1.5 3 1.5 3"/>
+                      </svg>
+                    </span>
+                    <span class="servico-card-nome">Miracle Face</span>
+                  </label>
+                </div>
+                <span class="form-error" id="erro-servico">Selecione um serviço.</span>
+              </div>
 
-    <a
-      class="button button-primary"
-      href="https://wa.me/5519993297780?text=Olá,%20Carla!%20Quero%20agendar%20uma%20sessão.%0A%0A📌%20Serviço:%20%0A📅%20Data%20preferida:%20%0A⏰%20Horário:%20"
-      target="_blank"
-      rel="noopener"
-    >
-      Agendar via WhatsApp
-    </a>
-  </div>
-</section>
+              <!-- Nome -->
+              <div class="form-group">
+                <label class="form-label" for="nome">Seu nome</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  id="nome"
+                  name="nome"
+                  placeholder="Como prefere ser chamada?"
+                  autocomplete="given-name"
+                  required
+                />
+                <span class="form-error" id="erro-nome">Por favor, informe seu nome.</span>
+              </div>
+
+              <!-- Data e Horário lado a lado -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="data">Data preferida</label>
+                  <input
+                    class="form-input"
+                    type="date"
+                    id="data"
+                    name="data"
+                    required
+                  />
+                  <span class="form-error" id="erro-data">Selecione uma data.</span>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="horario">Horário preferido</label>
+                  <select class="form-input form-select" id="horario" name="horario" required>
+                    <option value="">Selecione</option>
+                    <option value="09:00">09:00</option>
+                    <option value="10:00">10:00</option>
+                    <option value="11:00">11:00</option>
+                    <option value="13:00">13:00</option>
+                    <option value="14:00">14:00</option>
+                    <option value="15:00">15:00</option>
+                    <option value="16:00">16:00</option>
+                    <option value="17:00">17:00</option>
+                    <option value="18:00">18:00</option>
+                  </select>
+                  <span class="form-error" id="erro-horario">Selecione um horário.</span>
+                </div>
+              </div>
+
+              <!-- Observação opcional -->
+              <div class="form-group">
+                <label class="form-label" for="observacao">
+                  Observações <span class="form-label-opt">(opcional)</span>
+                </label>
+                <textarea
+                  class="form-input form-textarea"
+                  id="observacao"
+                  name="observacao"
+                  placeholder="Alguma região com dor? Restrição? Preferência de pressão?"
+                  rows="3"
+                ></textarea>
+              </div>
+
+              <!-- Botão -->
+              <button type="submit" class="button button-primary button-full agendamento-btn" id="btn-agendar">
+                <span class="btn-texto">Enviar pelo WhatsApp</span>
+                <span class="btn-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                </span>
+              </button>
+
+              <p class="agendamento-disclaimer">
+                Ao clicar, você será redirecionada para o WhatsApp com a mensagem já preenchida.
+              </p>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </section>
 
   </main>
-
 
   <footer class="site-footer">
     <div class="container footer-content">
@@ -600,8 +759,22 @@
       <p>© 2026. Todos os direitos reservados.</p>
     </div>
   </footer>
-  
-  <script src="script.js"></script>
 
+  <!-- BOTÃO FLUTUANTE WHATSAPP -->
+  <a
+    href="https://wa.me/5519993297780?text=Olá,%20Carla!%20Vim%20pelo%20site%20e%20gostaria%20de%20mais%20informações."
+    class="whatsapp-float"
+    target="_blank"
+    rel="noopener"
+    aria-label="Fale conosco pelo WhatsApp"
+    title="Fale conosco pelo WhatsApp"
+  >
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+    <span class="whatsapp-float-label">Fale conosco</span>
+  </a>
+
+  <script src="script.js"></script>
 </body>
 </html>
