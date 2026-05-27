@@ -3,7 +3,6 @@
 
 Uma landing page premium, moderna e totalmente responsiva desenvolvida para um profissional de massoterapia. O projeto foi estruturado com foco em conversão, UX/UI intuitiva e agendamento rápido de serviços.
 
-Link do Repositório: [https://github.com/Duduzzn22/massoterapeuta-home.git](https://github.com/Duduzzn22/massoterapeuta-home.git)
 
 ---
 
