@@ -1,40 +1,54 @@
-```markdown
-# 💆‍♂️ Site Profissional de Massoterapia
+# 💆 Massoterapeuta Home
 
-Uma landing page premium, moderna e totalmente responsiva desenvolvida para um profissional de massoterapia. O projeto foi estruturado com foco em conversão, UX/UI intuitiva e agendamento rápido de serviços.
-
+Sistema/plataforma voltado para atendimento de massoterapia domiciliar, oferecendo uma experiência moderna, prática e acessível para clientes que buscam saúde, relaxamento e bem-estar.
 
 ---
 
-## 📱 Sobre o Projeto
+## ✨ Sobre o Projeto
 
-O site serve como a montra digital do profissional, permitindo que os clientes conheçam os tipos de tratamentos disponíveis, entendam os benefícios da massoterapia e realizem um agendamento de forma direta e simplificada.
+O **Massoterapeuta Home** foi desenvolvido com foco em facilitar o agendamento e a gestão de atendimentos de massoterapia, permitindo que clientes encontrem serviços de forma simples e rápida.
 
-### ⚡ Principais Funcionalidades
-- **Apresentação Profissional:** Secção dedicada ao perfil, diferenciais e certificações do terapeuta.
-- **Catálogo de Serviços:** Exibição clara dos tratamentos (ex: Massagem Relaxante, Terapêutica, Drenagem Linfática, etc.) com descrições e benefícios.
-- **Mobile-First & Responsivo:** Interface otimizada para smartphones, tablets e computadores, garantindo uma navegação fluida em qualquer ecrã.
-- **Chamada para Ação (CTA):** Botões estratégicos integrados diretamente para o WhatsApp para facilitar a marcação de consultas.
-- **Secção de Feedback / Depoimentos:** Espaço para validação social com avaliações de clientes reais.
+O projeto busca unir:
+
+- 🧘 Bem-estar
+- 📅 Facilidade de agendamento
+- 📱 Interface moderna
+- ⚡ Performance e praticidade
+
+---
+
+## 🚀 Funcionalidades
+
+- Cadastro de clientes
+- Agendamento de sessões
+- Interface responsiva
+- Atendimento domiciliar
+- Contato rápido via WhatsApp
+- Organização de horários
+- Experiência intuitiva
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
-O projeto foi construído utilizando as melhores práticas de desenvolvimento web moderno:
+<div align="left">
 
-- **HTML5:** Estrutura semântica para melhor acessibilidade e SEO.
-- **CSS3:** Estilização personalizada, layout fluido (Design Responsivo) e transições suaves.
-- **JavaScript:** Comportamentos interativos e dinamismo na página.
+<img src="https://skillicons.dev/icons?i=html,css,javascript,react,nodejs,mongodb,git,github" />
+
+</div>
 
 ---
 
-## 📂 Estrutura do Projeto
+## 📸 Preview
 
-```text
-massoterapeuta-home/
-├── assets/          # Imagens, ícones e recursos visuais
-├── css/             # Ficheiros de estilização (styles.css)
-├── js/              # Scripts e interações (main.js)
-├── index.html       # Página principal do site
-└── README.md        # Documentação do repositório
+```bash
+Em breve screenshots do projeto
+---
+
+## © Direitos Autorais
+
+© 2026 Massoterapeuta Home. Todos os direitos reservados.
+
+Este projeto, incluindo seu design, código-fonte, identidade visual, funcionalidades e conteúdos, é protegido por direitos autorais e não pode ser copiado, distribuído ou reproduzido sem autorização prévia.
+
+Desenvolvido por Eduardo Almeida.
