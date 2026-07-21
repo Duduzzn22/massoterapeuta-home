@@ -507,7 +507,7 @@
             </div>
             <div class="info-item">
               <h3>Horário</h3>
-              <p>Segunda a Sábado, das 9h às 19h</p>
+              <p>Segunda a Sexta, das 8h às 17h</p>
             </div>
             <div class="info-item">
               <h3>Contato</h3>
@@ -515,18 +515,30 @@
             </div>
           </div>
 
-          <a
-            href="https://maps.app.goo.gl/5Q9zJYDfP93uPMvt5"
-            target="_blank"
-            class="btn-localizacao"
-          >
-            Ver rota no Google Maps
-          </a>
+          <div class="localizacao-botoes">
+            <a
+              href="https://maps.app.goo.gl/k8t5eYT6UTEm4nQK7"
+              target="_blank"
+              rel="noopener"
+              class="btn-localizacao"
+            >
+              Ver rota no Google Maps
+            </a>
+
+            <a
+              href="https://waze.com/ul?q=R.%20Samuel%20Fragoso%20Coimbra%2C%20483%20-%20Interfone%203%20-%20Vila%20Nova%20Valinhos%2C%20Valinhos%20-%20SP%2C%2013271-280&navigate=yes"
+              target="_blank"
+              rel="noopener"
+              class="btn-localizacao btn-waze"
+            >
+              Ver rota no Waze
+            </a>
+          </div>
         </div>
 
         <div class="localizacao-mapa">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3673.3991544451824!2d-47.00777338831667!3d-22.97234514013218!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c8cde6d8aa4993%3A0x31dd1a80e3b90931!2sSpa%20Carla%20Lira!5e0!3m2!1spt-BR!2sbr!4v1776534964548!5m2!1spt-BR!2sbr"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3673.399154442822!2d-47.00776802380494!3d-22.972345140219034!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c8cde6d8aa4993%3A0x31dd1a80e3b90931!2sSpa%20Carla%20Lira!5e0!3m2!1spt-BR!2sbr!4v1784594590460!5m2!1spt-BR!2sbr"
             width="600"
             height="450"
             style="border:0;"
@@ -564,7 +576,7 @@
                 </span>
                 <div>
                   <strong>Resposta rápida</strong>
-                  <span>Em até 1 hora em horário comercial</span>
+                  <span>Em até 45 minutos em horário comercial</span>
                 </div>
               </div>
               <div class="agendamento-info-card">
@@ -574,8 +586,8 @@
                   </svg>
                 </span>
                 <div>
-                  <strong>Atendimento home care</strong>
-                  <span>Vou até você, na sua cidade</span>
+                  <strong>Atendimento no local / home care</strong>
+                  <span>Agende sua sessao ou receba uma visita profissional na sua casa</span>
                 </div>
               </div>
               <div class="agendamento-info-card">
@@ -703,6 +715,7 @@
                   <label class="form-label" for="horario">Horário preferido</label>
                   <select class="form-input form-select" id="horario" name="horario" required>
                     <option value="">Selecione</option>
+                    <option value="08:00">08:00</option>
                     <option value="09:00">09:00</option>
                     <option value="10:00">10:00</option>
                     <option value="11:00">11:00</option>
@@ -711,7 +724,6 @@
                     <option value="15:00">15:00</option>
                     <option value="16:00">16:00</option>
                     <option value="17:00">17:00</option>
-                    <option value="18:00">18:00</option>
                   </select>
                   <span class="form-error" id="erro-horario">Selecione um horário.</span>
                 </div>

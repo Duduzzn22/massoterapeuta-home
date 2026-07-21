@@ -346,6 +346,21 @@
   transform: translateY(-2px);
 }
 
+.localizacao-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.btn-waze {
+  background-color: #33ccff;
+}
+
+.btn-waze:hover {
+  background-color: #1ea7d9;
+}
+
 .localizacao-mapa {
   height: 500px;
   border-radius: 24px;
