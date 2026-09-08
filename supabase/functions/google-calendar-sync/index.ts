@@ -19,7 +19,8 @@ Deno.serve(async (req: Request) => {
     const { data: appointment, error } = await auth.supabase
       .from('appointments')
       .select(`
-        id, starts_at, ends_at, status, location_type, home_city, home_neighborhood, google_event_id,
+        id, starts_at, ends_at, status, location_type, home_city, home_neighborhood,
+        google_event_id, google_event_etag, google_event_updated_at,
         clients!inner(full_name, phone_e164),
         services!inner(name)
       `)
@@ -31,11 +32,18 @@ Deno.serve(async (req: Request) => {
 
     const client = Array.isArray(appointment.clients) ? appointment.clients[0] : appointment.clients
     const service = Array.isArray(appointment.services) ? appointment.services[0] : appointment.services
+    const now = new Date().toISOString()
 
     if (action === 'delete' || appointment.status === 'cancelled') {
       if (appointment.google_event_id) {
         await deleteCalendarEvent(appointment.google_event_id)
-        await auth.supabase.from('appointments').update({ google_event_id: null }).eq('id', appointment.id)
+        await auth.supabase.from('appointments').update({
+          google_event_id: null,
+          google_event_etag: null,
+          google_event_updated_at: null,
+          google_last_synced_at: now,
+          updated_at: now,
+        }).eq('id', appointment.id)
       }
       await auth.supabase.from('appointment_events').insert({
         appointment_id: appointment.id,
@@ -55,6 +63,7 @@ Deno.serve(async (req: Request) => {
       location,
       startsAt: appointment.starts_at,
       endsAt: appointment.ends_at,
+      appointmentId: appointment.id,
     }
 
     let googleEvent
@@ -64,9 +73,16 @@ Deno.serve(async (req: Request) => {
       eventType = 'google_calendar_updated'
     } else {
       googleEvent = await createCalendarEvent(eventInput)
-      await auth.supabase.from('appointments').update({ google_event_id: googleEvent.id }).eq('id', appointment.id)
       eventType = 'google_calendar_created'
     }
+
+    await auth.supabase.from('appointments').update({
+      google_event_id: googleEvent?.id ?? appointment.google_event_id,
+      google_event_etag: googleEvent?.etag ?? null,
+      google_event_updated_at: googleEvent?.updated ?? null,
+      google_last_synced_at: now,
+      updated_at: now,
+    }).eq('id', appointment.id)
 
     await auth.supabase.from('appointment_events').insert({
       appointment_id: appointment.id,
