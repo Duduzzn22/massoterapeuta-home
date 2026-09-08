@@ -1,3 +1,5 @@
+@import url("./responsive-hardening.css");
+
 html,
 body {
   max-width: 100%;
