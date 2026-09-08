@@ -165,7 +165,6 @@ create table if not exists public.appointments (
   ends_at timestamptz not null,
   home_city text,
   home_neighborhood text,
-  -- Notas devem ser mínimas; evitar dados clínicos desnecessários.
   customer_note text,
   admin_note text,
   google_event_id text unique,
@@ -176,18 +175,13 @@ create table if not exists public.appointments (
   check (ends_at > starts_at)
 );
 
--- Para um único profissional, impede sobreposição de atendimentos ativos.
--- Se futuramente houver vários profissionais, incluir resource/professional_id na constraint.
 create index if not exists idx_appointments_starts_at on public.appointments(starts_at);
 create index if not exists idx_appointments_status_starts on public.appointments(status, starts_at);
 
--- Exclusion constraint idempotente via bloco DO.
 do $$ begin
   alter table public.appointments
     add constraint appointments_no_active_overlap
-    exclude using gist (
-      tstzrange(starts_at, ends_at, '[)') with &&
-    )
+    exclude using gist (tstzrange(starts_at, ends_at, '[)') with &&)
     where (status in ('pending', 'confirmed'));
 exception when duplicate_object then null; end $$;
 
@@ -332,7 +326,7 @@ create table if not exists public.audit_logs (
 );
 
 -- ============================================================
--- RLS
+-- RLS + DATA API
 -- ============================================================
 
 alter table public.profiles enable row level security;
@@ -354,27 +348,18 @@ alter table public.campaign_recipients enable row level security;
 alter table public.notification_jobs enable row level security;
 alter table public.audit_logs enable row level security;
 
--- Perfil: usuário autenticado enxerga apenas o próprio perfil.
 drop policy if exists "profile_self_select" on public.profiles;
-create policy "profile_self_select"
-  on public.profiles for select
-  to authenticated
-  using ((select auth.uid()) = id);
-
--- Políticas administrativas. O serviço público usa Edge Functions e não acesso direto anon.
--- Cada policy consulta somente o próprio profile do usuário autenticado.
+create policy "profile_self_select" on public.profiles for select to authenticated using ((select auth.uid()) = id);
 
 do $$
-declare
-  t text;
+declare t text;
 begin
   foreach t in array array[
     'services','service_packages','clients','client_consents','availability_rules',
     'blocked_periods','appointments','appointment_events','whatsapp_contacts',
     'whatsapp_conversations','whatsapp_messages','message_templates','quick_replies',
     'campaigns','campaign_recipients','notification_jobs','audit_logs'
-  ]
-  loop
+  ] loop
     execute format('drop policy if exists "admin_all" on public.%I', t);
     execute format(
       'create policy "admin_all" on public.%I for all to authenticated using (exists (select 1 from public.profiles p where p.id = (select auth.uid()) and p.active = true and p.role = ''admin'')) with check (exists (select 1 from public.profiles p where p.id = (select auth.uid()) and p.active = true and p.role = ''admin''))',
@@ -383,11 +368,62 @@ begin
   end loop;
 end $$;
 
--- Nenhuma policy para anon é criada intencionalmente.
--- A API pública será mediada por Edge Functions com validação e rate limiting.
+revoke all on all tables in schema public from anon;
+revoke all on all sequences in schema public from anon;
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+grant usage, select on all sequences in schema public to authenticated;
+
+-- Índices de FKs identificados pelos advisors de performance.
+create index if not exists idx_appointment_events_actor_user_id on public.appointment_events(actor_user_id);
+create index if not exists idx_appointment_events_appointment_id on public.appointment_events(appointment_id);
+create index if not exists idx_appointments_client_id on public.appointments(client_id);
+create index if not exists idx_appointments_package_id on public.appointments(package_id);
+create index if not exists idx_appointments_service_id on public.appointments(service_id);
+create index if not exists idx_audit_logs_actor_user_id on public.audit_logs(actor_user_id);
+create index if not exists idx_blocked_periods_created_by on public.blocked_periods(created_by);
+create index if not exists idx_campaign_recipients_client_id on public.campaign_recipients(client_id);
+create index if not exists idx_campaign_recipients_whatsapp_message_id on public.campaign_recipients(whatsapp_message_id);
+create index if not exists idx_campaigns_created_by on public.campaigns(created_by);
+create index if not exists idx_notification_jobs_appointment_id on public.notification_jobs(appointment_id);
+create index if not exists idx_notification_jobs_client_id on public.notification_jobs(client_id);
+create index if not exists idx_whatsapp_conversations_client_id on public.whatsapp_conversations(client_id);
+create index if not exists idx_whatsapp_messages_conversation_id on public.whatsapp_messages(conversation_id);
+
+-- Cria perfil staff automaticamente para usuários adicionados ao Supabase Auth.
+-- A promoção para admin é sempre explícita.
+create schema if not exists private;
+
+create or replace function private.handle_new_user_profile()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  insert into public.profiles (id, full_name, role, active)
+  values (
+    new.id,
+    coalesce(nullif(new.raw_user_meta_data ->> 'full_name', ''), split_part(coalesce(new.email, 'Usuário'), '@', 1)),
+    'staff'::public.user_role,
+    true
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+revoke all on function private.handle_new_user_profile() from public;
+revoke all on function private.handle_new_user_profile() from anon;
+revoke all on function private.handle_new_user_profile() from authenticated;
+
+drop trigger if exists on_auth_user_created_create_profile on auth.users;
+create trigger on_auth_user_created_create_profile
+after insert on auth.users
+for each row execute function private.handle_new_user_profile();
 
 -- ============================================================
--- DADOS INICIAIS (idempotentes)
+-- DADOS INICIAIS
 -- ============================================================
 
 insert into public.services (slug, name, description, duration_minutes, active, sort_order)
