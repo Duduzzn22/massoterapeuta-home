@@ -1,120 +1,215 @@
-# Google Calendar — integração
+# Google Calendar + Calendário do iPhone — integração bidirecional
 
 ## Objetivo
 
-Sincronizar cada agendamento do Supabase com uma agenda da Carla sem transformar o Google Calendar na fonte principal dos dados.
+Permitir que Carla continue usando o aplicativo **Calendário** nativo do iPhone como interface diária da agenda, enquanto o sistema mantém CRM, disponibilidade e automações no Supabase.
 
-## Fonte de verdade
+Arquitetura:
 
-- Supabase = fonte principal
-- Google Calendar = espelho operacional da agenda
+```text
+Site / Painel
+      ↓
+   Supabase
+      ↕
+Google Calendar
+      ↕
+Calendário do iPhone
+```
 
-Cada agendamento guarda o campo `google_event_id`.
+O iPhone não se conecta diretamente ao Supabase. A conta Google da agenda profissional é adicionada ao app Calendário da Apple e o Google funciona como ponte de sincronização.
 
-## Estratégia recomendada
+## Fonte de verdade e regra de conflito
 
-Usar OAuth 2.0 da própria conta Google da Carla com acesso à agenda escolhida.
-
-Por ser um sistema de uma única profissional, o fluxo será feito uma vez no painel administrativo:
-
-1. Carla clica em `Conectar Google Calendar`.
-2. É redirecionada ao Google.
-3. Autoriza o acesso à agenda.
-4. O callback retorna ao Supabase Edge Function.
-5. O sistema guarda o refresh token de forma protegida.
-6. O painel passa a sincronizar eventos automaticamente.
-
-## Escopo
-
-Solicitar apenas o escopo necessário para editar o calendário utilizado pelo sistema.
+- Supabase continua sendo a fonte principal do CRM e das regras de reserva.
+- Google Calendar é a ponte operacional e aceita alterações feitas pela Carla no iPhone.
+- Alterações vindas do iPhone são refletidas no Supabase quando são válidas.
+- A constraint de sobreposição do PostgreSQL continua impedindo dois agendamentos ativos no mesmo horário.
+- Se Carla tentar mover no iPhone um agendamento para um horário já ocupado, o Supabase rejeita a mudança e o sistema restaura o evento do Google para o horário anterior.
 
 ## Agenda recomendada
 
-Criar uma agenda separada, por exemplo:
+Criar uma agenda Google separada:
 
 **Spa Carla Lira — Agendamentos**
 
-Isso evita misturar compromissos pessoais com dados operacionais.
+Adicionar essa conta/agenda no iPhone e deixar o app Calendário da Apple exibi-la normalmente.
 
-## Criação de evento
+Isso permite que Carla continue usando o aplicativo que já conhece, sem precisar trabalhar dentro do app Google Calendar.
 
-Ao confirmar um agendamento:
+## O que acontece com eventos criados no iPhone
+
+### Evento que pertence a um cliente do sistema
+
+Os eventos criados pelo CRM recebem:
+
+- `google_event_id` no Supabase;
+- `extendedProperties.private.source = massoterapeuta-home` no Google;
+- `extendedProperties.private.appointment_id = <uuid>` no Google.
+
+Se Carla mover esse evento no Calendário do iPhone:
 
 ```text
-Título: Drenagem Linfática — Mariana
-Início: 15/09/2026 14:00
-Fim: 15/09/2026 15:00
-Local: Spa Carla Lira ou Home Care
-Descrição: ID interno do agendamento + telefone mascarado
+Calendário do iPhone
+→ Google Calendar
+→ webhook
+→ syncToken incremental
+→ Supabase
+→ appointment.starts_at / ends_at
 ```
 
-Evitar colocar dados sensíveis de saúde na descrição do evento.
+A alteração também gera um `appointment_event` para auditoria.
 
-## Idempotência
+### Evento pessoal criado manualmente
 
-O ID interno do Supabase deve ser associado ao evento do Google para impedir duplicação em caso de retry.
+Um evento criado pela Carla diretamente nessa agenda e que não pertence ao CRM **não cria cliente nem atendimento**.
+
+Ele é convertido em `blocked_periods`:
+
+```text
+Evento pessoal no iPhone
+→ Google Calendar
+→ Supabase blocked_periods
+→ horário deixa de aparecer no site
+```
+
+Por privacidade, o sistema não precisa guardar o título pessoal do evento. O bloqueio é armazenado apenas como:
+
+`Ocupado — Calendário da Carla`
+
+Eventos marcados como transparentes/livres não bloqueiam agenda.
+
+Eventos de dia inteiro bloqueiam o respectivo período integral.
+
+## Cancelamento pelo iPhone
+
+Se Carla apagar/cancelar um evento que corresponde a um agendamento do CRM:
+
+- o agendamento passa para `cancelled`;
+- o horário volta a ficar disponível;
+- é registrado `google_calendar_cancelled_from_iphone`.
+
+Mensagens automáticas de WhatsApp decorrentes desse cancelamento só serão ativadas depois que a Cloud API estiver configurada.
+
+## Push notifications do Google
+
+A função pública:
+
+`google-calendar-webhook`
+
+recebe os cabeçalhos `X-Goog-*` enviados pelo Google Calendar.
+
+Segurança:
+
+- cada canal recebe um token aleatório;
+- somente o SHA-256 desse token é armazenado no banco;
+- o webhook confere `X-Goog-Channel-ID`, `X-Goog-Resource-ID` e `X-Goog-Channel-Token`;
+- canais antigos/desconhecidos são ignorados;
+- mensagens repetidas são descartadas usando `X-Goog-Message-Number`.
+
+A notificação do Google não contém o evento alterado. Ela apenas informa que houve mudança. O sistema então chama a API do Calendar usando sincronização incremental.
+
+## Sincronização incremental
+
+Tabela:
+
+`calendar_sync_state`
+
+Armazena:
+
+- `calendar_id`;
+- `sync_token`;
+- `watch_channel_id`;
+- `watch_resource_id`;
+- hash do token do canal;
+- expiração do canal;
+- último número de mensagem;
+- datas das últimas sincronizações;
+- último erro.
 
 Fluxo:
 
+1. primeira conexão faz full sync;
+2. Google devolve `nextSyncToken`;
+3. mudanças futuras usam esse token;
+4. se o Google invalidar o token com HTTP 410, o sistema executa nova full sync automaticamente.
+
+## Renovação do canal
+
+Canais de push do Google expiram e não possuem renovação automática nativa.
+
+Funções:
+
+- `google-calendar-watch` — controle administrativo: status, start, renew, sync e stop;
+- `google-calendar-maintenance` — rotina protegida por `CALENDAR_SYNC_SECRET`;
+- `google-calendar-webhook` — recebimento das mudanças.
+
+A manutenção deve ser executada diariamente. Ela:
+
+1. executa uma sincronização incremental de segurança;
+2. verifica a expiração do canal;
+3. renova quando faltarem menos de 48 horas.
+
+Quando o novo canal é criado, existe uma pequena sobreposição antes do canal antigo ser encerrado, conforme estratégia recomendada pelo Google.
+
+## Fluxo Supabase → iPhone
+
 ```text
-appointment.id -> evento Google -> google_event_id
+Cliente agenda no site
+→ Supabase cria appointment
+→ Google Calendar cria evento
+→ iPhone sincroniza a conta Google
+→ evento aparece no app Calendário
 ```
 
-Antes de criar um novo evento, verificar se `google_event_id` já existe.
+## Fluxo iPhone → Supabase
 
-## Remarcação
+```text
+Carla muda 14:00 para 15:00 no iPhone
+→ Google recebe a alteração
+→ webhook informa que houve mudança
+→ sync incremental recupera o evento
+→ Supabase valida conflito
+→ appointment passa para 15:00
+```
 
-1. Atualizar o agendamento no Supabase.
-2. Atualizar o mesmo evento no Google.
-3. Registrar `appointment_event` de remarcação.
-4. Criar job de WhatsApp para confirmação da nova data.
+## Credenciais necessárias para ativação
 
-## Cancelamento
+Precisaremos da conta Google que será usada pela Carla e das seguintes configurações:
 
-1. Alterar status para `cancelled`.
-2. Cancelar/remover evento correspondente no Google.
-3. Registrar auditoria.
-4. Enviar confirmação pelo WhatsApp quando permitido.
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_REFRESH_TOKEN`
+- `GOOGLE_CALENDAR_ID`
+- `GOOGLE_CALENDAR_WEBHOOK_URL` (opcional; por padrão usa a Edge Function do projeto)
+- `CALENDAR_SYNC_SECRET`
 
-## Conflito de agenda
+Nunca armazenar essas credenciais no frontend ou no GitHub.
 
-A prevenção principal de dupla reserva está no banco por constraint de sobreposição.
+## Configuração no iPhone
 
-Antes de confirmar um horário, o sistema também pode consultar o Google Calendar para detectar bloqueios externos feitos manualmente pela Carla.
+Depois da conta Google profissional estar pronta:
 
-No futuro podemos suportar dois tipos de indisponibilidade:
+1. adicionar a conta Google nas contas de calendário do iPhone;
+2. habilitar a sincronização de Calendários;
+3. abrir o app Calendário;
+4. deixar marcada a agenda **Spa Carla Lira — Agendamentos**.
 
-- `blocked_periods` criados no painel;
-- eventos ocupados encontrados no Google Calendar.
+A Carla poderá continuar visualizando simultaneamente calendários pessoais do iCloud e a agenda profissional do Google.
 
-## Credenciais
+## Edge Functions
 
-Necessárias na etapa de produção:
+- `google-calendar-sync` — saída Supabase → Google;
+- `google-calendar-watch` — inicia/renova/encerra e força sync;
+- `google-calendar-webhook` — entrada Google/iPhone → Supabase;
+- `google-calendar-maintenance` — renovação periódica + sync de segurança.
 
-- Google OAuth Client ID
-- Google OAuth Client Secret
-- Redirect URI
-- Calendar ID
+## Privacidade
 
-Nunca armazenar segredo Google no frontend ou no GitHub.
+Não inserir em eventos Google/iPhone:
 
-## Edge Functions previstas
+- queixas clínicas detalhadas;
+- diagnósticos;
+- histórico médico;
+- observações sensíveis.
 
-- `google-oauth-start`
-- `google-oauth-callback`
-- `google-calendar-sync`
-- `google-calendar-webhook` (opcional, para sincronização bidirecional futura)
-
-## V1 vs V2
-
-### V1
-
-Supabase -> Google Calendar
-
-O painel cria/remarca/cancela e replica no Google.
-
-### V2
-
-Google Calendar -> Supabase
-
-Alterações feitas manualmente na agenda podem ser recebidas pelo sistema e refletidas no banco, com regras para evitar loops de sincronização.
+O evento operacional usa apenas serviço, cliente, contato necessário, local e ID interno.
