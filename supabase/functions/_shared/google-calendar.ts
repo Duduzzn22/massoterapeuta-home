@@ -7,6 +7,16 @@ function env(name: string) {
   return value
 }
 
+export function getCalendarId() {
+  return env('GOOGLE_CALENDAR_ID')
+}
+
+export function getCalendarWebhookUrl() {
+  const configured = Deno.env.get('GOOGLE_CALENDAR_WEBHOOK_URL')
+  if (configured) return configured
+  return `${env('SUPABASE_URL')}/functions/v1/google-calendar-webhook`
+}
+
 async function accessToken() {
   const body = new URLSearchParams({
     client_id: env('GOOGLE_CLIENT_ID'),
@@ -28,7 +38,7 @@ async function accessToken() {
   return data.access_token as string
 }
 
-async function googleRequest(path: string, init: RequestInit = {}) {
+async function googleRequestRaw(path: string, init: RequestInit = {}) {
   const token = await accessToken()
   const response = await fetch(`${GOOGLE_CALENDAR_API}${path}`, {
     ...init,
@@ -39,10 +49,27 @@ async function googleRequest(path: string, init: RequestInit = {}) {
     },
   })
 
-  if (response.status === 204) return null
+  if (response.status === 204) return { status: 204, data: null }
   const data = await response.json().catch(() => ({}))
-  if (!response.ok) throw new Error(`Google Calendar ${response.status}: ${JSON.stringify(data)}`)
-  return data
+  return { status: response.status, data }
+}
+
+async function googleRequest(path: string, init: RequestInit = {}) {
+  const result = await googleRequestRaw(path, init)
+  if (result.status >= 200 && result.status < 300) return result.data
+  throw new Error(`Google Calendar ${result.status}: ${JSON.stringify(result.data)}`)
+}
+
+export type GoogleCalendarEvent = {
+  id: string
+  status?: string
+  etag?: string
+  updated?: string
+  summary?: string
+  transparency?: string
+  start?: { dateTime?: string; date?: string; timeZone?: string }
+  end?: { dateTime?: string; date?: string; timeZone?: string }
+  extendedProperties?: { private?: Record<string, string> }
 }
 
 export async function createCalendarEvent(input: {
@@ -51,8 +78,9 @@ export async function createCalendarEvent(input: {
   location?: string
   startsAt: string
   endsAt: string
+  appointmentId?: string
 }) {
-  const calendarId = encodeURIComponent(env('GOOGLE_CALENDAR_ID'))
+  const calendarId = encodeURIComponent(getCalendarId())
   return await googleRequest(`/calendars/${calendarId}/events`, {
     method: 'POST',
     body: JSON.stringify({
@@ -61,7 +89,12 @@ export async function createCalendarEvent(input: {
       location: input.location ?? '',
       start: { dateTime: input.startsAt, timeZone: 'America/Sao_Paulo' },
       end: { dateTime: input.endsAt, timeZone: 'America/Sao_Paulo' },
-      extendedProperties: { private: { source: 'massoterapeuta-home' } },
+      extendedProperties: {
+        private: {
+          source: 'massoterapeuta-home',
+          ...(input.appointmentId ? { appointment_id: input.appointmentId } : {}),
+        },
+      },
     }),
   })
 }
@@ -72,8 +105,9 @@ export async function updateCalendarEvent(eventId: string, input: {
   location?: string
   startsAt: string
   endsAt: string
+  appointmentId?: string
 }) {
-  const calendarId = encodeURIComponent(env('GOOGLE_CALENDAR_ID'))
+  const calendarId = encodeURIComponent(getCalendarId())
   return await googleRequest(`/calendars/${calendarId}/events/${encodeURIComponent(eventId)}`, {
     method: 'PATCH',
     body: JSON.stringify({
@@ -82,13 +116,84 @@ export async function updateCalendarEvent(eventId: string, input: {
       location: input.location ?? '',
       start: { dateTime: input.startsAt, timeZone: 'America/Sao_Paulo' },
       end: { dateTime: input.endsAt, timeZone: 'America/Sao_Paulo' },
+      extendedProperties: {
+        private: {
+          source: 'massoterapeuta-home',
+          ...(input.appointmentId ? { appointment_id: input.appointmentId } : {}),
+        },
+      },
     }),
   })
 }
 
 export async function deleteCalendarEvent(eventId: string) {
-  const calendarId = encodeURIComponent(env('GOOGLE_CALENDAR_ID'))
-  return await googleRequest(`/calendars/${calendarId}/events/${encodeURIComponent(eventId)}`, {
+  const calendarId = encodeURIComponent(getCalendarId())
+  const result = await googleRequestRaw(`/calendars/${calendarId}/events/${encodeURIComponent(eventId)}`, {
     method: 'DELETE',
   })
+  if (result.status === 404 || result.status === 410 || result.status === 204) return null
+  if (result.status >= 200 && result.status < 300) return result.data
+  throw new Error(`Google Calendar ${result.status}: ${JSON.stringify(result.data)}`)
+}
+
+export async function listCalendarChanges(syncToken?: string) {
+  const calendarId = encodeURIComponent(getCalendarId())
+  const events: GoogleCalendarEvent[] = []
+  let pageToken: string | undefined
+  let nextSyncToken: string | undefined
+
+  do {
+    const params = new URLSearchParams({
+      singleEvents: 'true',
+      showDeleted: 'true',
+      maxResults: '2500',
+    })
+    if (syncToken) params.set('syncToken', syncToken)
+    if (pageToken) params.set('pageToken', pageToken)
+
+    const result = await googleRequestRaw(`/calendars/${calendarId}/events?${params.toString()}`)
+    if (result.status === 410) {
+      return { expired: true, events: [] as GoogleCalendarEvent[], nextSyncToken: null }
+    }
+    if (result.status < 200 || result.status >= 300) {
+      throw new Error(`Google Calendar ${result.status}: ${JSON.stringify(result.data)}`)
+    }
+
+    const data = result.data ?? {}
+    events.push(...((data.items ?? []) as GoogleCalendarEvent[]))
+    pageToken = data.nextPageToken
+    if (data.nextSyncToken) nextSyncToken = data.nextSyncToken
+  } while (pageToken)
+
+  return { expired: false, events, nextSyncToken: nextSyncToken ?? null }
+}
+
+export async function watchCalendarEvents(input: {
+  channelId: string
+  token: string
+  address?: string
+  expirationMs?: number
+}) {
+  const calendarId = encodeURIComponent(getCalendarId())
+  const expiration = input.expirationMs ?? (Date.now() + 6 * 24 * 60 * 60 * 1000)
+  return await googleRequest(`/calendars/${calendarId}/events/watch`, {
+    method: 'POST',
+    body: JSON.stringify({
+      id: input.channelId,
+      type: 'web_hook',
+      address: input.address ?? getCalendarWebhookUrl(),
+      token: input.token,
+      expiration,
+    }),
+  })
+}
+
+export async function stopCalendarWatch(channelId: string, resourceId: string) {
+  const result = await googleRequestRaw('/channels/stop', {
+    method: 'POST',
+    body: JSON.stringify({ id: channelId, resourceId }),
+  })
+  if ([204, 404, 410].includes(result.status)) return null
+  if (result.status >= 200 && result.status < 300) return result.data
+  throw new Error(`Google Calendar ${result.status}: ${JSON.stringify(result.data)}`)
 }
