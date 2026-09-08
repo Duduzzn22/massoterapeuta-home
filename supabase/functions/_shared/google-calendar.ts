@@ -1,3 +1,5 @@
+import { createAdminClient } from './supabase.ts'
+
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
 const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3'
 
@@ -5,6 +7,17 @@ function env(name: string) {
   const value = Deno.env.get(name)
   if (!value) throw new Error(`${name} is not configured`)
   return value
+}
+
+async function getRefreshToken() {
+  const configured = Deno.env.get('GOOGLE_REFRESH_TOKEN')
+  if (configured) return configured
+
+  const supabase = createAdminClient()
+  const { data, error } = await supabase.rpc('get_google_refresh_token')
+  if (error) throw new Error(`Unable to read Google refresh token: ${error.message}`)
+  if (typeof data !== 'string' || !data) throw new Error('Google Calendar is not authorized yet')
+  return data
 }
 
 export function getCalendarId() {
@@ -21,7 +34,7 @@ async function accessToken() {
   const body = new URLSearchParams({
     client_id: env('GOOGLE_CLIENT_ID'),
     client_secret: env('GOOGLE_CLIENT_SECRET'),
-    refresh_token: env('GOOGLE_REFRESH_TOKEN'),
+    refresh_token: await getRefreshToken(),
     grant_type: 'refresh_token',
   })
 
