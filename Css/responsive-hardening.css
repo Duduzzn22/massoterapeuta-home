@@ -1,0 +1,208 @@
+/* Responsive hardening — public site */
+
+img,
+svg,
+iframe {
+  max-width: 100%;
+}
+
+.form-input,
+.button,
+.menu-toggle,
+.booking-choice,
+.booking-consent,
+.servico-card {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 900px) {
+  .agendamento-wrapper {
+    gap: 2rem;
+  }
+
+  .agendamento-intro {
+    max-width: 760px;
+  }
+
+  .agendamento-form-wrap {
+    width: 100%;
+    max-width: 760px;
+    margin-inline: auto;
+  }
+
+  .plan-card,
+  .service-card,
+  .agendamento-info-card {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .agendamento-section .container {
+    padding-inline: 0.9rem;
+  }
+
+  .agendamento-intro h2 {
+    font-size: clamp(1.9rem, 9vw, 2.45rem);
+  }
+
+  .agendamento-intro > p {
+    margin-bottom: 1.35rem;
+  }
+
+  .agendamento-form-wrap {
+    padding: 1.25rem 1rem;
+    border-radius: 18px;
+  }
+
+  .agendamento-form {
+    gap: 1.15rem;
+  }
+
+  .form-input {
+    min-height: 48px;
+    font-size: 16px;
+    padding: 0.78rem 0.9rem;
+  }
+
+  .form-textarea {
+    min-height: 110px;
+  }
+
+  .servico-grid {
+    gap: 0.55rem;
+  }
+
+  .servico-card {
+    min-height: 112px;
+    justify-content: center;
+    padding: 0.7rem 0.45rem;
+  }
+
+  .servico-card-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .servico-card-nome {
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+  }
+
+  .booking-choice,
+  .booking-consent {
+    min-height: 48px;
+    padding: 0.8rem;
+  }
+
+  .booking-consent span,
+  .booking-choice span,
+  .booking-feedback,
+  .agendamento-info-card span,
+  .agendamento-info-card strong {
+    overflow-wrap: anywhere;
+  }
+
+  .agendamento-info-card {
+    align-items: flex-start;
+    padding: 0.85rem;
+  }
+
+  .agendamento-btn {
+    min-height: 50px;
+  }
+
+  .faq-list summary {
+    padding: 1rem;
+    font-size: 0.92rem;
+  }
+
+  .faq-list details p {
+    padding: 0.85rem 1rem 1rem;
+  }
+
+  .testimonial {
+    width: min(82vw, 300px);
+    padding: 1.2rem;
+  }
+
+  .carousel-track {
+    gap: 1rem;
+  }
+
+  .whatsapp-float {
+    width: 56px;
+    height: 56px;
+    max-width: 56px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .whatsapp-float-label {
+    display: none;
+  }
+
+  .whatsapp-float:hover {
+    width: 56px;
+    max-width: 56px;
+    padding: 0;
+    transform: none;
+  }
+}
+
+@media (max-width: 390px) {
+  .agendamento-section .container {
+    padding-inline: 0.75rem;
+  }
+
+  .agendamento-form-wrap {
+    padding: 1rem 0.8rem;
+  }
+
+  .servico-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .servico-card {
+    min-height: 108px;
+  }
+
+  .booking-consent {
+    font-size: 0.82rem;
+  }
+
+  .agendamento-info-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .faq-list summary {
+    gap: 0.65rem;
+  }
+
+  .faq-icon {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+@media (hover: none) {
+  .servico-card:hover,
+  .agendamento-info-card:hover,
+  .btn-localizacao:hover,
+  .agendamento-btn:hover,
+  .whatsapp-float:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
