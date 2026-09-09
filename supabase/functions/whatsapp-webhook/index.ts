@@ -37,6 +37,45 @@ function messagePreview(message: any) {
   return `[${String(message?.type ?? 'mensagem')}]`
 }
 
+async function getOrCreateClient(supabase: any, phone: string, profileName: string) {
+  const now = new Date().toISOString()
+  const { data: existing, error: existingError } = await supabase
+    .from('clients')
+    .select('id, full_name, crm_stage, source')
+    .eq('phone_e164', phone)
+    .maybeSingle()
+
+  if (existingError) throw existingError
+
+  if (existing) {
+    const { error: updateError } = await supabase
+      .from('clients')
+      .update({
+        last_contact_at: now,
+        updated_at: now,
+      })
+      .eq('id', existing.id)
+    if (updateError) throw updateError
+    return existing
+  }
+
+  const { data: created, error: createError } = await supabase
+    .from('clients')
+    .insert({
+      full_name: profileName,
+      phone_e164: phone,
+      source: 'whatsapp',
+      crm_stage: 'new_lead',
+      last_contact_at: now,
+      updated_at: now,
+    })
+    .select('id, full_name, crm_stage, source')
+    .single()
+
+  if (createError) throw createError
+  return created
+}
+
 Deno.serve(async (req: Request) => {
   const url = new URL(req.url)
 
@@ -44,7 +83,7 @@ Deno.serve(async (req: Request) => {
     const mode = url.searchParams.get('hub.mode')
     const token = url.searchParams.get('hub.verify_token')
     const challenge = url.searchParams.get('hub.challenge')
-    const expected = Deno.env.get('META_WEBHOOK_VERIFY_TOKEN')
+    const expected = Deno.env.get('WHATSAPP_WEBHOOK_VERIFY_TOKEN')
 
     if (mode === 'subscribe' && token && expected && token === expected && challenge) {
       return new Response(challenge, { status: 200 })
@@ -72,20 +111,7 @@ Deno.serve(async (req: Request) => {
           const phone = normalizeBrazilPhone(message?.from)
           if (!phone) continue
 
-          const { data: client, error: clientError } = await supabase
-            .from('clients')
-            .upsert({
-              full_name: profileName,
-              phone_e164: phone,
-              source: 'whatsapp',
-              crm_stage: 'new_lead',
-              last_contact_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            }, { onConflict: 'phone_e164', ignoreDuplicates: false })
-            .select('id')
-            .single()
-
-          if (clientError) throw clientError
+          const client = await getOrCreateClient(supabase, phone, profileName)
 
           await supabase.from('whatsapp_contacts').upsert({
             client_id: client.id,
