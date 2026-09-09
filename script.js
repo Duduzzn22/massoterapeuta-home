@@ -174,7 +174,7 @@ if (form) {
     return form.querySelector('input[name="location_type"]:checked')?.value || 'spa';
   }
 
-  async function loadAvailability() {
+  async function loadAvailability({ updateFeedback = true } = {}) {
     const service = selectedService();
     const date = dataEl?.value || '';
     if (!horarioEl) return;
@@ -187,7 +187,7 @@ if (form) {
 
     horarioEl.disabled = true;
     horarioEl.innerHTML = '<option value="">Carregando horários...</option>';
-    feedback('Consultando a agenda...', 'info');
+    if (updateFeedback) feedback('Consultando a agenda...', 'info');
 
     try {
       const response = await fetch(`${FUNCTIONS_BASE}/availability`, {
@@ -208,16 +208,16 @@ if (form) {
       horarioEl.disabled = result.slots.length === 0;
 
       if (result.slots.length) {
-        feedback(`${result.slots.length} horário(s) disponível(is) para ${formatarData(date)}.`, 'success');
+        if (updateFeedback) feedback(`${result.slots.length} horário(s) disponível(is) para ${formatarData(date)}.`, 'success');
       } else {
         horarioEl.innerHTML = '<option value="">Sem horários disponíveis</option>';
-        feedback('Não há horários disponíveis nessa data. Escolha outro dia.', 'warning');
+        if (updateFeedback) feedback('Não há horários disponíveis nessa data. Escolha outro dia.', 'warning');
       }
     } catch (error) {
       console.error('availability_frontend_error', error);
       horarioEl.innerHTML = '<option value="">Não foi possível carregar</option>';
       horarioEl.disabled = true;
-      feedback('Não foi possível consultar a agenda agora. Você ainda pode falar com a Carla pelo WhatsApp.', 'error');
+      if (updateFeedback) feedback('Não foi possível consultar a agenda agora. Você ainda pode falar com a Carla pelo WhatsApp.', 'error');
     }
   }
 
@@ -340,15 +340,18 @@ if (form) {
       const feedbackEl = document.getElementById('booking-feedback');
       if (feedbackEl) {
         feedbackEl.className = 'booking-feedback booking-feedback-success';
-        feedbackEl.innerHTML = `Pedido registrado com sucesso para <strong>${formatarData(result.appointment.date)} às ${result.appointment.time}</strong>. <a href="${fallbackUrl}" target="_blank" rel="noopener">Abrir conversa no WhatsApp</a>.`;
+        feedbackEl.setAttribute('tabindex', '-1');
+        feedbackEl.innerHTML = `<strong>Agendamento recebido!</strong><br>Seu pedido foi registrado para <strong>${formatarData(result.appointment.date)} às ${result.appointment.time}</strong>. A Carla poderá confirmar os próximos detalhes pelo WhatsApp. <a href="${fallbackUrl}" target="_blank" rel="noopener">Abrir conversa no WhatsApp</a>.`;
+        feedbackEl.focus({ preventScroll: true });
+        feedbackEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
 
       horarioEl.value = '';
-      await loadAvailability();
+      await loadAvailability({ updateFeedback: false });
     } catch (error) {
       console.error('booking_frontend_error', error);
       feedback(error.message || 'Não foi possível concluir o agendamento agora.', 'error');
-      await loadAvailability();
+      await loadAvailability({ updateFeedback: false });
     } finally {
       if (btn) btn.disabled = false;
       if (textEl) textEl.textContent = originalText;
