@@ -50,10 +50,7 @@ async function getOrCreateClient(supabase: any, phone: string, profileName: stri
   if (existing) {
     const { error: updateError } = await supabase
       .from('clients')
-      .update({
-        last_contact_at: now,
-        updated_at: now,
-      })
+      .update({ last_contact_at: now, updated_at: now })
       .eq('id', existing.id)
     if (updateError) throw updateError
     return existing
@@ -80,13 +77,20 @@ Deno.serve(async (req: Request) => {
   const url = new URL(req.url)
 
   if (req.method === 'GET') {
-    const mode = url.searchParams.get('hub.mode')
-    const token = url.searchParams.get('hub.verify_token')
+    const mode = (url.searchParams.get('hub.mode') ?? '').trim()
+    const token = (url.searchParams.get('hub.verify_token') ?? '').trim()
     const challenge = url.searchParams.get('hub.challenge')
-    const expected = Deno.env.get('WHATSAPP_WEBHOOK_VERIFY_TOKEN')
+    const expected = (
+      Deno.env.get('WHATSAPP_WEBHOOK_VERIFY_TOKEN') ??
+      Deno.env.get('META_WEBHOOK_VERIFY_TOKEN') ??
+      ''
+    ).trim()
 
     if (mode === 'subscribe' && token && expected && token === expected && challenge) {
-      return new Response(challenge, { status: 200 })
+      return new Response(challenge, {
+        status: 200,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      })
     }
     return new Response('Forbidden', { status: 403 })
   }
