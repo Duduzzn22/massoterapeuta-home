@@ -8,7 +8,7 @@ function getEnv(name: string) {
 
 export async function sendWhatsApp(payload: Record<string, unknown>) {
   const phoneNumberId = getEnv('WHATSAPP_PHONE_NUMBER_ID')
-  const accessToken = getEnv('META_ACCESS_TOKEN')
+  const accessToken = getEnv('WHATSAPP_ACCESS_TOKEN')
 
   const response = await fetch(`https://graph.facebook.com/${GRAPH_VERSION}/${phoneNumberId}/messages`, {
     method: 'POST',
