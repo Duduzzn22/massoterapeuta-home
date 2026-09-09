@@ -1,5 +1,6 @@
 import { createAdminClient } from '../_shared/supabase.ts'
 import { json, normalizeBrazilPhone } from '../_shared/http.ts'
+import { resolveBusinessFromWhatsAppPhoneNumber } from '../_shared/business.ts'
 
 function hexToBytes(hex: string) {
   if (!/^[0-9a-f]+$/i.test(hex) || hex.length % 2) return new Uint8Array()
@@ -37,11 +38,12 @@ function messagePreview(message: any) {
   return `[${String(message?.type ?? 'mensagem')}]`
 }
 
-async function getOrCreateClient(supabase: any, phone: string, profileName: string) {
+async function getOrCreateClient(supabase: any, businessId: string, phone: string, profileName: string) {
   const now = new Date().toISOString()
   const { data: existing, error: existingError } = await supabase
     .from('clients')
     .select('id, full_name, crm_stage, source')
+    .eq('business_id', businessId)
     .eq('phone_e164', phone)
     .maybeSingle()
 
@@ -51,6 +53,7 @@ async function getOrCreateClient(supabase: any, phone: string, profileName: stri
     const { error: updateError } = await supabase
       .from('clients')
       .update({ last_contact_at: now, updated_at: now })
+      .eq('business_id', businessId)
       .eq('id', existing.id)
     if (updateError) throw updateError
     return existing
@@ -59,6 +62,7 @@ async function getOrCreateClient(supabase: any, phone: string, profileName: stri
   const { data: created, error: createError } = await supabase
     .from('clients')
     .insert({
+      business_id: businessId,
       full_name: profileName,
       phone_e164: phone,
       source: 'whatsapp',
@@ -109,15 +113,23 @@ Deno.serve(async (req: Request) => {
     for (const entry of payload?.entry ?? []) {
       for (const change of entry?.changes ?? []) {
         const value = change?.value ?? {}
+        const phoneNumberId = String(value?.metadata?.phone_number_id ?? '') || null
+        const business = await resolveBusinessFromWhatsAppPhoneNumber(supabase, phoneNumberId)
+        if (!business) {
+          console.warn('whatsapp_webhook_unmapped_phone_number', phoneNumberId)
+          continue
+        }
+
         const profileName = value?.contacts?.[0]?.profile?.name ?? 'Contato WhatsApp'
 
         for (const message of value?.messages ?? []) {
           const phone = normalizeBrazilPhone(message?.from)
           if (!phone) continue
 
-          const client = await getOrCreateClient(supabase, phone, profileName)
+          const client = await getOrCreateClient(supabase, business.id, phone, profileName)
 
           await supabase.from('whatsapp_contacts').upsert({
+            business_id: business.id,
             client_id: client.id,
             wa_id: String(message.from),
             profile_name: profileName,
@@ -128,6 +140,7 @@ Deno.serve(async (req: Request) => {
           const { data: currentConversation } = await supabase
             .from('whatsapp_conversations')
             .select('id')
+            .eq('business_id', business.id)
             .eq('client_id', client.id)
             .is('closed_at', null)
             .order('opened_at', { ascending: false })
@@ -141,11 +154,12 @@ Deno.serve(async (req: Request) => {
             await supabase.from('whatsapp_conversations').update({
               last_message_at: new Date().toISOString(),
               customer_service_window_until: windowUntil,
-            }).eq('id', conversationId)
+            }).eq('business_id', business.id).eq('id', conversationId)
           } else {
             const { data: created, error: conversationError } = await supabase
               .from('whatsapp_conversations')
               .insert({
+                business_id: business.id,
                 client_id: client.id,
                 last_message_at: new Date().toISOString(),
                 customer_service_window_until: windowUntil,
@@ -157,6 +171,7 @@ Deno.serve(async (req: Request) => {
           }
 
           await supabase.from('whatsapp_messages').upsert({
+            business_id: business.id,
             conversation_id: conversationId,
             client_id: client.id,
             meta_message_id: message.id,
@@ -168,7 +183,7 @@ Deno.serve(async (req: Request) => {
             created_at: message.timestamp
               ? new Date(Number(message.timestamp) * 1000).toISOString()
               : new Date().toISOString(),
-          }, { onConflict: 'meta_message_id', ignoreDuplicates: true })
+          }, { onConflict: 'business_id,meta_message_id', ignoreDuplicates: true })
         }
 
         for (const status of value?.statuses ?? []) {
@@ -185,7 +200,10 @@ Deno.serve(async (req: Request) => {
             patch.failure_reason = JSON.stringify(status.errors ?? []).slice(0, 1000)
           }
 
-          await supabase.from('whatsapp_messages').update(patch).eq('meta_message_id', status.id)
+          await supabase.from('whatsapp_messages')
+            .update(patch)
+            .eq('business_id', business.id)
+            .eq('meta_message_id', status.id)
         }
       }
     }
