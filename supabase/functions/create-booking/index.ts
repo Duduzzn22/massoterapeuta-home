@@ -2,6 +2,7 @@ import { createAdminClient } from '../_shared/supabase.ts'
 import { getAvailableSlots } from '../_shared/slots.ts'
 import { cleanText, handleOptions, json, normalizeBrazilPhone } from '../_shared/http.ts'
 import { createBookingCalendarEvent } from '../_shared/calendar-booking.ts'
+import { resolveBusiness } from '../_shared/business.ts'
 
 async function createBookingToken() {
   const bytes = crypto.getRandomValues(new Uint8Array(32))
@@ -26,6 +27,7 @@ Deno.serve(async (req: Request) => {
     const phone = normalizeBrazilPhone(body?.phone)
     const email = cleanText(body?.email, 180) || null
     const serviceSlug = cleanText(body?.service_slug, 80)
+    const businessSlug = cleanText(body?.business_slug, 80) || null
     const date = cleanText(body?.date, 10)
     const time = cleanText(body?.time, 5)
     const locationType = body?.location_type === 'home_care' ? 'home_care' : 'spa'
@@ -38,27 +40,31 @@ Deno.serve(async (req: Request) => {
     if (!fullName || !phone || !serviceSlug || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) {
       return json({ error: 'Preencha corretamente nome, telefone, serviço, data e horário.' }, 400)
     }
-
-    if (!serviceConsent) {
-      return json({ error: 'É necessário autorizar as mensagens operacionais do agendamento.' }, 400)
-    }
-
+    if (!serviceConsent) return json({ error: 'É necessário autorizar as mensagens operacionais do agendamento.' }, 400)
     if (locationType === 'home_care' && (!city || !neighborhood)) {
       return json({ error: 'Informe cidade e bairro para atendimento home care.' }, 400)
     }
 
     const supabase = createAdminClient()
-    const availability = await getAvailableSlots(supabase, date, serviceSlug)
+    const business = await resolveBusiness(supabase, { slug: businessSlug })
+    if (!business) return json({ error: 'Empresa não encontrada.' }, 404)
+
+    const availability = await getAvailableSlots(
+      supabase,
+      date,
+      serviceSlug,
+      business.id,
+      business.timezone,
+    )
     if (!availability.service) return json({ error: 'Serviço não encontrado.' }, 404)
 
     const chosen = availability.slots.find((slot) => slot.time === time)
-    if (!chosen) {
-      return json({ error: 'Esse horário não está mais disponível. Escolha outro horário.' }, 409)
-    }
+    if (!chosen) return json({ error: 'Esse horário não está mais disponível. Escolha outro horário.' }, 409)
 
     const { data: client, error: clientError } = await supabase
       .from('clients')
       .upsert({
+        business_id: business.id,
         full_name: fullName,
         phone_e164: phone,
         email,
@@ -67,7 +73,7 @@ Deno.serve(async (req: Request) => {
         source: 'website',
         crm_stage: 'waiting_confirmation',
         updated_at: new Date().toISOString(),
-      }, { onConflict: 'phone_e164' })
+      }, { onConflict: 'business_id,phone_e164' })
       .select('id, full_name, phone_e164')
       .single()
 
@@ -77,6 +83,7 @@ Deno.serve(async (req: Request) => {
     const { data: appointment, error: appointmentError } = await supabase
       .from('appointments')
       .insert({
+        business_id: business.id,
         client_id: client.id,
         service_id: availability.service.id,
         status: 'pending',
@@ -101,46 +108,63 @@ Deno.serve(async (req: Request) => {
     const now = new Date().toISOString()
     const location = locationType === 'home_care'
       ? `Home care — ${neighborhood ?? ''}, ${city ?? ''}`
-      : 'Spa Carla Lira — R. Samuel Fragoso Coimbra, 483, Valinhos - SP'
+      : (business.address_text || business.name)
 
     let calendarSynced = false
     let calendarError: string | null = null
 
-    try {
-      const googleEvent = await createBookingCalendarEvent({
-        appointmentId: appointment.id,
-        clientName: fullName,
-        phone,
-        serviceName: availability.service.name,
-        startsAt: appointment.starts_at,
-        endsAt: appointment.ends_at,
-        location,
-      })
+    const { data: calendarState, error: calendarStateError } = await supabase
+      .from('calendar_sync_state')
+      .select('calendar_id')
+      .eq('business_id', business.id)
+      .maybeSingle()
+    if (calendarStateError) throw calendarStateError
 
-      const { error: calendarUpdateError } = await supabase.from('appointments').update({
-        google_event_id: googleEvent.id,
-        google_event_etag: googleEvent.etag ?? null,
-        google_event_updated_at: googleEvent.updated ?? null,
-        google_last_synced_at: now,
-        updated_at: now,
-      }).eq('id', appointment.id)
-      if (calendarUpdateError) throw calendarUpdateError
+    if (calendarState?.calendar_id) {
+      try {
+        const googleEvent = await createBookingCalendarEvent({
+          appointmentId: appointment.id,
+          businessId: business.id,
+          businessName: business.name,
+          clientName: fullName,
+          phone,
+          serviceName: availability.service.name,
+          startsAt: appointment.starts_at,
+          endsAt: appointment.ends_at,
+          location,
+          calendarId: calendarState.calendar_id,
+          timeZone: business.timezone,
+        })
 
-      const { error: calendarLogError } = await supabase.from('appointment_events').insert({
-        appointment_id: appointment.id,
-        event_type: 'google_calendar_created',
-        payload: { google_event_id: googleEvent.id, source: 'create_booking' },
-      })
-      if (calendarLogError) console.warn('booking_calendar_event_log_failed', calendarLogError)
+        const { error: calendarUpdateError } = await supabase.from('appointments').update({
+          google_event_id: googleEvent.id,
+          google_event_etag: googleEvent.etag ?? null,
+          google_event_updated_at: googleEvent.updated ?? null,
+          google_last_synced_at: now,
+          updated_at: now,
+        }).eq('business_id', business.id).eq('id', appointment.id)
+        if (calendarUpdateError) throw calendarUpdateError
 
-      calendarSynced = true
-    } catch (error) {
-      calendarError = errorText(error)
-      console.error('booking_calendar_sync_failed', error)
+        const { error: calendarLogError } = await supabase.from('appointment_events').insert({
+          business_id: business.id,
+          appointment_id: appointment.id,
+          event_type: 'google_calendar_created',
+          payload: { google_event_id: googleEvent.id, source: 'create_booking' },
+        })
+        if (calendarLogError) console.warn('booking_calendar_event_log_failed', calendarLogError)
+
+        calendarSynced = true
+      } catch (error) {
+        calendarError = errorText(error)
+        console.error('booking_calendar_sync_failed', error)
+      }
+    } else {
+      calendarError = 'Google Calendar is not connected for this business'
     }
 
     const consentRows = [
       {
+        business_id: business.id,
         client_id: client.id,
         category: 'whatsapp_service',
         granted: true,
@@ -149,6 +173,7 @@ Deno.serve(async (req: Request) => {
         recorded_at: now,
       },
       {
+        business_id: business.id,
         client_id: client.id,
         category: 'whatsapp_marketing',
         granted: marketingConsent,
@@ -164,12 +189,14 @@ Deno.serve(async (req: Request) => {
     const sideEffects = await Promise.allSettled([
       supabase.from('client_consents').insert(consentRows),
       supabase.from('appointment_events').insert({
+        business_id: business.id,
         appointment_id: appointment.id,
         event_type: 'booking_requested',
         payload: { source: 'website', marketing_consent: marketingConsent },
       }),
       supabase.from('notification_jobs').insert([
         {
+          business_id: business.id,
           appointment_id: appointment.id,
           client_id: client.id,
           job_type: 'whatsapp_booking_confirmation',
@@ -177,6 +204,7 @@ Deno.serve(async (req: Request) => {
           idempotency_key: confirmationKey,
         },
         {
+          business_id: business.id,
           appointment_id: appointment.id,
           client_id: client.id,
           job_type: 'google_calendar_create',
@@ -195,6 +223,7 @@ Deno.serve(async (req: Request) => {
 
     return json({
       ok: true,
+      business: { name: business.name, slug: business.slug },
       appointment: {
         id: appointment.id,
         status: appointment.status,
