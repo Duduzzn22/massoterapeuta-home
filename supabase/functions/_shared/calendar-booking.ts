@@ -33,23 +33,25 @@ async function accessToken() {
   })
 
   const data = await response.json().catch(() => ({}))
-  if (!response.ok || !data.access_token) {
-    throw new Error(`Google OAuth ${response.status}`)
-  }
+  if (!response.ok || !data.access_token) throw new Error(`Google OAuth ${response.status}`)
   return data.access_token as string
 }
 
 export async function createBookingCalendarEvent(input: {
   appointmentId: string
+  businessId: string
+  businessName: string
   clientName: string
   phone: string
   serviceName: string
   startsAt: string
   endsAt: string
   location: string
+  calendarId: string
+  timeZone: string
 }) {
   const token = await accessToken()
-  const calendarId = encodeURIComponent(env('GOOGLE_CALENDAR_ID'))
+  const calendarId = encodeURIComponent(input.calendarId)
   const response = await fetch(`${GOOGLE_CALENDAR_API}/calendars/${calendarId}/events`, {
     method: 'POST',
     headers: {
@@ -58,23 +60,21 @@ export async function createBookingCalendarEvent(input: {
     },
     body: JSON.stringify({
       summary: `${input.serviceName} — ${input.clientName}`,
-      description: `Agendamento Massoterapeuta Home\nCliente: ${input.clientName}\nContato: ${input.phone}\nID: ${input.appointmentId}`,
+      description: `Agendamento ${input.businessName}\nCliente: ${input.clientName}\nContato: ${input.phone}\nID: ${input.appointmentId}`,
       location: input.location,
-      start: { dateTime: input.startsAt, timeZone: 'America/Sao_Paulo' },
-      end: { dateTime: input.endsAt, timeZone: 'America/Sao_Paulo' },
+      start: { dateTime: input.startsAt, timeZone: input.timeZone },
+      end: { dateTime: input.endsAt, timeZone: input.timeZone },
       extendedProperties: {
         private: {
           source: 'massoterapeuta-home',
           appointment_id: input.appointmentId,
+          business_id: input.businessId,
         },
       },
     }),
   })
 
   const data = await response.json().catch(() => ({}))
-  if (!response.ok || !data.id) {
-    throw new Error(`Google Calendar create failed (${response.status})`)
-  }
-
+  if (!response.ok || !data.id) throw new Error(`Google Calendar create failed (${response.status})`)
   return data as { id: string; etag?: string; updated?: string }
 }
