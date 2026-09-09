@@ -1,7 +1,7 @@
 import { Temporal } from 'npm:@js-temporal/polyfill@0.5.1'
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2.116.0'
 
-const TIME_ZONE = 'America/Sao_Paulo'
+export const DEFAULT_TIME_ZONE = 'America/Sao_Paulo'
 
 function parseTime(value: string) {
   const [hour, minute] = value.slice(0, 5).split(':').map(Number)
@@ -12,6 +12,8 @@ export async function getAvailableSlots(
   supabase: SupabaseClient,
   date: string,
   serviceSlug: string,
+  businessId: string,
+  timeZone = DEFAULT_TIME_ZONE,
 ) {
   const plainDate = Temporal.PlainDate.from(date)
   const weekday = plainDate.dayOfWeek % 7
@@ -19,6 +21,7 @@ export async function getAvailableSlots(
   const { data: service, error: serviceError } = await supabase
     .from('services')
     .select('id, slug, name, duration_minutes')
+    .eq('business_id', businessId)
     .eq('slug', serviceSlug)
     .eq('active', true)
     .maybeSingle()
@@ -29,6 +32,7 @@ export async function getAvailableSlots(
   const { data: rules, error: rulesError } = await supabase
     .from('availability_rules')
     .select('start_time, end_time, slot_interval_minutes')
+    .eq('business_id', businessId)
     .eq('weekday', weekday)
     .eq('active', true)
     .order('start_time')
@@ -36,19 +40,21 @@ export async function getAvailableSlots(
   if (rulesError) throw rulesError
   if (!rules?.length) return { service, slots: [] }
 
-  const dayStart = plainDate.toZonedDateTime({ timeZone: TIME_ZONE, plainTime: '00:00' })
+  const dayStart = plainDate.toZonedDateTime({ timeZone, plainTime: '00:00' })
   const dayEnd = dayStart.add({ days: 1 })
 
   const [{ data: appointments, error: appointmentError }, { data: blocked, error: blockedError }] = await Promise.all([
     supabase
       .from('appointments')
       .select('starts_at, ends_at')
+      .eq('business_id', businessId)
       .in('status', ['pending', 'confirmed'])
       .lt('starts_at', dayEnd.toInstant().toString())
       .gt('ends_at', dayStart.toInstant().toString()),
     supabase
       .from('blocked_periods')
       .select('starts_at, ends_at')
+      .eq('business_id', businessId)
       .lt('starts_at', dayEnd.toInstant().toString())
       .gt('ends_at', dayStart.toInstant().toString()),
   ])
@@ -68,8 +74,8 @@ export async function getAvailableSlots(
     const startParts = parseTime(rule.start_time)
     const endParts = parseTime(rule.end_time)
 
-    let cursor = plainDate.toZonedDateTime({ timeZone: TIME_ZONE, plainTime: Temporal.PlainTime.from(startParts) })
-    const ruleEnd = plainDate.toZonedDateTime({ timeZone: TIME_ZONE, plainTime: Temporal.PlainTime.from(endParts) })
+    let cursor = plainDate.toZonedDateTime({ timeZone, plainTime: Temporal.PlainTime.from(startParts) })
+    const ruleEnd = plainDate.toZonedDateTime({ timeZone, plainTime: Temporal.PlainTime.from(endParts) })
 
     while (Temporal.ZonedDateTime.compare(cursor, ruleEnd) < 0) {
       const slotEnd = cursor.add({ minutes: service.duration_minutes })
@@ -96,5 +102,3 @@ export async function getAvailableSlots(
 
   return { service, slots }
 }
-
-export { TIME_ZONE }
