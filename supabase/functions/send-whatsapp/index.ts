@@ -1,6 +1,7 @@
 import { requireAdmin } from '../_shared/auth.ts'
 import { handleOptions, json, cleanText } from '../_shared/http.ts'
 import { sendWhatsApp, toWaRecipient } from '../_shared/whatsapp.ts'
+import { userCanAccessBusiness } from '../_shared/business.ts'
 
 Deno.serve(async (req: Request) => {
   const preflight = handleOptions(req)
@@ -17,12 +18,16 @@ Deno.serve(async (req: Request) => {
 
     const { data: client, error: clientError } = await auth.supabase
       .from('clients')
-      .select('id, full_name, phone_e164, blocked')
+      .select('id, business_id, full_name, phone_e164, blocked')
       .eq('id', clientId)
       .maybeSingle()
 
     if (clientError) throw clientError
     if (!client || client.blocked) return json({ error: 'Cliente indisponível para contato.' }, 404)
+
+    if (!(await userCanAccessBusiness(auth.supabase, auth.user.id, client.business_id))) {
+      return json({ error: 'Você não tem acesso a esta empresa.' }, 403)
+    }
 
     let apiPayload: Record<string, unknown>
     let bodyPreview = ''
@@ -36,6 +41,7 @@ Deno.serve(async (req: Request) => {
       const { data: template, error: templateError } = await auth.supabase
         .from('message_templates')
         .select('name, status, body, active')
+        .eq('business_id', client.business_id)
         .eq('name', templateName)
         .eq('active', true)
         .maybeSingle()
@@ -58,6 +64,7 @@ Deno.serve(async (req: Request) => {
       const { data: conversation, error: conversationError } = await auth.supabase
         .from('whatsapp_conversations')
         .select('id, customer_service_window_until')
+        .eq('business_id', client.business_id)
         .eq('client_id', client.id)
         .is('closed_at', null)
         .order('opened_at', { ascending: false })
@@ -81,10 +88,21 @@ Deno.serve(async (req: Request) => {
       bodyPreview = text
     }
 
-    const response = await sendWhatsApp(apiPayload)
+    const { data: phoneConfig, error: phoneConfigError } = await auth.supabase
+      .from('whatsapp_phone_numbers')
+      .select('phone_number_id')
+      .eq('business_id', client.business_id)
+      .eq('active', true)
+      .not('phone_number_id', 'is', null)
+      .limit(1)
+      .maybeSingle()
+    if (phoneConfigError) throw phoneConfigError
+
+    const response = await sendWhatsApp(apiPayload, { phoneNumberId: phoneConfig?.phone_number_id ?? null })
     const metaMessageId = response?.messages?.[0]?.id ?? null
 
     await auth.supabase.from('whatsapp_messages').insert({
+      business_id: client.business_id,
       client_id: client.id,
       meta_message_id: metaMessageId,
       direction: 'outbound',
@@ -97,6 +115,7 @@ Deno.serve(async (req: Request) => {
     })
 
     await auth.supabase.from('audit_logs').insert({
+      business_id: client.business_id,
       actor_user_id: auth.user.id,
       action: 'whatsapp_message_sent',
       entity_type: 'client',
