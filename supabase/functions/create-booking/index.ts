@@ -1,6 +1,7 @@
 import { createAdminClient } from '../_shared/supabase.ts'
 import { getAvailableSlots } from '../_shared/slots.ts'
 import { cleanText, handleOptions, json, normalizeBrazilPhone } from '../_shared/http.ts'
+import { createBookingCalendarEvent } from '../_shared/calendar-booking.ts'
 
 async function createBookingToken() {
   const bytes = crypto.getRandomValues(new Uint8Array(32))
@@ -8,6 +9,10 @@ async function createBookingToken() {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token))
   const hash = Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
   return { token, hash }
+}
+
+function errorText(error: unknown) {
+  return error instanceof Error ? error.message.slice(0, 700) : 'Unknown calendar sync error'
 }
 
 Deno.serve(async (req: Request) => {
@@ -94,6 +99,46 @@ Deno.serve(async (req: Request) => {
     }
 
     const now = new Date().toISOString()
+    const location = locationType === 'home_care'
+      ? `Home care — ${neighborhood ?? ''}, ${city ?? ''}`
+      : 'Spa Carla Lira — R. Samuel Fragoso Coimbra, 483, Valinhos - SP'
+
+    let calendarSynced = false
+    let calendarError: string | null = null
+
+    try {
+      const googleEvent = await createBookingCalendarEvent({
+        appointmentId: appointment.id,
+        clientName: fullName,
+        phone,
+        serviceName: availability.service.name,
+        startsAt: appointment.starts_at,
+        endsAt: appointment.ends_at,
+        location,
+      })
+
+      const { error: calendarUpdateError } = await supabase.from('appointments').update({
+        google_event_id: googleEvent.id,
+        google_event_etag: googleEvent.etag ?? null,
+        google_event_updated_at: googleEvent.updated ?? null,
+        google_last_synced_at: now,
+        updated_at: now,
+      }).eq('id', appointment.id)
+      if (calendarUpdateError) throw calendarUpdateError
+
+      const { error: calendarLogError } = await supabase.from('appointment_events').insert({
+        appointment_id: appointment.id,
+        event_type: 'google_calendar_created',
+        payload: { google_event_id: googleEvent.id, source: 'create_booking' },
+      })
+      if (calendarLogError) console.warn('booking_calendar_event_log_failed', calendarLogError)
+
+      calendarSynced = true
+    } catch (error) {
+      calendarError = errorText(error)
+      console.error('booking_calendar_sync_failed', error)
+    }
+
     const consentRows = [
       {
         client_id: client.id,
@@ -136,6 +181,9 @@ Deno.serve(async (req: Request) => {
           client_id: client.id,
           job_type: 'google_calendar_create',
           scheduled_for: now,
+          status: calendarSynced ? 'processed' : 'pending',
+          processed_at: calendarSynced ? now : null,
+          last_error: calendarError,
           idempotency_key: calendarKey,
         },
       ]),
@@ -155,6 +203,7 @@ Deno.serve(async (req: Request) => {
         time,
         starts_at: appointment.starts_at,
         location_type: locationType,
+        calendar_synced: calendarSynced,
       },
       booking_token: token,
     }, 201)
