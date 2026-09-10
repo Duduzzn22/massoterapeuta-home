@@ -2,6 +2,7 @@ import { requireAdmin } from '../_shared/auth.ts'
 import { handleOptions, json } from '../_shared/http.ts'
 import { createOrRenewCalendarWatch, getCalendarSyncState, stopStoredCalendarWatch } from '../_shared/calendar-watch.ts'
 import { runCalendarSync } from '../_shared/calendar-bidirectional.ts'
+import { resolveBusiness, userCanAccessBusiness } from '../_shared/business.ts'
 
 Deno.serve(async (req: Request) => {
   const preflight = handleOptions(req)
@@ -13,23 +14,30 @@ Deno.serve(async (req: Request) => {
     if (!auth) return json({ error: 'Acesso não autorizado.' }, 403)
 
     const body = await req.json().catch(() => ({}))
+    const business = await resolveBusiness(auth.supabase, {
+      id: typeof body?.business_id === 'string' ? body.business_id : null,
+      slug: typeof body?.business_slug === 'string' ? body.business_slug : null,
+    })
+    if (!business || !(await userCanAccessBusiness(auth.supabase, auth.user.id, business.id))) {
+      return json({ error: 'Empresa não encontrada ou acesso negado.' }, 403)
+    }
     const action = typeof body?.action === 'string' ? body.action : 'status'
 
     if (action === 'status') {
-      return json({ ok: true, state: await getCalendarSyncState() })
+      return json({ ok: true, state: await getCalendarSyncState(business.id) })
     }
 
     if (action === 'sync') {
-      const result = await runCalendarSync({ forceFull: body?.force_full === true })
+      const result = await runCalendarSync({ forceFull: body?.force_full === true, businessId: business.id })
       return json({ ok: true, result })
     }
 
     if (action === 'stop') {
-      return json({ ok: true, result: await stopStoredCalendarWatch() })
+      return json({ ok: true, result: await stopStoredCalendarWatch(business.id) })
     }
 
     if (action === 'start' || action === 'renew') {
-      const result = await createOrRenewCalendarWatch({ forceFull: body?.force_full === true })
+      const result = await createOrRenewCalendarWatch({ forceFull: body?.force_full === true, businessId: business.id })
       return json({ ok: true, result })
     }
 

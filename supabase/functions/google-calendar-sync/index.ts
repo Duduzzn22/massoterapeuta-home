@@ -1,6 +1,7 @@
 import { requireAdmin } from '../_shared/auth.ts'
 import { cleanText, handleOptions, json } from '../_shared/http.ts'
 import { createCalendarEvent, deleteCalendarEvent, updateCalendarEvent } from '../_shared/google-calendar.ts'
+import { resolveBusiness, userCanAccessBusiness } from '../_shared/business.ts'
 
 Deno.serve(async (req: Request) => {
   const preflight = handleOptions(req)
@@ -19,7 +20,7 @@ Deno.serve(async (req: Request) => {
     const { data: appointment, error } = await auth.supabase
       .from('appointments')
       .select(`
-        id, starts_at, ends_at, status, location_type, home_city, home_neighborhood,
+        id, business_id, starts_at, ends_at, status, location_type, home_city, home_neighborhood,
         google_event_id, google_event_etag, google_event_updated_at,
         clients!inner(full_name, phone_e164),
         services!inner(name)
@@ -30,22 +31,35 @@ Deno.serve(async (req: Request) => {
     if (error) throw error
     if (!appointment) return json({ error: 'Agendamento não encontrado.' }, 404)
 
+    const business = await resolveBusiness(auth.supabase, { id: appointment.business_id })
+    if (!business || !(await userCanAccessBusiness(auth.supabase, auth.user.id, business.id))) {
+      return json({ error: 'Acesso negado para esta empresa.' }, 403)
+    }
+    const { data: calendarState, error: calendarStateError } = await auth.supabase
+      .from('calendar_sync_state')
+      .select('calendar_id')
+      .eq('business_id', business.id)
+      .maybeSingle()
+    if (calendarStateError) throw calendarStateError
+    if (!calendarState?.calendar_id) return json({ error: 'Google Calendar não conectado para esta empresa.' }, 409)
+
     const client = Array.isArray(appointment.clients) ? appointment.clients[0] : appointment.clients
     const service = Array.isArray(appointment.services) ? appointment.services[0] : appointment.services
     const now = new Date().toISOString()
 
     if (action === 'delete' || appointment.status === 'cancelled') {
       if (appointment.google_event_id) {
-        await deleteCalendarEvent(appointment.google_event_id)
+        await deleteCalendarEvent(appointment.google_event_id, calendarState.calendar_id)
         await auth.supabase.from('appointments').update({
           google_event_id: null,
           google_event_etag: null,
           google_event_updated_at: null,
           google_last_synced_at: now,
           updated_at: now,
-        }).eq('id', appointment.id)
+        }).eq('business_id', business.id).eq('id', appointment.id)
       }
       await auth.supabase.from('appointment_events').insert({
+        business_id: business.id,
         appointment_id: appointment.id,
         event_type: 'google_calendar_deleted',
         actor_user_id: auth.user.id,
@@ -55,7 +69,7 @@ Deno.serve(async (req: Request) => {
 
     const location = appointment.location_type === 'home_care'
       ? `Home care — ${appointment.home_neighborhood ?? ''}, ${appointment.home_city ?? ''}`
-      : 'Spa Carla Lira — R. Samuel Fragoso Coimbra, 483, Valinhos - SP'
+      : (business.address_text || business.name)
 
     const eventInput = {
       summary: `${service?.name ?? 'Sessão'} — ${client?.full_name ?? 'Cliente'}`,
@@ -64,6 +78,9 @@ Deno.serve(async (req: Request) => {
       startsAt: appointment.starts_at,
       endsAt: appointment.ends_at,
       appointmentId: appointment.id,
+      businessId: business.id,
+      calendarId: calendarState.calendar_id,
+      timeZone: business.timezone,
     }
 
     let googleEvent
@@ -82,9 +99,10 @@ Deno.serve(async (req: Request) => {
       google_event_updated_at: googleEvent?.updated ?? null,
       google_last_synced_at: now,
       updated_at: now,
-    }).eq('id', appointment.id)
+    }).eq('business_id', business.id).eq('id', appointment.id)
 
     await auth.supabase.from('appointment_events').insert({
+      business_id: business.id,
       appointment_id: appointment.id,
       event_type: eventType,
       actor_user_id: auth.user.id,

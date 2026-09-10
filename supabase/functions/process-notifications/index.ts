@@ -1,6 +1,7 @@
 import { createAdminClient } from '../_shared/supabase.ts'
 import { json } from '../_shared/http.ts'
 import { createBookingCalendarEvent } from '../_shared/calendar-booking.ts'
+import { resolveBusiness } from '../_shared/business.ts'
 
 async function sha256Hex(value: string) {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))
@@ -44,11 +45,12 @@ Deno.serve(async (req: Request) => {
         const { data: appointment, error: appointmentError } = await supabase
           .from('appointments')
           .select(`
-            id, status, starts_at, ends_at, location_type, home_city, home_neighborhood,
+            id, business_id, status, starts_at, ends_at, location_type, home_city, home_neighborhood,
             google_event_id,
             clients!inner(full_name, phone_e164),
             services!inner(name)
           `)
+          .eq('business_id', job.business_id)
           .eq('id', job.appointment_id)
           .maybeSingle()
         if (appointmentError) throw appointmentError
@@ -58,7 +60,7 @@ Deno.serve(async (req: Request) => {
             status: 'processed',
             processed_at: new Date().toISOString(),
             last_error: null,
-          }).eq('id', job.id)
+          }).eq('business_id', job.business_id).eq('id', job.id)
           processed += 1
           continue
         }
@@ -68,25 +70,38 @@ Deno.serve(async (req: Request) => {
             status: 'processed',
             processed_at: new Date().toISOString(),
             last_error: null,
-          }).eq('id', job.id)
+          }).eq('business_id', job.business_id).eq('id', job.id)
           processed += 1
           continue
         }
 
         const client = Array.isArray(appointment.clients) ? appointment.clients[0] : appointment.clients
         const service = Array.isArray(appointment.services) ? appointment.services[0] : appointment.services
+        const business = await resolveBusiness(supabase, { id: appointment.business_id })
+        if (!business) throw new Error('Business not found for calendar retry')
+        const { data: calendarState, error: calendarStateError } = await supabase
+          .from('calendar_sync_state')
+          .select('calendar_id')
+          .eq('business_id', business.id)
+          .maybeSingle()
+        if (calendarStateError) throw calendarStateError
+        if (!calendarState?.calendar_id) throw new Error('Google Calendar is not connected for this business')
         const location = appointment.location_type === 'home_care'
           ? `Home care — ${appointment.home_neighborhood ?? ''}, ${appointment.home_city ?? ''}`
-          : 'Spa Carla Lira — R. Samuel Fragoso Coimbra, 483, Valinhos - SP'
+          : (business.address_text || business.name)
 
         const googleEvent = await createBookingCalendarEvent({
           appointmentId: appointment.id,
+          businessId: business.id,
+          businessName: business.name,
           clientName: client?.full_name ?? 'Cliente',
           phone: client?.phone_e164 ?? '',
           serviceName: service?.name ?? 'Sessão',
           startsAt: appointment.starts_at,
           endsAt: appointment.ends_at,
           location,
+          calendarId: calendarState.calendar_id,
+          timeZone: business.timezone,
         })
 
         const now = new Date().toISOString()
@@ -96,10 +111,11 @@ Deno.serve(async (req: Request) => {
           google_event_updated_at: googleEvent.updated ?? null,
           google_last_synced_at: now,
           updated_at: now,
-        }).eq('id', appointment.id)
+        }).eq('business_id', business.id).eq('id', appointment.id)
         if (updateError) throw updateError
 
         await supabase.from('appointment_events').insert({
+          business_id: business.id,
           appointment_id: appointment.id,
           event_type: 'google_calendar_created_retry',
           payload: { google_event_id: googleEvent.id },
@@ -109,7 +125,7 @@ Deno.serve(async (req: Request) => {
           status: 'processed',
           processed_at: now,
           last_error: null,
-        }).eq('id', job.id)
+        }).eq('business_id', business.id).eq('id', job.id)
         processed += 1
       } catch (error) {
         const attempts = Number(job.attempts ?? 1)
@@ -121,7 +137,7 @@ Deno.serve(async (req: Request) => {
           scheduled_for: new Date(Date.now() + delayMinutes * 60_000).toISOString(),
           last_error: errText(error),
           ...(terminal ? { processed_at: new Date().toISOString() } : {}),
-        }).eq('id', job.id)
+        }).eq('business_id', job.business_id).eq('id', job.id)
 
         if (terminal) failed += 1
         else retried += 1

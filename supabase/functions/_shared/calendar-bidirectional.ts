@@ -1,11 +1,11 @@
 import { Temporal } from 'npm:@js-temporal/polyfill@0.5.1'
 import { createAdminClient } from './supabase.ts'
 import {
-  getCalendarId,
   listCalendarChanges,
   updateCalendarEvent,
   type GoogleCalendarEvent,
 } from './google-calendar.ts'
+import { resolveBusiness } from './business.ts'
 
 const TIME_ZONE = 'America/Sao_Paulo'
 
@@ -49,12 +49,12 @@ function sameInstant(left?: string | null, right?: string | null) {
   return Number.isFinite(a) && Number.isFinite(b) && a === b
 }
 
-function appointmentEventInput(appointment: any) {
+function appointmentEventInput(appointment: any, business: any, calendarId: string) {
   const client = Array.isArray(appointment.clients) ? appointment.clients[0] : appointment.clients
   const service = Array.isArray(appointment.services) ? appointment.services[0] : appointment.services
   const location = appointment.location_type === 'home_care'
     ? `Home care — ${appointment.home_neighborhood ?? ''}, ${appointment.home_city ?? ''}`
-    : 'Spa Carla Lira — R. Samuel Fragoso Coimbra, 483, Valinhos - SP'
+    : (business.address_text || business.name)
 
   return {
     summary: `${service?.name ?? 'Sessão'} — ${client?.full_name ?? 'Cliente'}`,
@@ -63,10 +63,13 @@ function appointmentEventInput(appointment: any) {
     startsAt: appointment.starts_at,
     endsAt: appointment.ends_at,
     appointmentId: appointment.id,
+    businessId: business.id,
+    calendarId,
+    timeZone: business.timezone,
   }
 }
 
-async function findAppointment(supabase: any, event: GoogleCalendarEvent) {
+async function findAppointment(supabase: any, event: GoogleCalendarEvent, businessId: string) {
   const appointmentId = clean(event.extendedProperties?.private?.appointment_id, 80)
   const select = `
     id, client_id, service_id, status, starts_at, ends_at, location_type, home_city, home_neighborhood,
@@ -75,13 +78,13 @@ async function findAppointment(supabase: any, event: GoogleCalendarEvent) {
   `
 
   if (event.id) {
-    const byEvent = await supabase.from('appointments').select(select).eq('google_event_id', event.id).maybeSingle()
+    const byEvent = await supabase.from('appointments').select(select).eq('business_id', businessId).eq('google_event_id', event.id).maybeSingle()
     if (byEvent.error) throw byEvent.error
     if (byEvent.data) return byEvent.data
   }
 
   if (appointmentId) {
-    const byId = await supabase.from('appointments').select(select).eq('id', appointmentId).maybeSingle()
+    const byId = await supabase.from('appointments').select(select).eq('business_id', businessId).eq('id', appointmentId).maybeSingle()
     if (byId.error) throw byId.error
     if (byId.data) return byId.data
   }
@@ -89,8 +92,9 @@ async function findAppointment(supabase: any, event: GoogleCalendarEvent) {
   return null
 }
 
-async function logAppointmentEvent(supabase: any, appointmentId: string, eventType: string, payload: Record<string, unknown> = {}) {
+async function logAppointmentEvent(supabase: any, businessId: string, appointmentId: string, eventType: string, payload: Record<string, unknown> = {}) {
   const { error } = await supabase.from('appointment_events').insert({
+    business_id: businessId,
     appointment_id: appointmentId,
     event_type: eventType,
     payload,
@@ -98,7 +102,7 @@ async function logAppointmentEvent(supabase: any, appointmentId: string, eventTy
   if (error) console.warn('calendar_appointment_event_log_failed', error)
 }
 
-async function reconcileAppointment(supabase: any, appointment: any, event: GoogleCalendarEvent) {
+async function reconcileAppointment(supabase: any, business: any, calendarId: string, appointment: any, event: GoogleCalendarEvent) {
   const now = new Date().toISOString()
 
   if (event.status === 'cancelled') {
@@ -110,9 +114,9 @@ async function reconcileAppointment(supabase: any, appointment: any, event: Goog
         google_event_updated_at: event.updated ?? null,
         google_last_synced_at: now,
         updated_at: now,
-      }).eq('id', appointment.id)
+      }).eq('business_id', business.id).eq('id', appointment.id)
       if (error) throw error
-      await logAppointmentEvent(supabase, appointment.id, 'google_calendar_cancelled_from_iphone', {
+      await logAppointmentEvent(supabase, business.id, appointment.id, 'google_calendar_cancelled_from_iphone', {
         google_event_id: event.id,
       })
     }
@@ -131,7 +135,7 @@ async function reconcileAppointment(supabase: any, appointment: any, event: Goog
   }
 
   if (sameInstant(appointment.starts_at, range.startsAt) && sameInstant(appointment.ends_at, range.endsAt)) {
-    const { error } = await supabase.from('appointments').update(metadataPatch).eq('id', appointment.id)
+    const { error } = await supabase.from('appointments').update(metadataPatch).eq('business_id', business.id).eq('id', appointment.id)
     if (error) throw error
     return { type: 'appointment_unchanged', eventId: event.id }
   }
@@ -140,10 +144,10 @@ async function reconcileAppointment(supabase: any, appointment: any, event: Goog
     ...metadataPatch,
     starts_at: range.startsAt,
     ends_at: range.endsAt,
-  }).eq('id', appointment.id)
+  }).eq('business_id', business.id).eq('id', appointment.id)
 
   if (!updateError) {
-    await logAppointmentEvent(supabase, appointment.id, 'google_calendar_rescheduled_from_iphone', {
+    await logAppointmentEvent(supabase, business.id, appointment.id, 'google_calendar_rescheduled_from_iphone', {
       google_event_id: event.id,
       previous_starts_at: appointment.starts_at,
       previous_ends_at: appointment.ends_at,
@@ -155,15 +159,15 @@ async function reconcileAppointment(supabase: any, appointment: any, event: Goog
 
   // PostgreSQL exclusion violation: another active appointment occupies the requested interval.
   if (updateError.code === '23P01') {
-    const reverted = await updateCalendarEvent(event.id, appointmentEventInput(appointment))
+    const reverted = await updateCalendarEvent(event.id, appointmentEventInput(appointment, business, calendarId))
     await supabase.from('appointments').update({
       google_event_etag: reverted?.etag ?? event.etag ?? null,
       google_event_updated_at: reverted?.updated ?? event.updated ?? null,
       google_last_synced_at: now,
       updated_at: now,
-    }).eq('id', appointment.id)
+    }).eq('business_id', business.id).eq('id', appointment.id)
 
-    await logAppointmentEvent(supabase, appointment.id, 'google_calendar_conflict_reverted', {
+    await logAppointmentEvent(supabase, business.id, appointment.id, 'google_calendar_conflict_reverted', {
       google_event_id: event.id,
       attempted_starts_at: range.startsAt,
       attempted_ends_at: range.endsAt,
@@ -176,20 +180,21 @@ async function reconcileAppointment(supabase: any, appointment: any, event: Goog
   throw updateError
 }
 
-async function reconcileExternalBlock(supabase: any, event: GoogleCalendarEvent) {
+async function reconcileExternalBlock(supabase: any, businessId: string, event: GoogleCalendarEvent) {
   const now = new Date().toISOString()
   const shouldRemove = event.status === 'cancelled' || event.transparency === 'transparent'
 
   const { data: existing, error: lookupError } = await supabase
     .from('blocked_periods')
     .select('id')
+    .eq('business_id', businessId)
     .eq('google_event_id', event.id)
     .maybeSingle()
   if (lookupError) throw lookupError
 
   if (shouldRemove) {
     if (existing?.id) {
-      const { error } = await supabase.from('blocked_periods').delete().eq('id', existing.id)
+      const { error } = await supabase.from('blocked_periods').delete().eq('business_id', businessId).eq('id', existing.id)
       if (error) throw error
     }
     return { type: 'external_block_removed', eventId: event.id }
@@ -199,6 +204,7 @@ async function reconcileExternalBlock(supabase: any, event: GoogleCalendarEvent)
   if (!range) return { type: 'external_block_ignored_invalid_range', eventId: event.id }
 
   const values = {
+    business_id: businessId,
     starts_at: range.startsAt,
     ends_at: range.endsAt,
     reason: 'Ocupado — Calendário da Carla',
@@ -211,7 +217,7 @@ async function reconcileExternalBlock(supabase: any, event: GoogleCalendarEvent)
   }
 
   if (existing?.id) {
-    const { error } = await supabase.from('blocked_periods').update(values).eq('id', existing.id)
+    const { error } = await supabase.from('blocked_periods').update(values).eq('business_id', businessId).eq('id', existing.id)
     if (error) throw error
   } else {
     const { error } = await supabase.from('blocked_periods').insert(values)
@@ -221,11 +227,11 @@ async function reconcileExternalBlock(supabase: any, event: GoogleCalendarEvent)
   return { type: existing?.id ? 'external_block_updated' : 'external_block_created', eventId: event.id }
 }
 
-async function reconcileEvent(supabase: any, event: GoogleCalendarEvent) {
+async function reconcileEvent(supabase: any, business: any, calendarId: string, event: GoogleCalendarEvent) {
   if (!event.id) return { type: 'ignored_no_id', eventId: '' }
 
-  const appointment = await findAppointment(supabase, event)
-  if (appointment) return await reconcileAppointment(supabase, appointment, event)
+  const appointment = await findAppointment(supabase, event, business.id)
+  if (appointment) return await reconcileAppointment(supabase, business, calendarId, appointment, event)
 
   const source = event.extendedProperties?.private?.source
   if (source === 'massoterapeuta-home') {
@@ -233,59 +239,39 @@ async function reconcileEvent(supabase: any, event: GoogleCalendarEvent) {
     return { type: 'internal_orphan_ignored', eventId: event.id }
   }
 
-  return await reconcileExternalBlock(supabase, event)
+  return await reconcileExternalBlock(supabase, business.id, event)
 }
 
-async function ensureState(supabase: any) {
-  const calendarId = getCalendarId()
-  const { data, error } = await supabase.from('calendar_sync_state').select('*').eq('singleton_id', 1).maybeSingle()
+async function ensureState(supabase: any, businessId?: string) {
+  const business = await resolveBusiness(supabase, { id: businessId })
+  if (!business) throw new Error('Business not found for calendar sync')
+  const { data, error } = await supabase.from('calendar_sync_state').select('*').eq('business_id', business.id).maybeSingle()
   if (error) throw error
-  if (data) {
-    if (data.calendar_id !== calendarId) {
-      const { data: updated, error: updateError } = await supabase.from('calendar_sync_state').update({
-        calendar_id: calendarId,
-        sync_token: null,
-        watch_channel_id: null,
-        watch_resource_id: null,
-        watch_token_hash: null,
-        watch_expires_at: null,
-        last_message_number: null,
-        updated_at: new Date().toISOString(),
-      }).eq('singleton_id', 1).select('*').single()
-      if (updateError) throw updateError
-      return updated
-    }
-    return data
-  }
-
-  const { data: created, error: createError } = await supabase.from('calendar_sync_state').insert({
-    singleton_id: 1,
-    calendar_id: calendarId,
-  }).select('*').single()
-  if (createError) throw createError
-  return created
+  if (!data) throw new Error('Google Calendar is not connected for this business')
+  return { state: data, business }
 }
 
-export async function runCalendarSync(options: { forceFull?: boolean } = {}) {
+export async function runCalendarSync(options: { forceFull?: boolean; businessId?: string } = {}) {
   const supabase = createAdminClient()
-  const state = await ensureState(supabase)
+  const { state, business } = await ensureState(supabase, options.businessId)
+  const calendarId = state.calendar_id
   const forceFull = options.forceFull === true
   let syncToken = forceFull ? undefined : (state.sync_token || undefined)
   let mode: 'full' | 'incremental' = syncToken ? 'incremental' : 'full'
 
   try {
-    let result = await listCalendarChanges(syncToken)
+    let result = await listCalendarChanges(syncToken, calendarId)
     if (result.expired) {
       syncToken = undefined
       mode = 'full'
-      result = await listCalendarChanges()
+      result = await listCalendarChanges(undefined, calendarId)
     }
 
     const reconciled: Array<{ type: string; eventId: string }> = []
     const activeExternalIds = new Set<string>()
 
     for (const event of result.events) {
-      const outcome = await reconcileEvent(supabase, event)
+      const outcome = await reconcileEvent(supabase, business, calendarId, event)
       reconciled.push(outcome)
       if (mode === 'full' && outcome.type.startsWith('external_block_') && !['external_block_removed'].includes(outcome.type)) {
         activeExternalIds.add(event.id)
@@ -296,6 +282,7 @@ export async function runCalendarSync(options: { forceFull?: boolean } = {}) {
       const { data: existingBlocks, error: blocksError } = await supabase
         .from('blocked_periods')
         .select('id,google_event_id')
+        .eq('business_id', business.id)
         .eq('source', 'google_calendar')
       if (blocksError) throw blocksError
 
@@ -303,7 +290,7 @@ export async function runCalendarSync(options: { forceFull?: boolean } = {}) {
         .filter((block: any) => block.google_event_id && !activeExternalIds.has(block.google_event_id))
         .map((block: any) => block.id)
       if (staleIds.length) {
-        const { error: deleteError } = await supabase.from('blocked_periods').delete().in('id', staleIds)
+        const { error: deleteError } = await supabase.from('blocked_periods').delete().eq('business_id', business.id).in('id', staleIds)
         if (deleteError) throw deleteError
       }
     }
@@ -315,7 +302,7 @@ export async function runCalendarSync(options: { forceFull?: boolean } = {}) {
       updated_at: now,
       ...(mode === 'full' ? { last_full_sync_at: now } : { last_incremental_sync_at: now }),
     }
-    const { error: stateError } = await supabase.from('calendar_sync_state').update(statePatch).eq('singleton_id', 1)
+    const { error: stateError } = await supabase.from('calendar_sync_state').update(statePatch).eq('business_id', business.id)
     if (stateError) throw stateError
 
     return {
@@ -331,7 +318,7 @@ export async function runCalendarSync(options: { forceFull?: boolean } = {}) {
     await supabase.from('calendar_sync_state').update({
       last_error: error instanceof Error ? error.message.slice(0, 1000) : 'Unknown calendar sync error',
       updated_at: new Date().toISOString(),
-    }).eq('singleton_id', 1)
+    }).eq('business_id', business.id)
     throw error
   }
 }

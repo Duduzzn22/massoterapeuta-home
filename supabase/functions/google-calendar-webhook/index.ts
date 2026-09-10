@@ -28,7 +28,6 @@ Deno.serve(async (req: Request) => {
     const { data: state, error } = await supabase
       .from('calendar_sync_state')
       .select('*')
-      .eq('singleton_id', 1)
       .eq('watch_channel_id', channelId)
       .maybeSingle()
     if (error) throw error
@@ -58,13 +57,13 @@ Deno.serve(async (req: Request) => {
       last_notification_at: now,
       ...(messageNumber !== null ? { last_message_number: messageNumber } : {}),
       updated_at: now,
-    }).eq('singleton_id', 1)
+    }).eq('business_id', state.business_id)
     if (markError) throw markError
 
     // The first notification only confirms that the channel is active.
     if (resourceState === 'sync') return new Response(null, { status: 204 })
 
-    await runCalendarSync()
+    await runCalendarSync({ businessId: state.business_id })
     return new Response(null, { status: 204 })
   } catch (error) {
     console.error('google_calendar_webhook_error', error)

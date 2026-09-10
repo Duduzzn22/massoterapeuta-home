@@ -140,10 +140,10 @@ Canais de push do Google expiram e não possuem renovação automática nativa.
 Funções:
 
 - `google-calendar-watch` — controle administrativo: status, start, renew, sync e stop;
-- `google-calendar-maintenance` — rotina protegida por `CALENDAR_SYNC_SECRET`;
+- `google-calendar-maintenance` — rotina protegida por segredo interno armazenado no Supabase Vault;
 - `google-calendar-webhook` — recebimento das mudanças.
 
-A manutenção deve ser executada diariamente. Ela:
+A manutenção é executada automaticamente a cada 12 horas. Ela:
 
 1. executa uma sincronização incremental de segurança;
 2. verifica a expiração do canal;
@@ -181,9 +181,10 @@ Precisaremos da conta Google que será usada pela Carla e das seguintes configur
 - `GOOGLE_REFRESH_TOKEN`
 - `GOOGLE_CALENDAR_ID`
 - `GOOGLE_CALENDAR_WEBHOOK_URL` (opcional; por padrão usa a Edge Function do projeto)
-- `CALENDAR_SYNC_SECRET`
 
 Nunca armazenar essas credenciais no frontend ou no GitHub.
+
+O segredo da rotina de manutenção não precisa ser configurado manualmente: ele é gerado pelo banco, armazenado no Supabase Vault e conferido por hash pela Edge Function.
 
 ## Configuração no iPhone
 

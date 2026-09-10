@@ -20,7 +20,7 @@
 - Projeto Vercel conectado ao GitHub e Preview da branch `feature/crm-whatsapp-calendar` funcionando.
 - Advisors do Supabase: zero alertas de segurança após as novas migrations.
 
-## Google Calendar / iPhone — etapa bidirecional implementada no código e banco
+## Google Calendar / iPhone — integração bidirecional ativa
 
 - Calendário do iPhone definido como interface operacional da Carla.
 - Google Calendar definido como ponte entre iPhone e Supabase.
@@ -41,14 +41,19 @@
 - Renovação de canal `watch` antes do vencimento implementada.
 - Rotina diária de manutenção/sync de segurança implementada no repositório.
 
-### Edge Functions do Calendar preparadas no repositório
+### Edge Functions do Calendar publicadas
 
 - `google-calendar-sync`
 - `google-calendar-watch`
 - `google-calendar-webhook`
 - `google-calendar-maintenance`
 
-A ativação/deploy funcional dessas funções ficará para a etapa em que as credenciais reais da conta Google da Carla forem configuradas. A tentativa de publicação direta nesta sessão foi bloqueada pela camada de segurança da ferramenta ao empacotar lógica OAuth/segredos; nenhuma credencial foi exposta.
+- Sincronização incremental validada no ambiente real em 10/09/2026.
+- Canal de push ativo e associado à empresa correta.
+- Manutenção automática agendada a cada 12 horas pelo `pg_cron`.
+- Segredo do worker gerado no PostgreSQL, guardado no Supabase Vault e validado por hash.
+- Worker de repetição de criação de eventos corrigido para usar empresa, agenda e fuso horário.
+- Fluxos de sync, webhook, bloqueios e agendamentos isolados por `business_id`.
 
 ## Ainda depende de credenciais/configuração externa
 
@@ -65,15 +70,9 @@ A ativação/deploy funcional dessas funções ficará para a etapa em que as cr
 
 ### Google Calendar / iPhone
 
-- Conta Google que será proprietária da agenda profissional.
-- Criar/selecionar a agenda `Spa Carla Lira — Agendamentos`.
-- OAuth Client ID.
-- OAuth Client Secret.
-- Refresh Token/autorização da agenda.
-- Calendar ID da agenda dedicada.
-- `CALENDAR_SYNC_SECRET` para a rotina de manutenção.
-- Adicionar a conta Google ao Calendário do iPhone e habilitar a agenda profissional.
-- Após as credenciais: publicar as quatro Edge Functions, iniciar full sync e registrar o canal `watch`.
+- Manter a conta Google profissional adicionada ao Calendário do iPhone.
+- Não remover o acesso OAuth do aplicativo na conta Google.
+- Monitorar o campo `last_error` de `calendar_sync_state` nas verificações operacionais.
 
 ### Administrador do painel
 
@@ -83,5 +82,5 @@ A ativação/deploy funcional dessas funções ficará para a etapa em que as cr
 ## Não fazer ainda
 
 - Não fazer merge para `main`.
-- Não ativar WhatsApp/Calendar em produção sem credenciais reais e testes de ponta a ponta.
+- Não fazer alterações manuais nos segredos do Calendar armazenados no Vault.
 - Não remover o fallback `wa.me` até a Cloud API estar funcional.

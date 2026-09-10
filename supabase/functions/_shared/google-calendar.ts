@@ -20,8 +20,8 @@ async function getRefreshToken() {
   return data
 }
 
-export function getCalendarId() {
-  return env('GOOGLE_CALENDAR_ID')
+export function getCalendarId(configured?: string | null) {
+  return configured || env('GOOGLE_CALENDAR_ID')
 }
 
 export function getCalendarWebhookUrl() {
@@ -92,20 +92,24 @@ export async function createCalendarEvent(input: {
   startsAt: string
   endsAt: string
   appointmentId?: string
+  businessId?: string
+  calendarId?: string
+  timeZone?: string
 }) {
-  const calendarId = encodeURIComponent(getCalendarId())
+  const calendarId = encodeURIComponent(getCalendarId(input.calendarId))
   return await googleRequest(`/calendars/${calendarId}/events`, {
     method: 'POST',
     body: JSON.stringify({
       summary: input.summary,
       description: input.description ?? '',
       location: input.location ?? '',
-      start: { dateTime: input.startsAt, timeZone: 'America/Sao_Paulo' },
-      end: { dateTime: input.endsAt, timeZone: 'America/Sao_Paulo' },
+      start: { dateTime: input.startsAt, timeZone: input.timeZone || 'America/Sao_Paulo' },
+      end: { dateTime: input.endsAt, timeZone: input.timeZone || 'America/Sao_Paulo' },
       extendedProperties: {
         private: {
           source: 'massoterapeuta-home',
           ...(input.appointmentId ? { appointment_id: input.appointmentId } : {}),
+          ...(input.businessId ? { business_id: input.businessId } : {}),
         },
       },
     }),
@@ -119,28 +123,32 @@ export async function updateCalendarEvent(eventId: string, input: {
   startsAt: string
   endsAt: string
   appointmentId?: string
+  businessId?: string
+  calendarId?: string
+  timeZone?: string
 }) {
-  const calendarId = encodeURIComponent(getCalendarId())
+  const calendarId = encodeURIComponent(getCalendarId(input.calendarId))
   return await googleRequest(`/calendars/${calendarId}/events/${encodeURIComponent(eventId)}`, {
     method: 'PATCH',
     body: JSON.stringify({
       summary: input.summary,
       description: input.description ?? '',
       location: input.location ?? '',
-      start: { dateTime: input.startsAt, timeZone: 'America/Sao_Paulo' },
-      end: { dateTime: input.endsAt, timeZone: 'America/Sao_Paulo' },
+      start: { dateTime: input.startsAt, timeZone: input.timeZone || 'America/Sao_Paulo' },
+      end: { dateTime: input.endsAt, timeZone: input.timeZone || 'America/Sao_Paulo' },
       extendedProperties: {
         private: {
           source: 'massoterapeuta-home',
           ...(input.appointmentId ? { appointment_id: input.appointmentId } : {}),
+          ...(input.businessId ? { business_id: input.businessId } : {}),
         },
       },
     }),
   })
 }
 
-export async function deleteCalendarEvent(eventId: string) {
-  const calendarId = encodeURIComponent(getCalendarId())
+export async function deleteCalendarEvent(eventId: string, configuredCalendarId?: string) {
+  const calendarId = encodeURIComponent(getCalendarId(configuredCalendarId))
   const result = await googleRequestRaw(`/calendars/${calendarId}/events/${encodeURIComponent(eventId)}`, {
     method: 'DELETE',
   })
@@ -149,8 +157,8 @@ export async function deleteCalendarEvent(eventId: string) {
   throw new Error(`Google Calendar ${result.status}: ${JSON.stringify(result.data)}`)
 }
 
-export async function listCalendarChanges(syncToken?: string) {
-  const calendarId = encodeURIComponent(getCalendarId())
+export async function listCalendarChanges(syncToken?: string, configuredCalendarId?: string) {
+  const calendarId = encodeURIComponent(getCalendarId(configuredCalendarId))
   const events: GoogleCalendarEvent[] = []
   let pageToken: string | undefined
   let nextSyncToken: string | undefined
@@ -186,8 +194,9 @@ export async function watchCalendarEvents(input: {
   token: string
   address?: string
   expirationMs?: number
+  calendarId?: string
 }) {
-  const calendarId = encodeURIComponent(getCalendarId())
+  const calendarId = encodeURIComponent(getCalendarId(input.calendarId))
   const expiration = input.expirationMs ?? (Date.now() + 6 * 24 * 60 * 60 * 1000)
   return await googleRequest(`/calendars/${calendarId}/events/watch`, {
     method: 'POST',
