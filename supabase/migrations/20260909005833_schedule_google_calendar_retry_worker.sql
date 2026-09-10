@@ -32,3 +32,4 @@ select cron.schedule(
   );
   $cron$
 );
+

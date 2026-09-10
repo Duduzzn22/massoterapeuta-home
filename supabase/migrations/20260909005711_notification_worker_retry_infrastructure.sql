@@ -54,3 +54,4 @@ begin
     values ('notification_worker', encode(digest(worker_secret, 'sha256'), 'hex'));
   end if;
 end $$;
+

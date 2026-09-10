@@ -1,6 +1,3 @@
--- Google Calendar bidirectional synchronization
--- iPhone Calendar -> Google Calendar -> Supabase
-
 alter table public.blocked_periods
   add column if not exists source text not null default 'manual',
   add column if not exists google_event_id text,
@@ -68,3 +65,4 @@ with check (
 
 revoke all on public.calendar_sync_state from anon;
 grant select, insert, update, delete on public.calendar_sync_state to authenticated;
+

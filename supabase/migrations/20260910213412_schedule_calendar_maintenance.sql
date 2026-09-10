@@ -66,3 +66,4 @@ select cron.schedule(
   );
   $cron$
 );
+

@@ -12,6 +12,64 @@ async function createBookingToken() {
   return { token, hash }
 }
 
+async function sha256Hex(value: string) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
+}
+
+function requestIp(req: Request) {
+  const forwarded = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+  return req.headers.get('cf-connecting-ip') || forwarded || 'unknown'
+}
+
+async function enforceBookingRateLimit(
+  supabase: ReturnType<typeof createAdminClient>,
+  businessId: string,
+  phone: string,
+  req: Request,
+) {
+  const since = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+  const [phoneHash, ipHash] = await Promise.all([
+    sha256Hex(phone),
+    sha256Hex(requestIp(req)),
+  ])
+
+  const [phoneResult, ipResult] = await Promise.all([
+    supabase
+      .from('booking_rate_limits')
+      .select('id', { count: 'exact', head: true })
+      .eq('business_id', businessId)
+      .eq('phone_hash', phoneHash)
+      .gte('created_at', since),
+    supabase
+      .from('booking_rate_limits')
+      .select('id', { count: 'exact', head: true })
+      .eq('business_id', businessId)
+      .eq('ip_hash', ipHash)
+      .gte('created_at', since),
+  ])
+
+  if (phoneResult.error) throw phoneResult.error
+  if (ipResult.error) throw ipResult.error
+  if ((phoneResult.count ?? 0) >= 3 || (ipResult.count ?? 0) >= 10) return false
+
+  const { error } = await supabase.from('booking_rate_limits').insert({
+    business_id: businessId,
+    phone_hash: phoneHash,
+    ip_hash: ipHash,
+  })
+  if (error) throw error
+
+  const retentionCutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  const { error: cleanupError } = await supabase
+    .from('booking_rate_limits')
+    .delete()
+    .lt('created_at', retentionCutoff)
+  if (cleanupError) console.warn('booking_rate_limit_cleanup_failed', cleanupError)
+
+  return true
+}
+
 function errorText(error: unknown) {
   return error instanceof Error ? error.message.slice(0, 700) : 'Unknown calendar sync error'
 }
@@ -23,6 +81,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const body = await req.json()
+    if (cleanText(body?.website, 200)) return json({ error: 'Não foi possível registrar o agendamento.' }, 400)
     const fullName = cleanText(body?.full_name, 120)
     const phone = normalizeBrazilPhone(body?.phone)
     const email = cleanText(body?.email, 180) || null
@@ -48,6 +107,10 @@ Deno.serve(async (req: Request) => {
     const supabase = createAdminClient()
     const business = await resolveBusiness(supabase, { slug: businessSlug })
     if (!business) return json({ error: 'Empresa não encontrada.' }, 404)
+
+    if (!(await enforceBookingRateLimit(supabase, business.id, phone, req))) {
+      return json({ error: 'Muitas tentativas de agendamento. Aguarde um pouco e tente novamente.' }, 429)
+    }
 
     const availability = await getAvailableSlots(
       supabase,

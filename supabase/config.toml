@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.process-notifications]
 verify_jwt = false
+
+[functions.google-calendar-bootstrap]
+verify_jwt = true

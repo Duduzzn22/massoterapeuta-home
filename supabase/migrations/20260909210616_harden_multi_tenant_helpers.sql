@@ -11,3 +11,4 @@ revoke all on function private.default_business_id() from public, anon;
 revoke all on function private.user_can_access_business(uuid) from public, anon;
 grant execute on function private.default_business_id() to authenticated, service_role;
 grant execute on function private.user_can_access_business(uuid) to authenticated, service_role;
+

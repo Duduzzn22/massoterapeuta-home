@@ -58,3 +58,4 @@ revoke all on function public.set_google_refresh_token(text) from public, anon, 
 revoke all on function public.get_google_refresh_token() from public, anon, authenticated;
 grant execute on function public.set_google_refresh_token(text) to service_role;
 grant execute on function public.get_google_refresh_token() to service_role;
+

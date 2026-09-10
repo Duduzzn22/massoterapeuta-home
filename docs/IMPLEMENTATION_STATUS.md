@@ -18,7 +18,10 @@
 - Painel `admin.html` criado com login, agenda, clientes, CRM, WhatsApp e campanhas.
 - Responsividade reforçada para site e painel, incluindo navegação e tabelas mobile.
 - Projeto Vercel conectado ao GitHub e Preview da branch `feature/crm-whatsapp-calendar` funcionando.
-- Advisors do Supabase: zero alertas de segurança após as novas migrations.
+- Advisors do Supabase sem alertas de segurança de nível warning/error.
+- Proteção anti-spam do agendamento com honeypot e limite por telefone/IP.
+- Política de Privacidade publicada e vinculada ao formulário.
+- Histórico de migrations do projeto real recuperado e versionado no Git.
 
 ## Google Calendar / iPhone — integração bidirecional ativa
 
@@ -54,6 +57,8 @@
 - Segredo do worker gerado no PostgreSQL, guardado no Supabase Vault e validado por hash.
 - Worker de repetição de criação de eventos corrigido para usar empresa, agenda e fuso horário.
 - Fluxos de sync, webhook, bloqueios e agendamentos isolados por `business_id`.
+- Cancelamento pelo painel remove o evento correspondente do Google Calendar.
+- Endpoint legado `google-calendar-bootstrap` desativado e protegido por JWT.
 
 ## Ainda depende de credenciais/configuração externa
 

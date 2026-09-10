@@ -123,7 +123,7 @@ async function loadData() {
     const [appointmentsResult, clientsResult, repliesResult, messagesResult, campaignsResult] = await Promise.all([
       supabase
         .from('appointments')
-        .select('id,status,location_type,starts_at,ends_at,home_city,home_neighborhood,created_at,clients(id,full_name,phone_e164),services(id,name)')
+        .select('id,business_id,status,location_type,starts_at,ends_at,home_city,home_neighborhood,created_at,clients(id,full_name,phone_e164),services(id,name)')
         .gte('starts_at', start.toISOString())
         .order('starts_at', { ascending: true })
         .limit(250),
@@ -277,22 +277,48 @@ async function updateAppointment(id, action) {
 
   setGlobalFeedback('');
   try {
+    let calendarWarning = '';
     const patch = { status: target.status, updated_at: new Date().toISOString() };
     if (target.status === 'cancelled') patch.cancelled_at = new Date().toISOString();
 
-    const { error: appointmentError } = await supabase.from('appointments').update(patch).eq('id', id);
+    const { error: appointmentError } = await supabase
+      .from('appointments')
+      .update(patch)
+      .eq('business_id', appointment.business_id)
+      .eq('id', id);
     if (appointmentError) throw appointmentError;
 
     const client = Array.isArray(appointment.clients) ? appointment.clients[0] : appointment.clients;
     if (client?.id) {
-      const { error: clientError } = await supabase.from('clients').update({ crm_stage: target.crm, updated_at: new Date().toISOString() }).eq('id', client.id);
+      const { error: clientError } = await supabase
+        .from('clients')
+        .update({ crm_stage: target.crm, updated_at: new Date().toISOString() })
+        .eq('business_id', appointment.business_id)
+        .eq('id', client.id);
       if (clientError) console.warn('client_crm_update_failed', clientError);
     }
 
-    const { error: eventError } = await supabase.from('appointment_events').insert({ appointment_id: id, event_type: target.event, actor_user_id: state.profile.id, payload: { source: 'admin_panel' } });
+    const { error: eventError } = await supabase.from('appointment_events').insert({
+      business_id: appointment.business_id,
+      appointment_id: id,
+      event_type: target.event,
+      actor_user_id: state.profile.id,
+      payload: { source: 'admin_panel' },
+    });
     if (eventError) console.warn('appointment_event_insert_failed', eventError);
 
+    if (target.status === 'cancelled') {
+      const { error: calendarError } = await supabase.functions.invoke('google-calendar-sync', {
+        body: { appointment_id: id, action: 'delete' },
+      });
+      if (calendarError) {
+        console.error('calendar_cancel_sync_failed', calendarError);
+        calendarWarning = 'O agendamento foi cancelado, mas não foi possível removê-lo do Google Calendar. Tente novamente em alguns minutos.';
+      }
+    }
+
     await loadData();
+    if (calendarWarning) setGlobalFeedback(calendarWarning);
   } catch (error) {
     console.error('appointment_update_error', error);
     setGlobalFeedback('Não foi possível atualizar esse agendamento.');

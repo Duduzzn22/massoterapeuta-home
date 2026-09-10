@@ -1,0 +1,52 @@
+name: Validate static site
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - feature/crm-whatsapp-calendar
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check script.js
+          node --check admin.js
+
+      - name: Check local HTML references
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const files = ['index.html', 'admin.html', 'privacidade.html'];
+          const missing = [];
+
+          for (const file of files) {
+            const html = fs.readFileSync(file, 'utf8');
+            for (const match of html.matchAll(/(?:href|src)="([^"#?]+)"/g)) {
+              const reference = match[1];
+              if (!/^(?:https?:|mailto:|tel:|data:)/.test(reference) && !fs.existsSync(reference)) {
+                missing.push(`${file}: ${reference}`);
+              }
+            }
+          }
+
+          if (missing.length) {
+            console.error('Referências locais ausentes:\n' + missing.join('\n'));
+            process.exit(1);
+          }
+          NODE
+
+      - name: Check migration files
+        run: test -n "$(find supabase/migrations -maxdepth 1 -name '*.sql' -type f -size +0c -print -quit)"

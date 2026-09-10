@@ -184,6 +184,7 @@ create index if not exists business_members_business_id_idx on public.business_m
 create index if not exists meta_integrations_business_id_idx on public.meta_integrations(business_id);
 create index if not exists whatsapp_accounts_business_id_idx on public.whatsapp_accounts(business_id);
 create index if not exists whatsapp_phone_numbers_business_id_idx on public.whatsapp_phone_numbers(business_id);
+
 create index if not exists services_business_id_idx on public.services(business_id);
 create index if not exists clients_business_id_idx on public.clients(business_id);
 create index if not exists appointments_business_starts_idx on public.appointments(business_id, starts_at);
@@ -229,8 +230,10 @@ create policy organizations_authenticated_read on public.organizations for selec
   )
   or exists (select 1 from public.profiles p where p.id = auth.uid() and p.active and p.role = 'admin')
 );
+
 create policy businesses_member_read on public.businesses for select to authenticated using (public.user_can_access_business(id));
 create policy business_members_member_read on public.business_members for select to authenticated using (public.user_can_access_business(business_id));
 create policy meta_integrations_member_read on public.meta_integrations for select to authenticated using (public.user_can_access_business(business_id));
 create policy whatsapp_accounts_member_read on public.whatsapp_accounts for select to authenticated using (public.user_can_access_business(business_id));
 create policy whatsapp_phone_numbers_member_read on public.whatsapp_phone_numbers for select to authenticated using (public.user_can_access_business(business_id));
+
