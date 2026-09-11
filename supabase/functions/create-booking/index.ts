@@ -74,6 +74,10 @@ function errorText(error: unknown) {
   return error instanceof Error ? error.message.slice(0, 700) : 'Unknown calendar sync error'
 }
 
+function isValidEmail(value: string | null) {
+  return value === null || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
 Deno.serve(async (req: Request) => {
   const preflight = handleOptions(req)
   if (preflight) return preflight
@@ -99,6 +103,7 @@ Deno.serve(async (req: Request) => {
     if (!fullName || !phone || !serviceSlug || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) {
       return json({ error: 'Preencha corretamente nome, telefone, serviço, data e horário.' }, 400)
     }
+    if (!isValidEmail(email)) return json({ error: 'Informe um e-mail válido.' }, 400)
     if (!serviceConsent) return json({ error: 'É necessário autorizar as mensagens operacionais do agendamento.' }, 400)
     if (locationType === 'home_care' && (!city || !neighborhood)) {
       return json({ error: 'Informe cidade e bairro para atendimento home care.' }, 400)
@@ -281,7 +286,11 @@ Deno.serve(async (req: Request) => {
     ])
 
     sideEffects.forEach((result, index) => {
-      if (result.status === 'rejected') console.error('booking_side_effect_failed', index, result.reason)
+      if (result.status === 'rejected') {
+        console.error('booking_side_effect_failed', index, result.reason)
+        return
+      }
+      if (result.value.error) console.error('booking_side_effect_failed', index, result.value.error)
     })
 
     return json({

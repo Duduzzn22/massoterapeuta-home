@@ -29,6 +29,7 @@ const form = document.getElementById('form-agendamento');
 
 if (form) {
   const FUNCTIONS_BASE = 'https://nmjssxbneqepqonvcvoe.supabase.co/functions/v1';
+  const BUSINESS_SLUG = 'massoterapia-spa';
   const NUMERO_WHATSAPP = '5519993297780';
 
   const SERVICE_SLUGS = {
@@ -74,6 +75,7 @@ if (form) {
           <div class="form-group">
             <label class="form-label" for="email">E-mail <span class="form-label-opt">(opcional)</span></label>
             <input class="form-input" type="email" id="email" name="email" placeholder="voce@exemplo.com" autocomplete="email" />
+            <span class="form-error" id="erro-email">Informe um e-mail válido.</span>
           </div>
         </div>
       `);
@@ -193,7 +195,7 @@ if (form) {
       const response = await fetch(`${FUNCTIONS_BASE}/availability`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date, service_slug: service.slug }),
+        body: JSON.stringify({ business_slug: BUSINESS_SLUG, date, service_slug: service.slug }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Falha ao consultar horários.');
@@ -236,6 +238,7 @@ if (form) {
     let valid = true;
     const service = selectedService();
     const phone = document.getElementById('telefone')?.value || '';
+    const email = document.getElementById('email')?.value.trim() || '';
     const consent = document.getElementById('consent-service');
 
     if (!service?.slug) {
@@ -247,6 +250,7 @@ if (form) {
 
     if (!nomeEl?.value.trim()) { showFieldError('nome'); valid = false; } else clearFieldError('nome');
     if (phone.replace(/\D/g, '').length < 10) { showFieldError('telefone'); valid = false; } else clearFieldError('telefone');
+    if (email && !document.getElementById('email')?.checkValidity()) { showFieldError('email'); valid = false; } else clearFieldError('email');
     if (!dataEl?.value) { showFieldError('data'); valid = false; } else clearFieldError('data');
     if (!horarioEl?.value) { showFieldError('horario'); valid = false; } else clearFieldError('horario');
 
@@ -286,7 +290,7 @@ if (form) {
   dataEl?.addEventListener('change', loadAvailability);
   form.querySelectorAll('input[name="location_type"]').forEach(el => el.addEventListener('change', configureLocationFields));
 
-  ['nome', 'telefone', 'data', 'horario', 'cidade', 'bairro'].forEach(id => {
+  ['nome', 'telefone', 'email', 'data', 'horario', 'cidade', 'bairro'].forEach(id => {
     const el = document.getElementById(id);
     el?.addEventListener('input', () => clearFieldError(id));
     el?.addEventListener('change', () => clearFieldError(id));
@@ -311,6 +315,7 @@ if (form) {
     try {
       const payload = {
         website: document.getElementById('website')?.value || '',
+        business_slug: BUSINESS_SLUG,
         full_name: nomeEl.value.trim(),
         phone: document.getElementById('telefone').value,
         email: document.getElementById('email')?.value.trim() || null,
