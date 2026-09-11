@@ -29,13 +29,13 @@ O projeto busca unir:
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🛠️ Tecnologias utilizadas
 
-<div align="left">
-
-<img src="https://skillicons.dev/icons?i=html,css,javascript,react,nodejs,mongodb,git,github" />
-
-</div>
+- HTML, CSS e JavaScript
+- Supabase (Postgres, Auth e Edge Functions)
+- Google Calendar API
+- WhatsApp Cloud API
+- Vercel e GitHub Actions
 
 ---
 
@@ -43,6 +43,8 @@ O projeto busca unir:
 
 ```bash
 Em breve screenshots do projeto
+```
+
 ---
 
 ## © Direitos Autorais

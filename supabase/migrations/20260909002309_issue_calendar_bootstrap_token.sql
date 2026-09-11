@@ -1,0 +1,2 @@
+-- Migração histórica: o token descartável original não é versionado por segurança.
+-- Gere um novo token apenas durante um procedimento manual de bootstrap.

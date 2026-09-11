@@ -1,0 +1,270 @@
+/* Responsive hardening — admin dashboard */
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 720px) {
+  .login-shell {
+    padding: 1rem;
+  }
+
+  .login-card {
+    padding: 1.5rem 1.15rem;
+    border-radius: 18px;
+  }
+
+  .login-card h1 {
+    font-size: clamp(1.7rem, 8vw, 2rem);
+  }
+
+  .login-form input,
+  .search-input,
+  .login-form button,
+  .secondary-button,
+  .nav-item {
+    min-height: 44px;
+  }
+
+  .login-form input,
+  .search-input {
+    font-size: 16px;
+  }
+
+  .admin-sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    padding: 0.6rem;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 16%);
+  }
+
+  .admin-nav {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .nav-item {
+    flex: 0 0 auto;
+  }
+
+  .admin-content {
+    padding: 1rem 0.85rem 2.5rem;
+  }
+
+  .admin-topbar {
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .admin-topbar h1 {
+    font-size: clamp(1.65rem, 8vw, 2rem);
+  }
+
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .metric-card {
+    padding: 1rem;
+  }
+
+  .metric-card strong {
+    font-size: 1.7rem;
+  }
+
+  .panel-card {
+    border-radius: 14px;
+  }
+
+  .panel-heading {
+    padding: 1rem;
+  }
+
+  .quick-replies-list,
+  .messages-list {
+    padding: 0.8rem;
+  }
+
+  .quick-reply,
+  .message-item {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 640px) {
+  .table-wrap {
+    overflow: visible;
+  }
+
+  .table-wrap table,
+  .table-wrap tbody,
+  .table-wrap tr,
+  .table-wrap td {
+    display: block;
+    width: 100%;
+  }
+
+  .table-wrap table {
+    min-width: 0;
+  }
+
+  .table-wrap thead {
+    display: none;
+  }
+
+  .table-wrap tbody {
+    padding: 0.75rem;
+  }
+
+  .table-wrap tbody tr {
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 0.85rem;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgb(53 35 24 / 5%);
+  }
+
+  .table-wrap tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .table-wrap td {
+    display: grid;
+    grid-template-columns: minmax(88px, 34%) minmax(0, 1fr);
+    gap: 0.65rem;
+    align-items: start;
+    padding: 0.58rem 0;
+    border-bottom: 1px solid #eee7e1;
+    font-size: 0.83rem;
+    overflow-wrap: anywhere;
+  }
+
+  .table-wrap td:last-child {
+    border-bottom: 0;
+  }
+
+  .table-wrap td::before {
+    color: var(--text-soft);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  #appointments-body td:nth-child(1)::before { content: 'Data'; }
+  #appointments-body td:nth-child(2)::before { content: 'Cliente'; }
+  #appointments-body td:nth-child(3)::before { content: 'Serviço'; }
+  #appointments-body td:nth-child(4)::before { content: 'Local'; }
+  #appointments-body td:nth-child(5)::before { content: 'Status'; }
+  #appointments-body td:nth-child(6)::before { content: 'Ações'; }
+
+  #clients-body td:nth-child(1)::before { content: 'Cliente'; }
+  #clients-body td:nth-child(2)::before { content: 'WhatsApp'; }
+  #clients-body td:nth-child(3)::before { content: 'Cidade'; }
+  #clients-body td:nth-child(4)::before { content: 'Etapa CRM'; }
+  #clients-body td:nth-child(5)::before { content: 'Último contato'; }
+
+  #campaigns-body td:nth-child(1)::before { content: 'Campanha'; }
+  #campaigns-body td:nth-child(2)::before { content: 'Template'; }
+  #campaigns-body td:nth-child(3)::before { content: 'Status'; }
+  #campaigns-body td:nth-child(4)::before { content: 'Programada'; }
+
+  .table-wrap td[colspan] {
+    display: block;
+    text-align: center;
+    padding: 1.25rem 0.5rem;
+    border: 0;
+  }
+
+  .table-wrap td[colspan]::before {
+    content: none !important;
+  }
+
+  .row-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .row-action {
+    min-height: 40px;
+    width: 100%;
+  }
+
+  .status-pill,
+  .crm-stage {
+    width: fit-content;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-topbar {
+    flex-direction: column;
+  }
+
+  .admin-topbar .secondary-button {
+    width: 100%;
+  }
+
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-heading .secondary-button,
+  .search-input {
+    width: 100%;
+  }
+
+  .table-wrap tbody {
+    padding: 0.6rem;
+  }
+
+  .table-wrap td {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .table-wrap td::before {
+    margin-bottom: 0.05rem;
+  }
+
+  .row-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 390px) {
+  .admin-content {
+    padding-inline: 0.65rem;
+  }
+
+  .admin-sidebar {
+    padding-inline: 0.45rem;
+  }
+
+  .nav-item {
+    padding-inline: 0.7rem;
+  }
+
+  .panel-heading,
+  .metric-card {
+    padding: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

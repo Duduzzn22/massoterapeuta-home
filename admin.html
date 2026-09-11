@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Painel | Carla Lira</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="stylesheet" href="Css/admin.css" />
+  <link rel="stylesheet" href="Css/admin-mobile.css" />
+</head>
+<body>
+  <main class="admin-page">
+    <section class="login-shell" id="login-shell">
+      <div class="login-card">
+        <a href="index.html" class="admin-brand" aria-label="Voltar para o site">
+          <span class="admin-brand-mark">✦</span>
+          <span><strong>Carla Almeida Lira</strong><small>Massoterapia Spa</small></span>
+        </a>
+        <p class="eyebrow">área administrativa</p>
+        <h1>Acesse seu painel</h1>
+        <p class="login-copy">Informe seu e-mail para receber um link seguro de acesso ao painel.</p>
+        <form id="login-form" class="login-form">
+          <label>
+            <span>E-mail</span>
+            <input id="login-email" type="email" autocomplete="email" required />
+          </label>
+          <button type="submit" id="login-button">Enviar link de acesso</button>
+          <p id="login-feedback" class="form-feedback" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <section class="dashboard-shell" id="dashboard-shell" hidden>
+      <aside class="admin-sidebar">
+        <a href="index.html" class="admin-brand admin-brand-sidebar">
+          <span class="admin-brand-mark">✦</span>
+          <span><strong>Carla Lira</strong><small>Gestão</small></span>
+        </a>
+        <nav class="admin-nav" aria-label="Navegação do painel">
+          <button class="nav-item active" data-view="agenda">Agenda</button>
+          <button class="nav-item" data-view="clientes">Clientes</button>
+          <button class="nav-item" data-view="whatsapp">WhatsApp</button>
+          <button class="nav-item" data-view="campanhas">Campanhas</button>
+        </nav>
+        <div class="sidebar-footer">
+          <span id="admin-user-name">Administrador</span>
+          <button id="logout-button" class="logout-button">Sair</button>
+        </div>
+      </aside>
+
+      <div class="admin-content">
+        <header class="admin-topbar">
+          <div>
+            <p class="eyebrow">painel administrativo</p>
+            <h1 id="view-title">Agenda</h1>
+          </div>
+          <button id="refresh-button" class="secondary-button">Atualizar</button>
+        </header>
+
+        <div id="global-feedback" class="global-feedback" role="status" aria-live="polite"></div>
+
+        <section class="view-panel active" id="view-agenda" data-panel="agenda">
+          <div class="metric-grid">
+            <article class="metric-card"><span>Hoje</span><strong id="metric-today">0</strong><small>atendimentos</small></article>
+            <article class="metric-card"><span>Pendentes</span><strong id="metric-pending">0</strong><small>aguardando confirmação</small></article>
+            <article class="metric-card"><span>Clientes</span><strong id="metric-clients">0</strong><small>cadastrados</small></article>
+            <article class="metric-card"><span>Próximos 7 dias</span><strong id="metric-week">0</strong><small>agendamentos</small></article>
+          </div>
+          <div class="panel-card">
+            <div class="panel-heading"><div><h2>Agenda</h2><p>Pedidos recentes e próximos atendimentos.</p></div></div>
+            <div class="table-wrap"><table><thead><tr><th>Data</th><th>Cliente</th><th>Serviço</th><th>Local</th><th>Status</th><th>Ações</th></tr></thead><tbody id="appointments-body"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="view-panel" id="view-clientes" data-panel="clientes">
+          <div class="panel-card">
+            <div class="panel-heading"><div><h2>Clientes</h2><p>Histórico comercial e etapa atual do relacionamento.</p></div><input id="client-search" class="search-input" type="search" placeholder="Buscar cliente ou telefone" /></div>
+            <div class="table-wrap"><table><thead><tr><th>Cliente</th><th>WhatsApp</th><th>Cidade</th><th>Etapa CRM</th><th>Último contato</th></tr></thead><tbody id="clients-body"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="view-panel" id="view-whatsapp" data-panel="whatsapp">
+          <div class="split-grid">
+            <div class="panel-card">
+              <div class="panel-heading"><div><h2>Respostas rápidas</h2><p>Atalhos preparados para o atendimento.</p></div></div>
+              <div id="quick-replies-list" class="quick-replies-list"></div>
+            </div>
+            <div class="panel-card">
+              <div class="panel-heading"><div><h2>Últimas mensagens</h2><p>O histórico aparecerá aqui quando a Cloud API estiver conectada.</p></div></div>
+              <div id="messages-list" class="messages-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view-panel" id="view-campanhas" data-panel="campanhas">
+          <div class="panel-card">
+            <div class="panel-heading"><div><h2>Campanhas</h2><p>Somente clientes com consentimento de marketing poderão receber envios.</p></div><button class="secondary-button" id="new-campaign-button" disabled>Nova campanha</button></div>
+            <div class="table-wrap"><table><thead><tr><th>Campanha</th><th>Template</th><th>Status</th><th>Programada</th></tr></thead><tbody id="campaigns-body"></tbody></table></div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
