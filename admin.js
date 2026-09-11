@@ -336,25 +336,25 @@ loginForm.addEventListener('submit', async event => {
   event.preventDefault();
   loginFeedback.textContent = '';
   loginButton.disabled = true;
-  loginButton.textContent = 'Entrando...';
+  loginButton.textContent = 'Enviando...';
   try {
     const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value;
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const redirectUrl = new URL('admin.html', window.location.href).href;
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: redirectUrl,
+        shouldCreateUser: false,
+      },
+    });
     if (error) throw error;
-    const allowed = await ensureAdmin(data.session);
-    if (!allowed) {
-      showLogin('Este usuário não possui permissão administrativa.');
-      return;
-    }
-    showDashboard();
-    await loadData();
+    loginFeedback.textContent = 'Link enviado. Abra seu e-mail e clique no link para acessar o painel.';
   } catch (error) {
     console.error('admin_login_error', error);
-    loginFeedback.textContent = 'E-mail ou senha inválidos, ou acesso ainda não autorizado.';
+    loginFeedback.textContent = 'Não foi possível enviar o link de acesso. Tente novamente em alguns minutos.';
   } finally {
     loginButton.disabled = false;
-    loginButton.textContent = 'Entrar';
+    loginButton.textContent = 'Enviar link de acesso';
   }
 });
 
