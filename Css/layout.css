@@ -121,9 +121,9 @@ form {
 
 .sobre-imagem {
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
-  object-position: top center;
+  object-position: 50% 39%;
   border-radius: 2px 120px 2px 2px; /* canto superior direito arredondado — toque elegante */
   display: block;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
@@ -222,6 +222,7 @@ form {
   .sobre-imagem {
     border-radius: 2px 80px 2px 2px;
     aspect-ratio: 4 / 5;
+    object-position: 50% 38%;
   }
 
   .sobre-badge {

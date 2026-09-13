@@ -27,6 +27,89 @@ const faqSection = document.getElementById('faq');
 if (bookingSection && faqSection) faqSection.before(bookingSection);
 
 /* =============================================
+   DÚVIDAS FREQUENTES — acordeão com movimento
+   ============================================= */
+
+const faqItems = Array.from(document.querySelectorAll('.faq-item'));
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function setFaqIcon(item, isOpen) {
+  const icon = item.querySelector('.faq-icon');
+  if (icon) icon.textContent = isOpen ? '−' : '+';
+}
+
+function closeFaq(item, animate = true) {
+  const answer = item.querySelector('.faq-answer');
+  if (!answer || !item.open) return;
+
+  setFaqIcon(item, false);
+  if (!animate || reduceMotion || !answer.animate) {
+    item.open = false;
+    answer.style.height = '';
+    answer.style.opacity = '';
+    item.style.transform = '';
+    return;
+  }
+
+  const height = answer.scrollHeight;
+  const contentAnimation = answer.animate(
+    [
+      { height: `${height}px`, opacity: 1, transform: 'translateY(0)' },
+      { height: '0px', opacity: 0, transform: 'translateY(-8px)' },
+    ],
+    { duration: 280, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' },
+  );
+  item.animate(
+    [{ transform: 'scale(1)' }, { transform: 'scale(0.985)' }],
+    { duration: 280, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' },
+  );
+  contentAnimation.onfinish = () => {
+    item.open = false;
+    answer.style.height = '';
+    answer.style.opacity = '';
+  };
+}
+
+function openFaq(item) {
+  const answer = item.querySelector('.faq-answer');
+  if (!answer) return;
+
+  faqItems.forEach(other => {
+    if (other !== item && other.open) closeFaq(other);
+  });
+
+  item.open = true;
+  setFaqIcon(item, true);
+  if (reduceMotion || !answer.animate) return;
+
+  const height = answer.scrollHeight;
+  answer.animate(
+    [
+      { height: '0px', opacity: 0, transform: 'translateY(-8px)' },
+      { height: `${height}px`, opacity: 1, transform: 'translateY(0)' },
+    ],
+    { duration: 420, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+  );
+  item.animate(
+    [
+      { transform: 'scale(0.985)' },
+      { transform: 'scale(1.008)', offset: 0.72 },
+      { transform: 'scale(1)' },
+    ],
+    { duration: 430, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards' },
+  );
+}
+
+faqItems.forEach(item => {
+  const summary = item.querySelector('summary');
+  summary?.addEventListener('click', event => {
+    event.preventDefault();
+    if (item.open) closeFaq(item);
+    else openFaq(item);
+  });
+});
+
+/* =============================================
    AGENDAMENTO REAL — Supabase + fallback WhatsApp
    ============================================= */
 
