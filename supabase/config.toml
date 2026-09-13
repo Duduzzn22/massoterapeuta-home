@@ -1,0 +1,37 @@
+project_id = "massoterapeuta-home"
+
+[functions.availability]
+verify_jwt = false
+
+[functions.create-booking]
+verify_jwt = false
+
+[functions.whatsapp-webhook]
+verify_jwt = false
+
+[functions.send-whatsapp]
+verify_jwt = true
+
+[functions.google-oauth-start]
+verify_jwt = false
+
+[functions.google-oauth-callback]
+verify_jwt = false
+
+[functions.google-calendar-sync]
+verify_jwt = true
+
+[functions.google-calendar-watch]
+verify_jwt = true
+
+[functions.google-calendar-webhook]
+verify_jwt = false
+
+[functions.google-calendar-maintenance]
+verify_jwt = false
+
+[functions.process-notifications]
+verify_jwt = false
+
+[functions.google-calendar-bootstrap]
+verify_jwt = true

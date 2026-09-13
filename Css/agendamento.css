@@ -13,7 +13,6 @@
   align-items: start;
 }
 
-/* --- Coluna esquerda: texto intro --- */
 .agendamento-intro {
   position: sticky;
   top: 100px;
@@ -77,7 +76,6 @@
   color: var(--color-text-soft);
 }
 
-/* --- Coluna direita: formulário --- */
 .agendamento-form-wrap {
   background: #fff;
   border: 1px solid var(--color-border);
@@ -92,7 +90,6 @@
   gap: 1.4rem;
 }
 
-/* Grupos de campo */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -155,13 +152,17 @@
   cursor: pointer;
 }
 
+.form-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
 .form-textarea {
   resize: vertical;
   min-height: 80px;
   line-height: 1.6;
 }
 
-/* Mensagens de erro */
 .form-error {
   font-size: 0.8rem;
   color: #c0392b;
@@ -173,10 +174,6 @@
 .form-error.visible {
   display: flex;
 }
-
-/* =============================================
-   SELEÇÃO DE SERVIÇO — Cards clicáveis
-   ============================================= */
 
 .servico-grid {
   display: grid;
@@ -244,9 +241,103 @@
   line-height: 1.3;
 }
 
-/* =============================================
-   BOTÃO DE ENVIO
-   ============================================= */
+/* Local de atendimento */
+.booking-location-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.booking-choice,
+.booking-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-alt);
+  padding: 0.8rem 0.9rem;
+  cursor: pointer;
+  color: var(--color-text);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.booking-choice:has(input:checked) {
+  border-color: var(--color-primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgb(122 74 43 / 8%);
+}
+
+.booking-choice input,
+.booking-consent input {
+  accent-color: var(--color-primary);
+  margin-top: 0.18rem;
+  flex: 0 0 auto;
+}
+
+.booking-home-fields {
+  margin-top: 0.75rem;
+}
+
+.booking-home-fields[hidden] {
+  display: none;
+}
+
+.booking-consents {
+  gap: 0.65rem;
+}
+
+.booking-consent {
+  cursor: pointer;
+  background: #fff;
+}
+
+.booking-consent strong {
+  color: var(--color-text-soft);
+  font-weight: 500;
+}
+
+.booking-feedback {
+  border-radius: 10px;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  min-height: 0;
+  padding: 0;
+}
+
+.booking-feedback:not(:empty) {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+}
+
+.booking-feedback-info {
+  background: #f5f5f5;
+}
+
+.booking-feedback-success {
+  background: #f1f8f3;
+  border-color: #bcd9c5 !important;
+  color: #235b33;
+}
+
+.booking-feedback-warning {
+  background: #fff8e8;
+  border-color: #ead49a !important;
+  color: #6d5614;
+}
+
+.booking-feedback-error {
+  background: #fff1ef;
+  border-color: #e5b8b1 !important;
+  color: #8f3024;
+}
+
+.booking-feedback a {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
 
 .agendamento-btn {
   display: flex;
@@ -271,6 +362,12 @@
   transform: translateY(0);
 }
 
+.agendamento-btn:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
 .btn-icon {
   display: flex;
   align-items: center;
@@ -282,10 +379,6 @@
   text-align: center;
   margin-top: -0.5rem;
 }
-
-/* =============================================
-   FAQ — Estilizado com ícone e transição
-   ============================================= */
 
 .faq-list {
   display: flex;
@@ -360,10 +453,6 @@
   padding-top: 0.9rem;
 }
 
-/* =============================================
-   BOTÃO FLUTUANTE — WhatsApp
-   ============================================= */
-
 .whatsapp-float {
   align-items: center;
   background: #25d366;
@@ -406,7 +495,6 @@
   max-width: 160px;
 }
 
-/* Pulso de atenção inicial */
 @keyframes wpp-pulse {
   0%   { box-shadow: 0 8px 28px rgb(0 0 0 / 22%), 0 0 0 0 rgb(37 211 102 / 55%); }
   70%  { box-shadow: 0 8px 28px rgb(0 0 0 / 22%), 0 0 0 14px rgb(37 211 102 / 0%); }
@@ -416,10 +504,6 @@
 .whatsapp-float {
   animation: wpp-pulse 2.2s ease-out 1.5s 3;
 }
-
-/* =============================================
-   RESPONSIVO — Agendamento
-   ============================================= */
 
 @media (max-width: 900px) {
   .agendamento-wrapper {
@@ -441,7 +525,8 @@
     padding: 1.5rem 1.25rem;
   }
 
-  .form-row {
+  .form-row,
+  .booking-location-options {
     grid-template-columns: 1fr;
   }
 
