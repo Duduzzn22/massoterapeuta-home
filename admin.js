@@ -94,6 +94,18 @@ function showDashboard() {
   document.getElementById('admin-user-name').textContent = state.profile?.full_name || 'Administrador';
 }
 
+function getLoginErrorMessage(error) {
+  if (error?.code === 'over_email_send_rate_limit') {
+    return 'O limite de envio de e-mails foi atingido. Aguarde até 1 hora antes de solicitar outro link.';
+  }
+
+  if (error?.status === 429) {
+    return 'Muitas tentativas em pouco tempo. Aguarde pelo menos 60 segundos e tente novamente.';
+  }
+
+  return 'Não foi possível enviar o link de acesso. Verifique sua conexão e tente novamente.';
+}
+
 async function ensureAdmin(session) {
   if (!session?.user) return false;
   const { data: profile, error } = await supabase
@@ -351,7 +363,7 @@ loginForm.addEventListener('submit', async event => {
     loginFeedback.textContent = 'Link enviado. Abra seu e-mail e clique no link para acessar o painel.';
   } catch (error) {
     console.error('admin_login_error', error);
-    loginFeedback.textContent = 'Não foi possível enviar o link de acesso. Tente novamente em alguns minutos.';
+    loginFeedback.textContent = getLoginErrorMessage(error);
   } finally {
     loginButton.disabled = false;
     loginButton.textContent = 'Enviar link de acesso';
