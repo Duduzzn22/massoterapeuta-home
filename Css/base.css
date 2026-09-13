@@ -46,6 +46,16 @@ a {
   text-decoration: none;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 3px solid rgb(122 74 43 / 32%);
+  outline-offset: 3px;
+}
+
 h1,
 h2,
 h3 {

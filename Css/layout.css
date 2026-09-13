@@ -65,9 +65,12 @@
 }
 
 .main-nav a {
+  align-items: center;
   color: #363d44;
+  display: inline-flex;
   font-size: 0.94rem;
   font-weight: 500;
+  min-height: 44px;
 }
 
 .hero-grid,

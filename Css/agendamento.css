@@ -90,6 +90,21 @@
   gap: 1.4rem;
 }
 
+.selected-plan {
+  background: #f5ece5;
+  border: 1px solid #ddc8b9;
+  border-radius: 10px;
+  color: var(--color-primary-dark);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.5;
+  padding: 0.85rem 1rem;
+}
+
+.selected-plan[hidden] {
+  display: none;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -215,6 +230,13 @@
   border-color: var(--color-primary);
   background: linear-gradient(135deg, #fff 0%, #f5ece5 100%);
   box-shadow: 0 6px 20px rgb(122 74 43 / 16%);
+}
+
+.servico-card:has(input:focus-visible),
+.booking-choice:has(input:focus-visible),
+.booking-consent:has(input:focus-visible) {
+  outline: 3px solid rgb(122 74 43 / 28%);
+  outline-offset: 3px;
 }
 
 .servico-card-icon {

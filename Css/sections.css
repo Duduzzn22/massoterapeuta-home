@@ -1,6 +1,6 @@
 .hero-section {
   align-items: stretch;
-  background-image: url("../assets/hero-bg-massagem.jpg"), url("../assets/hero_image.jpg");
+  background-image: url("../assets/hero_image.webp");
   background-color: #2b1d12;
   background-position: center;
   background-repeat: no-repeat;
@@ -82,6 +82,18 @@
   background: rgb(250 249 246 / 24%);
   border-color: rgb(250 249 246 / 62%);
   box-shadow: 0 12px 32px rgb(20 13 9 / 32%);
+}
+
+.hero-section .hero-panel .button-secondary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 10px 24px rgb(60 35 21 / 22%);
+}
+
+.hero-section .hero-panel .button-secondary:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
 }
 
 .hero-panel {
