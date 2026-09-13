@@ -124,11 +124,12 @@ iframe {
 
   .testimonial {
     width: min(82vw, 300px);
+    min-height: 250px;
     padding: 1.2rem;
   }
 
   .carousel-track {
-    gap: 1rem;
+    --carousel-gap: 1rem;
   }
 
   .whatsapp-float {

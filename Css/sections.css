@@ -400,13 +400,16 @@
 }
 
 .carousel-track {
+  --carousel-gap: 1.5rem;
   display: flex;
-  gap: 1.5rem;
+  align-items: stretch;
+  gap: var(--carousel-gap);
   width: max-content;
-  animation: slide-loop 28s linear infinite;
+  animation: slide-loop 34s linear infinite;
 }
 
-.carousel-track:hover {
+.carousel-track:hover,
+.carousel-track:focus-within {
   animation-play-state: paused;
 }
 
@@ -416,9 +419,20 @@
   border: 1px solid rgba(0, 0, 0, 0.07);
   border-radius: 12px;
   padding: 1.5rem;
-  width: 300px;
+  width: 330px;
+  min-height: 260px;
   flex-shrink: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.testimonial:hover,
+.testimonial:focus-visible {
+  border-color: rgb(139 80 43 / 24%);
+  box-shadow: 0 16px 34px rgb(60 38 21 / 12%);
+  transform: translateY(-3px);
 }
 
 .testimonial-stars {
@@ -445,6 +459,8 @@
   gap: 10px;
   font-size: 0.8rem;
   color: var(--color-text-muted, #777);
+  margin-top: auto;
+  overflow-wrap: anywhere;
 }
 
 /* Avatar com inicial */
@@ -466,7 +482,7 @@
 /* Animação do loop */
 @keyframes slide-loop {
   0%   { transform: translateX(0); }
-  100% { transform: translateX(calc(-50%)); }
+  100% { transform: translateX(calc(-50% - (var(--carousel-gap) / 2))); }
 }
 
 /* Respeita preferência de movimento reduzido (acessibilidade) */
