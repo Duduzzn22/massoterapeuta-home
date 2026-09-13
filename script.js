@@ -63,11 +63,16 @@ function closeFaq(item, animate = true) {
     [{ transform: 'scale(1)' }, { transform: 'scale(0.985)' }],
     { duration: 280, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' },
   );
-  contentAnimation.onfinish = () => {
+  let closeFinished = false;
+  const finishClose = () => {
+    if (closeFinished) return;
+    closeFinished = true;
     item.open = false;
     answer.style.height = '';
     answer.style.opacity = '';
   };
+  contentAnimation.addEventListener('finish', finishClose, { once: true });
+  window.setTimeout(finishClose, 320);
 }
 
 function openFaq(item) {
