@@ -212,7 +212,7 @@ if (form) {
           <div class="form-group booking-consents">
             <label class="booking-consent">
               <input type="checkbox" id="consent-service" required />
-              <span>Aceito receber mensagens pelo WhatsApp relacionadas ao meu agendamento.</span>
+              <span>Autorizo o envio de confirmações e informações do meu atendimento pelo WhatsApp.</span>
             </label>
             <label class="booking-consent">
               <input type="checkbox" id="consent-marketing" />
@@ -226,7 +226,7 @@ if (form) {
 
     if (btn) {
       const text = btn.querySelector('.btn-texto');
-      if (text) text.textContent = 'Confirmar agendamento';
+      if (text) text.textContent = 'Confirmar horário';
       if (!document.getElementById('booking-feedback')) {
         btn.insertAdjacentHTML('afterend', '<div id="booking-feedback" class="booking-feedback" role="status" aria-live="polite"></div>');
       }
@@ -450,7 +450,7 @@ if (form) {
     const service = selectedService();
     const locationType = selectedLocation();
     const textEl = btn?.querySelector('.btn-texto');
-    const originalText = textEl?.textContent || 'Confirmar agendamento';
+    const originalText = textEl?.textContent || 'Confirmar horário';
 
     if (btn) btn.disabled = true;
     if (textEl) textEl.textContent = 'Registrando...';
