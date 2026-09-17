@@ -90,6 +90,21 @@
   gap: 1.4rem;
 }
 
+.selected-plan {
+  background: #f5ece5;
+  border: 1px solid #ddc8b9;
+  border-radius: 10px;
+  color: var(--color-primary-dark);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.5;
+  padding: 0.85rem 1rem;
+}
+
+.selected-plan[hidden] {
+  display: none;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -217,6 +232,13 @@
   box-shadow: 0 6px 20px rgb(122 74 43 / 16%);
 }
 
+.servico-card:has(input:focus-visible),
+.booking-choice:has(input:focus-visible),
+.booking-consent:has(input:focus-visible) {
+  outline: 3px solid rgb(122 74 43 / 28%);
+  outline-offset: 3px;
+}
+
 .servico-card-icon {
   display: flex;
   align-items: center;
@@ -339,6 +361,31 @@
   text-decoration: underline;
 }
 
+.agendamento-submit-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(139, 82, 47, 0.2);
+  border-radius: 0.75rem;
+  background: rgba(139, 82, 47, 0.06);
+  color: var(--color-text-soft);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.agendamento-submit-info strong {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.agendamento-submit-info-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  margin-top: 0.08rem;
+  color: var(--color-primary);
+}
+
 .agendamento-btn {
   display: flex;
   align-items: center;
@@ -383,19 +430,22 @@
 .faq-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  max-width: 760px;
+  gap: 0.625rem;
+  max-width: 820px;
 }
 
 .faq-list details {
   background: #fff;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-medium);
+  border-radius: 30px;
   overflow: hidden;
-  transition: box-shadow 0.2s ease;
+  transform: scale(0.985);
+  transform-origin: 50% 0;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .faq-list details[open] {
+  border-color: rgb(139 80 43 / 22%);
   box-shadow: 0 8px 24px rgb(60 38 21 / 8%);
 }
 
@@ -404,10 +454,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.15rem 1.4rem;
+  min-height: 76px;
+  padding: 1.2rem 1.75rem;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.97rem;
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
   color: var(--color-text);
   list-style: none;
   user-select: none;
@@ -424,33 +475,49 @@
 
 .faq-icon {
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  background: var(--color-surface-alt);
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.35rem;
+  font-weight: 500;
   color: var(--color-primary);
-  transition: transform 0.25s ease, background 0.15s ease;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s ease;
   line-height: 1;
 }
 
 .faq-list details[open] .faq-icon {
-  transform: rotate(45deg);
-  background: var(--color-primary);
-  color: #fff;
+  transform: rotate(180deg) scale(1.05);
+}
+
+.faq-answer {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.faq-list details[open] .faq-answer {
+  height: auto;
+  opacity: 1;
 }
 
 .faq-list details p {
-  padding: 0 1.4rem 1.2rem;
-  font-size: 0.93rem;
-  line-height: 1.7;
+  padding: 0 1.75rem 1.65rem;
+  font-size: 1rem;
+  line-height: 1.75;
   color: var(--color-text-soft);
-  border-top: 1px solid var(--color-border);
-  padding-top: 0.9rem;
+  max-width: 68ch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-list details,
+  .faq-icon,
+  .faq-answer {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 .whatsapp-float {

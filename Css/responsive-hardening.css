@@ -115,19 +115,21 @@ iframe {
   .faq-list summary {
     padding: 1rem;
     font-size: 0.92rem;
+    min-height: 64px;
   }
 
   .faq-list details p {
-    padding: 0.85rem 1rem 1rem;
+    padding: 0 1rem 1.15rem;
   }
 
   .testimonial {
     width: min(82vw, 300px);
+    min-height: 250px;
     padding: 1.2rem;
   }
 
   .carousel-track {
-    gap: 1rem;
+    --carousel-gap: 1rem;
   }
 
   .whatsapp-float {
@@ -181,8 +183,8 @@ iframe {
   }
 
   .faq-icon {
-    width: 22px;
-    height: 22px;
+    width: 40px;
+    height: 40px;
   }
 }
 

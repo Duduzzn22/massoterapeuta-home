@@ -21,6 +21,99 @@ if (toggle && nav) {
   });
 }
 
+/* Mantém a ação principal antes das dúvidas e da localização. */
+const bookingSection = document.getElementById('agendar');
+const faqSection = document.getElementById('faq');
+if (bookingSection && faqSection) faqSection.before(bookingSection);
+
+/* =============================================
+   DÚVIDAS FREQUENTES — acordeão com movimento
+   ============================================= */
+
+const faqItems = Array.from(document.querySelectorAll('.faq-item'));
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function setFaqIcon(item, isOpen) {
+  const icon = item.querySelector('.faq-icon');
+  if (icon) icon.textContent = isOpen ? '−' : '+';
+}
+
+function closeFaq(item, animate = true) {
+  const answer = item.querySelector('.faq-answer');
+  if (!answer || !item.open) return;
+
+  setFaqIcon(item, false);
+  if (!animate || reduceMotion || !answer.animate) {
+    item.open = false;
+    answer.style.height = '';
+    answer.style.opacity = '';
+    item.style.transform = '';
+    return;
+  }
+
+  const height = answer.scrollHeight;
+  const contentAnimation = answer.animate(
+    [
+      { height: `${height}px`, opacity: 1, transform: 'translateY(0)' },
+      { height: '0px', opacity: 0, transform: 'translateY(-8px)' },
+    ],
+    { duration: 280, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' },
+  );
+  item.animate(
+    [{ transform: 'scale(1)' }, { transform: 'scale(0.985)' }],
+    { duration: 280, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' },
+  );
+  let closeFinished = false;
+  const finishClose = () => {
+    if (closeFinished) return;
+    closeFinished = true;
+    item.open = false;
+    answer.style.height = '';
+    answer.style.opacity = '';
+  };
+  contentAnimation.addEventListener('finish', finishClose, { once: true });
+  window.setTimeout(finishClose, 320);
+}
+
+function openFaq(item) {
+  const answer = item.querySelector('.faq-answer');
+  if (!answer) return;
+
+  faqItems.forEach(other => {
+    if (other !== item && other.open) closeFaq(other);
+  });
+
+  item.open = true;
+  setFaqIcon(item, true);
+  if (reduceMotion || !answer.animate) return;
+
+  const height = answer.scrollHeight;
+  answer.animate(
+    [
+      { height: '0px', opacity: 0, transform: 'translateY(-8px)' },
+      { height: `${height}px`, opacity: 1, transform: 'translateY(0)' },
+    ],
+    { duration: 420, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+  );
+  item.animate(
+    [
+      { transform: 'scale(0.985)' },
+      { transform: 'scale(1.008)', offset: 0.72 },
+      { transform: 'scale(1)' },
+    ],
+    { duration: 430, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards' },
+  );
+}
+
+faqItems.forEach(item => {
+  const summary = item.querySelector('summary');
+  summary?.addEventListener('click', event => {
+    event.preventDefault();
+    if (item.open) closeFaq(item);
+    else openFaq(item);
+  });
+});
+
 /* =============================================
    AGENDAMENTO REAL — Supabase + fallback WhatsApp
    ============================================= */
@@ -46,6 +139,7 @@ if (form) {
   const horarioEl = document.getElementById('horario');
   const obsEl = document.getElementById('observacao');
   const btn = document.getElementById('btn-agendar');
+  let selectedPlan = '';
 
   function formatarData(dataISO) {
     if (!dataISO) return '';
@@ -63,18 +157,22 @@ if (form) {
   }
 
   function injectEnhancedFields() {
+    if (!document.getElementById('selected-plan')) {
+      form.insertAdjacentHTML('afterbegin', '<p id="selected-plan" class="selected-plan" role="status" aria-live="polite" hidden></p>');
+    }
+
     const nomeGroup = nomeEl?.closest('.form-group');
     if (nomeGroup && !document.getElementById('telefone')) {
       nomeGroup.insertAdjacentHTML('afterend', `
         <div class="form-row booking-contact-row">
           <div class="form-group">
             <label class="form-label" for="telefone">WhatsApp</label>
-            <input class="form-input" type="tel" id="telefone" name="telefone" placeholder="(19) 99999-9999" autocomplete="tel" inputmode="tel" required />
+            <input class="form-input" type="tel" id="telefone" name="telefone" placeholder="(19) 99999-9999" autocomplete="tel" inputmode="tel" aria-describedby="erro-telefone" required />
             <span class="form-error" id="erro-telefone">Informe um WhatsApp válido.</span>
           </div>
           <div class="form-group">
             <label class="form-label" for="email">E-mail <span class="form-label-opt">(opcional)</span></label>
-            <input class="form-input" type="email" id="email" name="email" placeholder="voce@exemplo.com" autocomplete="email" />
+            <input class="form-input" type="email" id="email" name="email" placeholder="voce@exemplo.com" autocomplete="email" aria-describedby="erro-email" />
             <span class="form-error" id="erro-email">Informe um e-mail válido.</span>
           </div>
         </div>
@@ -93,12 +191,12 @@ if (form) {
           <div class="form-row booking-home-fields" id="home-care-fields" hidden>
             <div class="form-group">
               <label class="form-label" for="cidade">Cidade</label>
-              <input class="form-input" type="text" id="cidade" name="cidade" placeholder="Sua cidade" autocomplete="address-level2" />
+              <input class="form-input" type="text" id="cidade" name="cidade" placeholder="Sua cidade" autocomplete="address-level2" aria-describedby="erro-cidade" />
               <span class="form-error" id="erro-cidade">Informe a cidade.</span>
             </div>
             <div class="form-group">
               <label class="form-label" for="bairro">Bairro</label>
-              <input class="form-input" type="text" id="bairro" name="bairro" placeholder="Seu bairro" autocomplete="address-level3" />
+              <input class="form-input" type="text" id="bairro" name="bairro" placeholder="Seu bairro" autocomplete="address-level3" aria-describedby="erro-bairro" />
               <span class="form-error" id="erro-bairro">Informe o bairro.</span>
             </div>
           </div>
@@ -114,7 +212,7 @@ if (form) {
           <div class="form-group booking-consents">
             <label class="booking-consent">
               <input type="checkbox" id="consent-service" required />
-              <span>Aceito receber mensagens pelo WhatsApp relacionadas ao meu agendamento.</span>
+              <span>Autorizo o envio de confirmações e informações do meu atendimento pelo WhatsApp.</span>
             </label>
             <label class="booking-consent">
               <input type="checkbox" id="consent-marketing" />
@@ -128,7 +226,7 @@ if (form) {
 
     if (btn) {
       const text = btn.querySelector('.btn-texto');
-      if (text) text.textContent = 'Confirmar agendamento';
+      if (text) text.textContent = 'Confirmar horário';
       if (!document.getElementById('booking-feedback')) {
         btn.insertAdjacentHTML('afterend', '<div id="booking-feedback" class="booking-feedback" role="status" aria-live="polite"></div>');
       }
@@ -143,6 +241,17 @@ if (form) {
       horarioEl.innerHTML = '<option value="">Escolha o serviço e a data</option>';
       horarioEl.disabled = true;
     }
+
+    const descriptions = {
+      nome: 'erro-nome',
+      data: 'erro-data',
+      horario: 'erro-horario',
+      'consent-service': 'erro-consentimento',
+    };
+    Object.entries(descriptions).forEach(([id, errorId]) => {
+      document.getElementById(id)?.setAttribute('aria-describedby', errorId);
+    });
+    form.querySelector('.servico-grid')?.setAttribute('aria-describedby', 'erro-servico');
   }
 
   function feedback(message, type = 'info') {
@@ -156,6 +265,7 @@ if (form) {
     const input = document.getElementById(id);
     const error = document.getElementById(`erro-${id}`);
     input?.classList.remove('input-error');
+    input?.removeAttribute('aria-invalid');
     error?.classList.remove('visible');
   }
 
@@ -163,6 +273,7 @@ if (form) {
     const input = document.getElementById(id);
     const error = document.getElementById(`erro-${id}`);
     input?.classList.add('input-error');
+    input?.setAttribute('aria-invalid', 'true');
     error?.classList.add('visible');
   }
 
@@ -236,6 +347,7 @@ if (form) {
 
   function validateForm() {
     let valid = true;
+    let firstInvalid = null;
     const service = selectedService();
     const phone = document.getElementById('telefone')?.value || '';
     const email = document.getElementById('email')?.value.trim() || '';
@@ -243,28 +355,39 @@ if (form) {
 
     if (!service?.slug) {
       document.getElementById('erro-servico')?.classList.add('visible');
+      form.querySelector('.servico-grid')?.setAttribute('aria-invalid', 'true');
+      firstInvalid = form.querySelector('input[name="servico"]');
       valid = false;
     } else {
       document.getElementById('erro-servico')?.classList.remove('visible');
+      form.querySelector('.servico-grid')?.removeAttribute('aria-invalid');
     }
 
-    if (!nomeEl?.value.trim()) { showFieldError('nome'); valid = false; } else clearFieldError('nome');
-    if (phone.replace(/\D/g, '').length < 10) { showFieldError('telefone'); valid = false; } else clearFieldError('telefone');
-    if (email && !document.getElementById('email')?.checkValidity()) { showFieldError('email'); valid = false; } else clearFieldError('email');
-    if (!dataEl?.value) { showFieldError('data'); valid = false; } else clearFieldError('data');
-    if (!horarioEl?.value) { showFieldError('horario'); valid = false; } else clearFieldError('horario');
+    if (!nomeEl?.value.trim()) { showFieldError('nome'); firstInvalid ||= nomeEl; valid = false; } else clearFieldError('nome');
+    if (phone.replace(/\D/g, '').length < 10) { showFieldError('telefone'); firstInvalid ||= document.getElementById('telefone'); valid = false; } else clearFieldError('telefone');
+    if (email && !document.getElementById('email')?.checkValidity()) { showFieldError('email'); firstInvalid ||= document.getElementById('email'); valid = false; } else clearFieldError('email');
+    if (!dataEl?.value) { showFieldError('data'); firstInvalid ||= dataEl; valid = false; } else clearFieldError('data');
+    if (!horarioEl?.value) { showFieldError('horario'); firstInvalid ||= horarioEl; valid = false; } else clearFieldError('horario');
 
     if (selectedLocation() === 'home_care') {
-      if (!document.getElementById('cidade')?.value.trim()) { showFieldError('cidade'); valid = false; } else clearFieldError('cidade');
-      if (!document.getElementById('bairro')?.value.trim()) { showFieldError('bairro'); valid = false; } else clearFieldError('bairro');
+      if (!document.getElementById('cidade')?.value.trim()) { showFieldError('cidade'); firstInvalid ||= document.getElementById('cidade'); valid = false; } else clearFieldError('cidade');
+      if (!document.getElementById('bairro')?.value.trim()) { showFieldError('bairro'); firstInvalid ||= document.getElementById('bairro'); valid = false; } else clearFieldError('bairro');
     }
 
     const consentError = document.getElementById('erro-consentimento');
     if (!consent?.checked) {
       consentError?.classList.add('visible');
+      consent?.setAttribute('aria-invalid', 'true');
+      firstInvalid ||= consent;
       valid = false;
     } else {
       consentError?.classList.remove('visible');
+      consent?.removeAttribute('aria-invalid');
+    }
+
+    if (!valid && firstInvalid) {
+      firstInvalid.focus({ preventScroll: true });
+      firstInvalid.closest('label, .form-group')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     return valid;
@@ -286,9 +409,30 @@ if (form) {
   setMinDate();
   configureLocationFields();
 
-  form.querySelectorAll('input[name="servico"]').forEach(el => el.addEventListener('change', loadAvailability));
+  document.querySelectorAll('.plan-select').forEach(link => {
+    link.addEventListener('click', () => {
+      selectedPlan = link.dataset.plan || '';
+      const selectedPlanEl = document.getElementById('selected-plan');
+      if (selectedPlanEl && selectedPlan) {
+        selectedPlanEl.hidden = false;
+        selectedPlanEl.textContent = `${selectedPlan} selecionado. Agora escolha a técnica, a data e o horário.`;
+      }
+    });
+  });
+
+  form.querySelectorAll('input[name="servico"]').forEach(el => el.addEventListener('change', () => {
+    document.getElementById('erro-servico')?.classList.remove('visible');
+    form.querySelector('.servico-grid')?.removeAttribute('aria-invalid');
+    loadAvailability();
+  }));
   dataEl?.addEventListener('change', loadAvailability);
   form.querySelectorAll('input[name="location_type"]').forEach(el => el.addEventListener('change', configureLocationFields));
+  document.getElementById('consent-service')?.addEventListener('change', event => {
+    if (event.target.checked) {
+      event.target.removeAttribute('aria-invalid');
+      document.getElementById('erro-consentimento')?.classList.remove('visible');
+    }
+  });
 
   ['nome', 'telefone', 'email', 'data', 'horario', 'cidade', 'bairro'].forEach(id => {
     const el = document.getElementById(id);
@@ -306,7 +450,7 @@ if (form) {
     const service = selectedService();
     const locationType = selectedLocation();
     const textEl = btn?.querySelector('.btn-texto');
-    const originalText = textEl?.textContent || 'Confirmar agendamento';
+    const originalText = textEl?.textContent || 'Confirmar horário';
 
     if (btn) btn.disabled = true;
     if (textEl) textEl.textContent = 'Registrando...';
@@ -325,7 +469,7 @@ if (form) {
         location_type: locationType,
         city: locationType === 'home_care' ? document.getElementById('cidade')?.value.trim() : null,
         neighborhood: locationType === 'home_care' ? document.getElementById('bairro')?.value.trim() : null,
-        note: obsEl?.value.trim() || null,
+        note: [selectedPlan ? `Interesse: ${selectedPlan}` : '', obsEl?.value.trim() || ''].filter(Boolean).join(' | ') || null,
         whatsapp_service_consent: document.getElementById('consent-service')?.checked === true,
         whatsapp_marketing_consent: document.getElementById('consent-marketing')?.checked === true,
       };
