@@ -136,27 +136,6 @@ iframe {
     padding-inline: 0;
   }
 
-  .carousel-button {
-    top: auto;
-    bottom: -0.25rem;
-    width: 38px;
-    height: 38px;
-    transform: none;
-  }
-
-  .carousel-button:hover,
-  .carousel-button:focus-visible {
-    transform: scale(1.04);
-  }
-
-  .carousel-button-prev {
-    left: calc(50% - 94px);
-  }
-
-  .carousel-button-next {
-    right: calc(50% - 94px);
-  }
-
   .whatsapp-float {
     width: 56px;
     height: 56px;

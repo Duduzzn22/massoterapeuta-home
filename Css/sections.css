@@ -396,13 +396,7 @@
 
 .testimonials-carousel {
   position: relative;
-  padding: 0 3rem 2.5rem;
-  outline: none;
-}
-
-.testimonials-carousel:focus-visible {
-  border-radius: var(--radius-large);
-  box-shadow: 0 0 0 3px rgb(122 74 43 / 16%);
+  padding-bottom: 1rem;
 }
 
 .carousel-track-wrap {
@@ -417,13 +411,18 @@
   align-items: stretch;
   gap: var(--carousel-gap);
   width: max-content;
-  transform: translate3d(0, 0, 0);
-  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: testimonials-loop 32s linear infinite;
   will-change: transform;
 }
 
-.carousel-track.is-jumping {
-  transition: none;
+@media (hover: hover) {
+  .testimonials-carousel:hover .carousel-track {
+    animation-play-state: paused;
+  }
+}
+
+.testimonials-carousel.is-paused .carousel-track {
+  animation-play-state: paused;
 }
 
 /* Cada card de depoimento */
@@ -492,75 +491,23 @@
   flex-shrink: 0;
 }
 
-.carousel-button {
-  position: absolute;
-  top: 50%;
-  z-index: 2;
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  padding: 0;
-  border: 1px solid rgb(122 74 43 / 18%);
-  border-radius: 50%;
-  background: var(--color-surface);
-  color: var(--color-primary);
-  box-shadow: 0 8px 24px rgb(60 38 21 / 12%);
-  cursor: pointer;
-  transform: translateY(calc(-50% - 1.25rem));
-  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
-}
+@keyframes testimonials-loop {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
 
-.carousel-button:hover,
-.carousel-button:focus-visible {
-  background: var(--color-primary);
-  color: #fff;
-  transform: translateY(calc(-50% - 1.25rem)) scale(1.06);
-}
-
-.carousel-button-prev {
-  left: 0;
-}
-
-.carousel-button-next {
-  right: 0;
-}
-
-.carousel-dots {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-  transform: translateX(-50%);
-}
-
-.carousel-dot {
-  width: 8px;
-  height: 8px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: rgb(122 74 43 / 28%);
-  cursor: pointer;
-  transition: width 0.25s ease, background 0.25s ease;
-}
-
-.carousel-dot.is-active {
-  width: 24px;
-  background: var(--color-primary);
-}
-
-.carousel-dot:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 3px;
+  to {
+    transform: translate3d(calc(-50% - (var(--carousel-gap) / 2)), 0, 0);
+  }
 }
 
 /* Respeita preferência de movimento reduzido (acessibilidade) */
 @media (prefers-reduced-motion: reduce) {
   .carousel-track {
-    transition: none;
+    animation: none;
+  }
+
+  .carousel-track-wrap {
+    overflow-x: auto;
   }
 }
