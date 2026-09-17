@@ -373,27 +373,35 @@
         </header>
       </div>
 
-      <div class="carousel-track-wrap">
-        <div class="carousel-track">
-          <figure class="testimonial" tabindex="0">
+      <div class="container">
+        <div
+          class="testimonials-carousel"
+          role="region"
+          aria-roledescription="carrossel"
+          aria-label="Depoimentos de clientes"
+          tabindex="0"
+        >
+          <div class="carousel-track-wrap">
+            <div class="carousel-track" id="testimonials-track">
+          <figure class="testimonial">
             <span class="testimonial-stars">★★★★★</span>
             <blockquote>“Ontem, na hora que saí da sua casa, estava super relaxada! Treinei até mais pesado à noite. Já fiz propaganda sua para as meninas hoje nas aulas!”</blockquote>
             <figcaption data-inicial="R">@rosangelatonettipersonal</figcaption>
           </figure>
 
-          <figure class="testimonial" tabindex="0">
+          <figure class="testimonial">
             <span class="testimonial-stars">★★★★★</span>
             <blockquote>“Eu estou muito bem do incômodo da coluna que me acomete geralmente. Estou literalmente relaxada e sinto muito conforto, muito bom!”</blockquote>
             <figcaption data-inicial="S">@soniabianchin</figcaption>
           </figure>
 
-          <figure class="testimonial" tabindex="0">
+          <figure class="testimonial">
             <span class="testimonial-stars">★★★★★</span>
             <blockquote>“Uma profissional exemplar, me sinto outra depois das suas sessões ♥”</blockquote>
             <figcaption data-inicial="K">@dra.karla.sandovall</figcaption>
           </figure>
 
-          <figure class="testimonial" tabindex="0">
+          <figure class="testimonial">
             <span class="testimonial-stars">★★★★★</span>
             <blockquote>“Foi ótima, Cá, eu estava precisando! Bom te ver, ainda mais assim, com brilho nos olhos de fazer algo que é nítido que está amando. Essas mãozinhas de fada vão operar milagres por aí, rsrsrs.”</blockquote>
             <figcaption data-inicial="A">@andressacvilla</figcaption>
@@ -420,6 +428,21 @@
             <blockquote>“Foi ótima, Cá, eu estava precisando! Bom te ver, ainda mais assim, com brilho nos olhos de fazer algo que é nítido que está amando. Essas mãozinhas de fada vão operar milagres por aí, rsrsrs.”</blockquote>
             <figcaption data-inicial="A">@andressacvilla</figcaption>
           </figure>
+            </div>
+          </div>
+
+          <button class="carousel-button carousel-button-prev" type="button" aria-label="Ver depoimento anterior" aria-controls="testimonials-track">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="carousel-button carousel-button-next" type="button" aria-label="Ver próximo depoimento" aria-controls="testimonials-track">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="carousel-dots" role="group" aria-label="Selecionar depoimento"></div>
         </div>
       </div>
     </section>

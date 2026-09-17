@@ -115,6 +115,181 @@ faqItems.forEach(item => {
 });
 
 /* =============================================
+   DEPOIMENTOS — carrossel automático em loop
+   ============================================= */
+
+const testimonialsCarousel = document.querySelector('.testimonials-carousel');
+
+if (testimonialsCarousel) {
+  const track = testimonialsCarousel.querySelector('.carousel-track');
+  const viewport = testimonialsCarousel.querySelector('.carousel-track-wrap');
+  const previousButton = testimonialsCarousel.querySelector('.carousel-button-prev');
+  const nextButton = testimonialsCarousel.querySelector('.carousel-button-next');
+  const dotsContainer = testimonialsCarousel.querySelector('.carousel-dots');
+  const slides = Array.from(track?.querySelectorAll('.testimonial:not([aria-hidden="true"])') || []);
+  const slideCount = slides.length;
+  let currentIndex = 0;
+  let autoplayTimer = null;
+  let touchStartX = 0;
+  let isVisible = true;
+  let pointerInside = false;
+  let focusInside = false;
+
+  slides.forEach((slide, index) => {
+    slide.setAttribute('role', 'group');
+    slide.setAttribute('aria-roledescription', 'slide');
+    slide.setAttribute('aria-label', `${index + 1} de ${slideCount}`);
+  });
+
+  function slideStep() {
+    const firstSlide = track?.querySelector('.testimonial');
+    if (!firstSlide || !track) return 0;
+    const gap = Number.parseFloat(getComputedStyle(track).columnGap) || 0;
+    return firstSlide.getBoundingClientRect().width + gap;
+  }
+
+  function updateDots() {
+    const activeIndex = currentIndex % slideCount;
+    dotsContainer?.querySelectorAll('.carousel-dot').forEach((dot, index) => {
+      const isActive = index === activeIndex;
+      dot.classList.toggle('is-active', isActive);
+      dot.setAttribute('aria-current', isActive ? 'true' : 'false');
+    });
+  }
+
+  function moveTrack(animate = true) {
+    if (!track || !slideCount) return;
+    track.classList.toggle('is-jumping', !animate || reduceMotion);
+    track.style.transform = `translate3d(${-currentIndex * slideStep()}px, 0, 0)`;
+    updateDots();
+  }
+
+  function goNext() {
+    if (!slideCount || currentIndex === slideCount) return;
+    currentIndex = reduceMotion && currentIndex === slideCount - 1
+      ? 0
+      : currentIndex + 1;
+    moveTrack();
+  }
+
+  function goPrevious() {
+    if (!track || !slideCount) return;
+    if (currentIndex === 0) {
+      currentIndex = slideCount;
+      moveTrack(false);
+      track.getBoundingClientRect();
+    }
+    currentIndex -= 1;
+    moveTrack();
+  }
+
+  function stopAutoplay() {
+    window.clearInterval(autoplayTimer);
+    autoplayTimer = null;
+  }
+
+  function startAutoplay() {
+    stopAutoplay();
+    if (!reduceMotion && isVisible && !document.hidden && !pointerInside && !focusInside) {
+      autoplayTimer = window.setInterval(goNext, 4200);
+    }
+  }
+
+  if (dotsContainer) {
+    slides.forEach((_, index) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'carousel-dot';
+      dot.setAttribute('aria-label', `Ir para o depoimento ${index + 1}`);
+      dot.addEventListener('click', () => {
+        currentIndex = index;
+        moveTrack();
+        startAutoplay();
+      });
+      dotsContainer.appendChild(dot);
+    });
+  }
+
+  track?.addEventListener('transitionend', event => {
+    if (event.propertyName !== 'transform' || currentIndex !== slideCount) return;
+    currentIndex = 0;
+    moveTrack(false);
+  });
+
+  previousButton?.addEventListener('click', () => {
+    goPrevious();
+    startAutoplay();
+  });
+  nextButton?.addEventListener('click', () => {
+    goNext();
+    startAutoplay();
+  });
+
+  testimonialsCarousel.addEventListener('keydown', event => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      goPrevious();
+      startAutoplay();
+    }
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      goNext();
+      startAutoplay();
+    }
+  });
+
+  viewport?.addEventListener('touchstart', event => {
+    touchStartX = event.changedTouches[0].clientX;
+    stopAutoplay();
+  }, { passive: true });
+  viewport?.addEventListener('touchend', event => {
+    const distance = event.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(distance) > 45) {
+      if (distance < 0) goNext();
+      else goPrevious();
+    }
+    startAutoplay();
+  }, { passive: true });
+
+  testimonialsCarousel.addEventListener('mouseenter', () => {
+    pointerInside = true;
+    stopAutoplay();
+  });
+  testimonialsCarousel.addEventListener('mouseleave', () => {
+    pointerInside = false;
+    startAutoplay();
+  });
+  testimonialsCarousel.addEventListener('focusin', () => {
+    focusInside = true;
+    stopAutoplay();
+  });
+  testimonialsCarousel.addEventListener('focusout', event => {
+    if (!testimonialsCarousel.contains(event.relatedTarget)) {
+      focusInside = false;
+      startAutoplay();
+    }
+  });
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      isVisible = entries[0]?.isIntersecting ?? true;
+      if (isVisible) startAutoplay();
+      else stopAutoplay();
+    }, { threshold: 0.2 });
+    observer.observe(testimonialsCarousel);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopAutoplay();
+    else startAutoplay();
+  });
+  window.addEventListener('resize', () => moveTrack(false));
+
+  moveTrack(false);
+  startAutoplay();
+}
+
+/* =============================================
    AGENDAMENTO REAL — Supabase + fallback WhatsApp
    ============================================= */
 
