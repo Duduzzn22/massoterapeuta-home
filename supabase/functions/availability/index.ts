@@ -6,7 +6,7 @@ import { resolveBusiness } from '../_shared/business.ts'
 Deno.serve(async (req: Request) => {
   const preflight = handleOptions(req)
   if (preflight) return preflight
-  if (req.method !== 'POST') return json({ error: 'Método não permitido.' }, 405)
+  if (req.method !== 'POST') return json({ error: 'Método não permitido.' }, 405, req)
 
   try {
     const body = await req.json()
@@ -15,12 +15,12 @@ Deno.serve(async (req: Request) => {
     const businessSlug = typeof body?.business_slug === 'string' ? body.business_slug : null
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^[a-z0-9-]{2,80}$/.test(serviceSlug)) {
-      return json({ error: 'Data ou serviço inválido.' }, 400)
+      return json({ error: 'Data ou serviço inválido.' }, 400, req)
     }
 
     const supabase = createAdminClient()
     const business = await resolveBusiness(supabase, { slug: businessSlug })
-    if (!business) return json({ error: 'Empresa não encontrada.' }, 404)
+    if (!business) return json({ error: 'Empresa não encontrada.' }, 404, req)
 
     const result = await getAvailableSlots(
       supabase,
@@ -30,7 +30,7 @@ Deno.serve(async (req: Request) => {
       business.timezone,
     )
 
-    if (!result.service) return json({ error: 'Serviço não encontrado.' }, 404)
+    if (!result.service) return json({ error: 'Serviço não encontrado.' }, 404, req)
 
     return json({
       date,
@@ -38,9 +38,9 @@ Deno.serve(async (req: Request) => {
       service: result.service,
       slots: result.slots,
       timezone: business.timezone,
-    })
+    }, 200, req)
   } catch (error) {
     console.error('availability_error', error)
-    return json({ error: 'Não foi possível consultar os horários agora.' }, 500)
+    return json({ error: 'Não foi possível consultar os horários agora.' }, 500, req)
   }
 })

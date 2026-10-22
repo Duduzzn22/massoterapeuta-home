@@ -6,16 +6,16 @@ import { resolveBusiness, userCanAccessBusiness } from '../_shared/business.ts'
 Deno.serve(async (req: Request) => {
   const preflight = handleOptions(req)
   if (preflight) return preflight
-  if (req.method !== 'POST') return json({ error: 'Método não permitido.' }, 405)
+  if (req.method !== 'POST') return json({ error: 'Método não permitido.' }, 405, req)
 
   try {
     const auth = await requireAdmin(req)
-    if (!auth) return json({ error: 'Acesso não autorizado.' }, 403)
+    if (!auth) return json({ error: 'Acesso não autorizado.' }, 403, req)
 
     const body = await req.json()
     const appointmentId = cleanText(body?.appointment_id, 80)
     const action = ['create', 'update', 'delete'].includes(body?.action) ? body.action : 'update'
-    if (!appointmentId) return json({ error: 'Agendamento inválido.' }, 400)
+    if (!appointmentId) return json({ error: 'Agendamento inválido.' }, 400, req)
 
     const { data: appointment, error } = await auth.supabase
       .from('appointments')
@@ -29,11 +29,11 @@ Deno.serve(async (req: Request) => {
       .maybeSingle()
 
     if (error) throw error
-    if (!appointment) return json({ error: 'Agendamento não encontrado.' }, 404)
+    if (!appointment) return json({ error: 'Agendamento não encontrado.' }, 404, req)
 
     const business = await resolveBusiness(auth.supabase, { id: appointment.business_id })
     if (!business || !(await userCanAccessBusiness(auth.supabase, auth.user.id, business.id))) {
-      return json({ error: 'Acesso negado para esta empresa.' }, 403)
+      return json({ error: 'Acesso negado para esta empresa.' }, 403, req)
     }
     const { data: calendarState, error: calendarStateError } = await auth.supabase
       .from('calendar_sync_state')
@@ -41,7 +41,7 @@ Deno.serve(async (req: Request) => {
       .eq('business_id', business.id)
       .maybeSingle()
     if (calendarStateError) throw calendarStateError
-    if (!calendarState?.calendar_id) return json({ error: 'Google Calendar não conectado para esta empresa.' }, 409)
+    if (!calendarState?.calendar_id) return json({ error: 'Google Calendar não conectado para esta empresa.' }, 409, req)
 
     const client = Array.isArray(appointment.clients) ? appointment.clients[0] : appointment.clients
     const service = Array.isArray(appointment.services) ? appointment.services[0] : appointment.services
@@ -64,7 +64,7 @@ Deno.serve(async (req: Request) => {
         event_type: 'google_calendar_deleted',
         actor_user_id: auth.user.id,
       })
-      return json({ ok: true, action: 'deleted' })
+      return json({ ok: true, action: 'deleted' }, 200, req)
     }
 
     const location = appointment.location_type === 'home_care'
@@ -109,9 +109,9 @@ Deno.serve(async (req: Request) => {
       payload: { google_event_id: googleEvent?.id ?? appointment.google_event_id },
     })
 
-    return json({ ok: true, google_event_id: googleEvent?.id ?? appointment.google_event_id })
+    return json({ ok: true, google_event_id: googleEvent?.id ?? appointment.google_event_id }, 200, req)
   } catch (error) {
     console.error('google_calendar_sync_error', error)
-    return json({ error: 'Não foi possível sincronizar com o Google Calendar.' }, 500)
+    return json({ error: 'Não foi possível sincronizar com o Google Calendar.' }, 500, req)
   }
 })
