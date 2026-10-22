@@ -386,20 +386,42 @@ document.addEventListener('click', event => {
   if (button) updateAppointment(button.dataset.id, button.dataset.appointmentAction);
 });
 
-const { data: sessionData } = await supabase.auth.getSession();
-if (sessionData.session) {
+async function handleSession(session, { silent = false } = {}) {
+  if (!session) {
+    state.profile = null;
+    if (!silent) showLogin();
+    return;
+  }
   try {
-    const allowed = await ensureAdmin(sessionData.session);
+    const allowed = await ensureAdmin(session);
     if (allowed) {
       showDashboard();
       await loadData();
-    } else {
+    } else if (!silent) {
       showLogin('Seu acesso ainda não foi autorizado como administrador.');
     }
   } catch (error) {
     console.error('admin_boot_error', error);
-    showLogin('Não foi possível validar seu acesso agora.');
+    if (!silent) showLogin('Não foi possível validar seu acesso agora.');
   }
-} else {
-  showLogin();
 }
+
+// Propaga mudanças de sessão em tempo real: expiração, refresh de token,
+// logout em outra aba, confirmação de magic link na mesma aba.
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_OUT') {
+    state.profile = null;
+    showLogin();
+    return;
+  }
+  if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+    void handleSession(session, { silent: event === 'TOKEN_REFRESHED' });
+    return;
+  }
+  if (event === 'USER_UPDATED') {
+    void handleSession(session, { silent: true });
+  }
+});
+
+const { data: sessionData } = await supabase.auth.getSession();
+await handleSession(sessionData.session);
