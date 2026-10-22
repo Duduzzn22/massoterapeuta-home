@@ -188,12 +188,13 @@ function renderMetrics() {
   document.getElementById('metric-week').textContent = weekCount;
 }
 
-function appointmentActions(a) {
+function appointmentActions(a, client) {
+  const appointmentLabel = `${escapeHtml(client?.full_name || 'Cliente')} em ${formatDateTime(a.starts_at)}`;
   if (a.status === 'pending') {
-    return `<button class="row-action" data-appointment-action="confirm" data-id="${a.id}">Confirmar</button><button class="row-action danger" data-appointment-action="cancel" data-id="${a.id}">Cancelar</button>`;
+    return `<button class="row-action" aria-label="Confirmar agendamento de ${appointmentLabel}" data-appointment-action="confirm" data-id="${a.id}">Confirmar</button><button class="row-action danger" aria-label="Cancelar agendamento de ${appointmentLabel}" data-appointment-action="cancel" data-id="${a.id}">Cancelar</button>`;
   }
   if (a.status === 'confirmed') {
-    return `<button class="row-action" data-appointment-action="complete" data-id="${a.id}">Concluir</button><button class="row-action danger" data-appointment-action="cancel" data-id="${a.id}">Cancelar</button>`;
+    return `<button class="row-action" aria-label="Concluir agendamento de ${appointmentLabel}" data-appointment-action="complete" data-id="${a.id}">Concluir</button><button class="row-action danger" aria-label="Cancelar agendamento de ${appointmentLabel}" data-appointment-action="cancel" data-id="${a.id}">Cancelar</button>`;
   }
   return '—';
 }
@@ -215,7 +216,7 @@ function renderAppointments() {
       <td>${escapeHtml(service?.name || '—')}</td>
       <td>${location}</td>
       <td><span class="status-pill status-${escapeHtml(a.status)}">${escapeHtml(STATUS_LABELS[a.status] || a.status)}</span></td>
-      <td><div class="row-actions">${appointmentActions(a)}</div></td>
+      <td><div class="row-actions">${appointmentActions(a, client)}</div></td>
     </tr>`;
   }).join('');
 }
