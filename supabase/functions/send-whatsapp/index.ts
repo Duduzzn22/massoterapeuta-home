@@ -3,6 +3,8 @@ import { handleOptions, json, cleanText } from '../_shared/http.ts'
 import { sendWhatsApp, toWaRecipient } from '../_shared/whatsapp.ts'
 import { userCanAccessBusiness } from '../_shared/business.ts'
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 Deno.serve(async (req: Request) => {
   const preflight = handleOptions(req)
   if (preflight) return preflight
@@ -13,21 +15,30 @@ Deno.serve(async (req: Request) => {
     if (!auth) return json({ error: 'Acesso não autorizado.' }, 403)
 
     const body = await req.json()
+    const businessId = cleanText(body?.business_id, 80)
     const clientId = cleanText(body?.client_id, 80)
     const mode = body?.mode === 'template' ? 'template' : 'text'
+
+    if (!UUID_PATTERN.test(businessId) || !UUID_PATTERN.test(clientId)) {
+      return json({ error: 'Identificadores inválidos.' }, 400)
+    }
+
+    // Autorizar o business ANTES de consultar o cliente — evita vazar dados
+    // (nome, telefone, blocked status) de clientes de outros tenants via
+    // service_role bypass de RLS. Ver SEC-A2.
+    if (!(await userCanAccessBusiness(auth.supabase, auth.user.id, businessId))) {
+      return json({ error: 'Você não tem acesso a esta empresa.' }, 403)
+    }
 
     const { data: client, error: clientError } = await auth.supabase
       .from('clients')
       .select('id, business_id, full_name, phone_e164, blocked')
+      .eq('business_id', businessId)
       .eq('id', clientId)
       .maybeSingle()
 
     if (clientError) throw clientError
     if (!client || client.blocked) return json({ error: 'Cliente indisponível para contato.' }, 404)
-
-    if (!(await userCanAccessBusiness(auth.supabase, auth.user.id, client.business_id))) {
-      return json({ error: 'Você não tem acesso a esta empresa.' }, 403)
-    }
 
     let apiPayload: Record<string, unknown>
     let bodyPreview = ''
