@@ -81,11 +81,11 @@ function isValidEmail(value: string | null) {
 Deno.serve(async (req: Request) => {
   const preflight = handleOptions(req)
   if (preflight) return preflight
-  if (req.method !== 'POST') return json({ error: 'Método não permitido.' }, 405)
+  if (req.method !== 'POST') return json({ error: 'Método não permitido.' }, 405, req)
 
   try {
     const body = await req.json()
-    if (cleanText(body?.website, 200)) return json({ error: 'Não foi possível registrar o agendamento.' }, 400)
+    if (cleanText(body?.website, 200)) return json({ error: 'Não foi possível registrar o agendamento.' }, 400, req)
     const fullName = cleanText(body?.full_name, 120)
     const phone = normalizeBrazilPhone(body?.phone)
     const email = cleanText(body?.email, 180) || null
@@ -101,20 +101,20 @@ Deno.serve(async (req: Request) => {
     const marketingConsent = body?.whatsapp_marketing_consent === true
 
     if (!fullName || !phone || !serviceSlug || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) {
-      return json({ error: 'Preencha corretamente nome, telefone, serviço, data e horário.' }, 400)
+      return json({ error: 'Preencha corretamente nome, telefone, serviço, data e horário.' }, 400, req)
     }
-    if (!isValidEmail(email)) return json({ error: 'Informe um e-mail válido.' }, 400)
-    if (!serviceConsent) return json({ error: 'É necessário autorizar as mensagens operacionais do agendamento.' }, 400)
+    if (!isValidEmail(email)) return json({ error: 'Informe um e-mail válido.' }, 400, req)
+    if (!serviceConsent) return json({ error: 'É necessário autorizar as mensagens operacionais do agendamento.' }, 400, req)
     if (locationType === 'home_care' && (!city || !neighborhood)) {
-      return json({ error: 'Informe cidade e bairro para atendimento home care.' }, 400)
+      return json({ error: 'Informe cidade e bairro para atendimento home care.' }, 400, req)
     }
 
     const supabase = createAdminClient()
     const business = await resolveBusiness(supabase, { slug: businessSlug })
-    if (!business) return json({ error: 'Empresa não encontrada.' }, 404)
+    if (!business) return json({ error: 'Empresa não encontrada.' }, 404, req)
 
     if (!(await enforceBookingRateLimit(supabase, business.id, phone, req))) {
-      return json({ error: 'Muitas tentativas de agendamento. Aguarde um pouco e tente novamente.' }, 429)
+      return json({ error: 'Muitas tentativas de agendamento. Aguarde um pouco e tente novamente.' }, 429, req)
     }
 
     const availability = await getAvailableSlots(
@@ -124,10 +124,10 @@ Deno.serve(async (req: Request) => {
       business.id,
       business.timezone,
     )
-    if (!availability.service) return json({ error: 'Serviço não encontrado.' }, 404)
+    if (!availability.service) return json({ error: 'Serviço não encontrado.' }, 404, req)
 
     const chosen = availability.slots.find((slot) => slot.time === time)
-    if (!chosen) return json({ error: 'Esse horário não está mais disponível. Escolha outro horário.' }, 409)
+    if (!chosen) return json({ error: 'Esse horário não está mais disponível. Escolha outro horário.' }, 409, req)
 
     const { data: client, error: clientError } = await supabase
       .from('clients')
@@ -168,7 +168,7 @@ Deno.serve(async (req: Request) => {
 
     if (appointmentError) {
       if (appointmentError.code === '23P01' || appointmentError.code === '23505') {
-        return json({ error: 'Esse horário acabou de ser reservado. Escolha outro horário.' }, 409)
+        return json({ error: 'Esse horário acabou de ser reservado. Escolha outro horário.' }, 409, req)
       }
       throw appointmentError
     }
@@ -307,9 +307,9 @@ Deno.serve(async (req: Request) => {
         calendar_synced: calendarSynced,
       },
       booking_token: token,
-    }, 201)
+    }, 201, req)
   } catch (error) {
     console.error('create_booking_error', error)
-    return json({ error: 'Não foi possível concluir o agendamento agora.' }, 500)
+    return json({ error: 'Não foi possível concluir o agendamento agora.' }, 500, req)
   }
 })

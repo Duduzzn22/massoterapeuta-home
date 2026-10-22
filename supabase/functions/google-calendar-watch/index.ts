@@ -7,11 +7,11 @@ import { resolveBusiness, userCanAccessBusiness } from '../_shared/business.ts'
 Deno.serve(async (req: Request) => {
   const preflight = handleOptions(req)
   if (preflight) return preflight
-  if (req.method !== 'POST') return json({ error: 'Método não permitido.' }, 405)
+  if (req.method !== 'POST') return json({ error: 'Método não permitido.' }, 405, req)
 
   try {
     const auth = await requireAdmin(req)
-    if (!auth) return json({ error: 'Acesso não autorizado.' }, 403)
+    if (!auth) return json({ error: 'Acesso não autorizado.' }, 403, req)
 
     const body = await req.json().catch(() => ({}))
     const business = await resolveBusiness(auth.supabase, {
@@ -19,31 +19,31 @@ Deno.serve(async (req: Request) => {
       slug: typeof body?.business_slug === 'string' ? body.business_slug : null,
     })
     if (!business || !(await userCanAccessBusiness(auth.supabase, auth.user.id, business.id))) {
-      return json({ error: 'Empresa não encontrada ou acesso negado.' }, 403)
+      return json({ error: 'Empresa não encontrada ou acesso negado.' }, 403, req)
     }
     const action = typeof body?.action === 'string' ? body.action : 'status'
 
     if (action === 'status') {
-      return json({ ok: true, state: await getCalendarSyncState(business.id) })
+      return json({ ok: true, state: await getCalendarSyncState(business.id) }, 200, req)
     }
 
     if (action === 'sync') {
       const result = await runCalendarSync({ forceFull: body?.force_full === true, businessId: business.id })
-      return json({ ok: true, result })
+      return json({ ok: true, result }, 200, req)
     }
 
     if (action === 'stop') {
-      return json({ ok: true, result: await stopStoredCalendarWatch(business.id) })
+      return json({ ok: true, result: await stopStoredCalendarWatch(business.id) }, 200, req)
     }
 
     if (action === 'start' || action === 'renew') {
       const result = await createOrRenewCalendarWatch({ forceFull: body?.force_full === true, businessId: business.id })
-      return json({ ok: true, result })
+      return json({ ok: true, result }, 200, req)
     }
 
-    return json({ error: 'Ação inválida. Use status, sync, start, renew ou stop.' }, 400)
+    return json({ error: 'Ação inválida. Use status, sync, start, renew ou stop.' }, 400, req)
   } catch (error) {
     console.error('google_calendar_watch_error', error)
-    return json({ error: 'Não foi possível configurar a sincronização do Google Calendar.' }, 500)
+    return json({ error: 'Não foi possível configurar a sincronização do Google Calendar.' }, 500, req)
   }
 })
