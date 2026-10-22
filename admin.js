@@ -337,11 +337,35 @@ async function updateAppointment(id, action) {
   }
 }
 
-function switchView(view) {
-  document.querySelectorAll('.nav-item').forEach(button => button.classList.toggle('active', button.dataset.view === view));
+const VIEW_ORDER = ['agenda', 'clientes', 'whatsapp', 'campanhas'];
+const VIEW_TITLES = { agenda: 'Agenda', clientes: 'Clientes', whatsapp: 'WhatsApp', campanhas: 'Campanhas' };
+
+function switchView(view, { focusTab = false } = {}) {
+  if (!VIEW_ORDER.includes(view)) view = 'agenda';
+  document.querySelectorAll('.nav-item').forEach(button => {
+    const selected = button.dataset.view === view;
+    button.classList.toggle('active', selected);
+    button.setAttribute('aria-selected', selected ? 'true' : 'false');
+    button.setAttribute('tabindex', selected ? '0' : '-1');
+    if (selected && focusTab) button.focus();
+  });
   document.querySelectorAll('.view-panel').forEach(panel => panel.classList.toggle('active', panel.dataset.panel === view));
-  const titles = { agenda: 'Agenda', clientes: 'Clientes', whatsapp: 'WhatsApp', campanhas: 'Campanhas' };
-  viewTitle.textContent = titles[view] || 'Painel';
+  viewTitle.textContent = VIEW_TITLES[view];
+}
+
+function handleTabKey(event) {
+  const target = event.target.closest('.nav-item');
+  if (!target || target.getAttribute('role') !== 'tab') return;
+  const currentIndex = VIEW_ORDER.indexOf(target.dataset.view);
+  if (currentIndex === -1) return;
+  let nextIndex = null;
+  if (event.key === 'ArrowRight' || event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % VIEW_ORDER.length;
+  else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + VIEW_ORDER.length) % VIEW_ORDER.length;
+  else if (event.key === 'Home') nextIndex = 0;
+  else if (event.key === 'End') nextIndex = VIEW_ORDER.length - 1;
+  if (nextIndex === null) return;
+  event.preventDefault();
+  switchView(VIEW_ORDER[nextIndex], { focusTab: true });
 }
 
 loginForm.addEventListener('submit', async event => {
@@ -380,6 +404,7 @@ refreshButton.addEventListener('click', loadData);
 clientSearch?.addEventListener('input', event => renderClients(event.target.value));
 
 document.querySelectorAll('.nav-item').forEach(button => button.addEventListener('click', () => switchView(button.dataset.view)));
+document.querySelector('.admin-nav')?.addEventListener('keydown', handleTabKey);
 
 document.addEventListener('click', event => {
   const button = event.target.closest('[data-appointment-action]');

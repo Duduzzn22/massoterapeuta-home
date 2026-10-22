@@ -40,11 +40,11 @@
           <span class="admin-brand-mark">✦</span>
           <span><strong>Carla Lira</strong><small>Gestão</small></span>
         </a>
-        <nav class="admin-nav" aria-label="Navegação do painel">
-          <button class="nav-item active" data-view="agenda">Agenda</button>
-          <button class="nav-item" data-view="clientes">Clientes</button>
-          <button class="nav-item" data-view="whatsapp">WhatsApp</button>
-          <button class="nav-item" data-view="campanhas">Campanhas</button>
+        <nav class="admin-nav" role="tablist" aria-label="Navegação do painel">
+          <button class="nav-item active" role="tab" id="tab-agenda" aria-selected="true" aria-controls="view-agenda" tabindex="0" data-view="agenda">Agenda</button>
+          <button class="nav-item" role="tab" id="tab-clientes" aria-selected="false" aria-controls="view-clientes" tabindex="-1" data-view="clientes">Clientes</button>
+          <button class="nav-item" role="tab" id="tab-whatsapp" aria-selected="false" aria-controls="view-whatsapp" tabindex="-1" data-view="whatsapp">WhatsApp</button>
+          <button class="nav-item" role="tab" id="tab-campanhas" aria-selected="false" aria-controls="view-campanhas" tabindex="-1" data-view="campanhas">Campanhas</button>
         </nav>
         <div class="sidebar-footer">
           <span id="admin-user-name">Administrador</span>
@@ -63,7 +63,7 @@
 
         <div id="global-feedback" class="global-feedback" role="status" aria-live="polite"></div>
 
-        <section class="view-panel active" id="view-agenda" data-panel="agenda">
+        <section class="view-panel active" id="view-agenda" role="tabpanel" aria-labelledby="tab-agenda" data-panel="agenda">
           <div class="metric-grid">
             <article class="metric-card"><span>Hoje</span><strong id="metric-today">0</strong><small>atendimentos</small></article>
             <article class="metric-card"><span>Pendentes</span><strong id="metric-pending">0</strong><small>aguardando confirmação</small></article>
@@ -76,14 +76,14 @@
           </div>
         </section>
 
-        <section class="view-panel" id="view-clientes" data-panel="clientes">
+        <section class="view-panel" id="view-clientes" role="tabpanel" aria-labelledby="tab-clientes" data-panel="clientes">
           <div class="panel-card">
             <div class="panel-heading"><div><h2>Clientes</h2><p>Histórico comercial e etapa atual do relacionamento.</p></div><input id="client-search" class="search-input" type="search" placeholder="Buscar cliente ou telefone" /></div>
             <div class="table-wrap"><table><thead><tr><th>Cliente</th><th>WhatsApp</th><th>Cidade</th><th>Etapa CRM</th><th>Último contato</th></tr></thead><tbody id="clients-body"></tbody></table></div>
           </div>
         </section>
 
-        <section class="view-panel" id="view-whatsapp" data-panel="whatsapp">
+        <section class="view-panel" id="view-whatsapp" role="tabpanel" aria-labelledby="tab-whatsapp" data-panel="whatsapp">
           <div class="split-grid">
             <div class="panel-card">
               <div class="panel-heading"><div><h2>Respostas rápidas</h2><p>Atalhos preparados para o atendimento.</p></div></div>
@@ -96,7 +96,7 @@
           </div>
         </section>
 
-        <section class="view-panel" id="view-campanhas" data-panel="campanhas">
+        <section class="view-panel" id="view-campanhas" role="tabpanel" aria-labelledby="tab-campanhas" data-panel="campanhas">
           <div class="panel-card">
             <div class="panel-heading"><div><h2>Campanhas</h2><p>Somente clientes com consentimento de marketing poderão receber envios.</p></div><button class="secondary-button" id="new-campaign-button" disabled>Nova campanha</button></div>
             <div class="table-wrap"><table><thead><tr><th>Campanha</th><th>Template</th><th>Status</th><th>Programada</th></tr></thead><tbody id="campaigns-body"></tbody></table></div>
