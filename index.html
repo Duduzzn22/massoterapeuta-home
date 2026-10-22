@@ -557,8 +557,7 @@
             <p class="eyebrow">agendamento</p>
             <h2>Pronta para começar sua jornada de bem-estar?</h2>
             <p>
-              Escolha o serviço, local, data e horário. Seu pedido será registrado com segurança,
-              e a Carla poderá confirmar os próximos detalhes pelo WhatsApp.
+              Escolha o serviço, local, data e horário. Seu pedido será registrado com segurança e a confirmação será enviada pelo WhatsApp.
             </p>
 
             <div class="agendamento-info-cards">
@@ -606,10 +605,12 @@
                 <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
               </div>
 
+              <p id="selected-plan" class="selected-plan" role="status" aria-live="polite" hidden></p>
+
               <!-- Seleção de serviço por card -->
               <div class="form-group">
                 <label class="form-label">Qual serviço você deseja?</label>
-                <div class="servico-grid" role="radiogroup" aria-label="Selecione o serviço">
+                <div class="servico-grid" role="radiogroup" aria-label="Selecione o serviço" aria-describedby="erro-servico">
                   <label class="servico-card">
                     <input type="radio" name="servico" value="Massagem Sueca" required />
                     <span class="servico-card-icon">
@@ -690,9 +691,45 @@
                   name="nome"
                   placeholder="Como prefere ser chamada?"
                   autocomplete="given-name"
+                  aria-describedby="erro-nome"
                   required
                 />
                 <span class="form-error" id="erro-nome">Por favor, informe seu nome.</span>
+              </div>
+
+              <!-- Contato: WhatsApp + E-mail -->
+              <div class="form-row booking-contact-row">
+                <div class="form-group">
+                  <label class="form-label" for="telefone">WhatsApp</label>
+                  <input class="form-input" type="tel" id="telefone" name="telefone" placeholder="(19) 99999-9999" autocomplete="tel" inputmode="tel" aria-describedby="erro-telefone" required />
+                  <span class="form-error" id="erro-telefone">Informe um WhatsApp válido.</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="email">E-mail <span class="form-label-opt">(opcional)</span></label>
+                  <input class="form-input" type="email" id="email" name="email" placeholder="voce@exemplo.com" autocomplete="email" aria-describedby="erro-email" />
+                  <span class="form-error" id="erro-email">Informe um e-mail válido.</span>
+                </div>
+              </div>
+
+              <!-- Local do atendimento -->
+              <div class="form-group booking-location-group">
+                <label class="form-label">Onde deseja o atendimento?</label>
+                <div class="booking-location-options" role="radiogroup" aria-label="Local do atendimento">
+                  <label class="booking-choice"><input type="radio" id="location-spa" name="location_type" value="spa" checked /> <span>Spa Carla Lira</span></label>
+                  <label class="booking-choice"><input type="radio" name="location_type" value="home_care" /> <span>Na minha residência</span></label>
+                </div>
+                <div class="form-row booking-home-fields" id="home-care-fields" hidden>
+                  <div class="form-group">
+                    <label class="form-label" for="cidade">Cidade</label>
+                    <input class="form-input" type="text" id="cidade" name="cidade" placeholder="Sua cidade" autocomplete="address-level2" aria-describedby="erro-cidade" />
+                    <span class="form-error" id="erro-cidade">Informe a cidade.</span>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="bairro">Bairro</label>
+                    <input class="form-input" type="text" id="bairro" name="bairro" placeholder="Seu bairro" autocomplete="address-level3" aria-describedby="erro-bairro" />
+                    <span class="form-error" id="erro-bairro">Informe o bairro.</span>
+                  </div>
+                </div>
               </div>
 
               <!-- Data e Horário lado a lado -->
@@ -704,6 +741,7 @@
                     type="date"
                     id="data"
                     name="data"
+                    aria-describedby="erro-data"
                     required
                   />
                   <span class="form-error" id="erro-data">Selecione uma data.</span>
@@ -711,17 +749,8 @@
 
                 <div class="form-group">
                   <label class="form-label" for="horario">Horário preferido</label>
-                  <select class="form-input form-select" id="horario" name="horario" required>
-                    <option value="">Selecione</option>
-                    <option value="08:00">08:00</option>
-                    <option value="09:00">09:00</option>
-                    <option value="10:00">10:00</option>
-                    <option value="11:00">11:00</option>
-                    <option value="13:00">13:00</option>
-                    <option value="14:00">14:00</option>
-                    <option value="15:00">15:00</option>
-                    <option value="16:00">16:00</option>
-                    <option value="17:00">17:00</option>
+                  <select class="form-input form-select" id="horario" name="horario" aria-describedby="erro-horario" required disabled>
+                    <option value="">Escolha o serviço e a data</option>
                   </select>
                   <span class="form-error" id="erro-horario">Selecione um horário.</span>
                 </div>
@@ -736,9 +765,22 @@
                   class="form-input form-textarea"
                   id="observacao"
                   name="observacao"
-                  placeholder="Alguma região com dor? Restrição? Preferência de pressão?"
+                  placeholder="Informação útil para organizar o atendimento (opcional). Evite inserir dados de saúde sensíveis."
                   rows="3"
                 ></textarea>
+              </div>
+
+              <!-- Consentimentos WhatsApp -->
+              <div class="form-group booking-consents">
+                <label class="booking-consent">
+                  <input type="checkbox" id="consent-service" aria-describedby="erro-consentimento" required />
+                  <span>Autorizo o envio de confirmações e informações do meu atendimento pelo WhatsApp.</span>
+                </label>
+                <label class="booking-consent">
+                  <input type="checkbox" id="consent-marketing" />
+                  <span>Quero receber novidades, horários disponíveis e promoções pelo WhatsApp. <strong>Opcional.</strong></span>
+                </label>
+                <span class="form-error" id="erro-consentimento">Autorize as mensagens necessárias para o agendamento.</span>
               </div>
 
               <div class="agendamento-submit-info" id="agendamento-submit-info">
@@ -760,6 +802,8 @@
                   </svg>
                 </span>
               </button>
+
+              <div id="booking-feedback" class="booking-feedback" role="status" aria-live="polite"></div>
 
               <p class="agendamento-disclaimer">
                 Ao enviar, você concorda com o tratamento dos dados necessário para organizar o atendimento.

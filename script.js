@@ -156,104 +156,6 @@ if (form) {
     dataEl.min = `${ano}-${mes}-${dia}`;
   }
 
-  function injectEnhancedFields() {
-    if (!document.getElementById('selected-plan')) {
-      form.insertAdjacentHTML('afterbegin', '<p id="selected-plan" class="selected-plan" role="status" aria-live="polite" hidden></p>');
-    }
-
-    const nomeGroup = nomeEl?.closest('.form-group');
-    if (nomeGroup && !document.getElementById('telefone')) {
-      nomeGroup.insertAdjacentHTML('afterend', `
-        <div class="form-row booking-contact-row">
-          <div class="form-group">
-            <label class="form-label" for="telefone">WhatsApp</label>
-            <input class="form-input" type="tel" id="telefone" name="telefone" placeholder="(19) 99999-9999" autocomplete="tel" inputmode="tel" aria-describedby="erro-telefone" required />
-            <span class="form-error" id="erro-telefone">Informe um WhatsApp válido.</span>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="email">E-mail <span class="form-label-opt">(opcional)</span></label>
-            <input class="form-input" type="email" id="email" name="email" placeholder="voce@exemplo.com" autocomplete="email" aria-describedby="erro-email" />
-            <span class="form-error" id="erro-email">Informe um e-mail válido.</span>
-          </div>
-        </div>
-      `);
-    }
-
-    const dateRow = dataEl?.closest('.form-row');
-    if (dateRow && !document.getElementById('location-spa')) {
-      dateRow.insertAdjacentHTML('beforebegin', `
-        <div class="form-group booking-location-group">
-          <label class="form-label">Onde deseja o atendimento?</label>
-          <div class="booking-location-options" role="radiogroup" aria-label="Local do atendimento">
-            <label class="booking-choice"><input type="radio" id="location-spa" name="location_type" value="spa" checked /> <span>Spa Carla Lira</span></label>
-            <label class="booking-choice"><input type="radio" name="location_type" value="home_care" /> <span>Na minha residência</span></label>
-          </div>
-          <div class="form-row booking-home-fields" id="home-care-fields" hidden>
-            <div class="form-group">
-              <label class="form-label" for="cidade">Cidade</label>
-              <input class="form-input" type="text" id="cidade" name="cidade" placeholder="Sua cidade" autocomplete="address-level2" aria-describedby="erro-cidade" />
-              <span class="form-error" id="erro-cidade">Informe a cidade.</span>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="bairro">Bairro</label>
-              <input class="form-input" type="text" id="bairro" name="bairro" placeholder="Seu bairro" autocomplete="address-level3" aria-describedby="erro-bairro" />
-              <span class="form-error" id="erro-bairro">Informe o bairro.</span>
-            </div>
-          </div>
-        </div>
-      `);
-    }
-
-    if (obsEl) {
-      obsEl.placeholder = 'Informação útil para organizar o atendimento (opcional). Evite inserir dados de saúde sensíveis.';
-      const obsGroup = obsEl.closest('.form-group');
-      if (obsGroup && !document.getElementById('consent-service')) {
-        obsGroup.insertAdjacentHTML('afterend', `
-          <div class="form-group booking-consents">
-            <label class="booking-consent">
-              <input type="checkbox" id="consent-service" required />
-              <span>Autorizo o envio de confirmações e informações do meu atendimento pelo WhatsApp.</span>
-            </label>
-            <label class="booking-consent">
-              <input type="checkbox" id="consent-marketing" />
-              <span>Quero receber novidades, horários disponíveis e promoções pelo WhatsApp. <strong>Opcional.</strong></span>
-            </label>
-            <span class="form-error" id="erro-consentimento">Autorize as mensagens necessárias para o agendamento.</span>
-          </div>
-        `);
-      }
-    }
-
-    if (btn) {
-      const text = btn.querySelector('.btn-texto');
-      if (text) text.textContent = 'Confirmar horário';
-      if (!document.getElementById('booking-feedback')) {
-        btn.insertAdjacentHTML('afterend', '<div id="booking-feedback" class="booking-feedback" role="status" aria-live="polite"></div>');
-      }
-    }
-
-    const intro = document.querySelector('.agendamento-intro > p:not(.eyebrow)');
-    if (intro) {
-      intro.textContent = 'Escolha o serviço, local, data e horário. Seu pedido será registrado com segurança e a confirmação será enviada pelo WhatsApp.';
-    }
-
-    if (horarioEl) {
-      horarioEl.innerHTML = '<option value="">Escolha o serviço e a data</option>';
-      horarioEl.disabled = true;
-    }
-
-    const descriptions = {
-      nome: 'erro-nome',
-      data: 'erro-data',
-      horario: 'erro-horario',
-      'consent-service': 'erro-consentimento',
-    };
-    Object.entries(descriptions).forEach(([id, errorId]) => {
-      document.getElementById(id)?.setAttribute('aria-describedby', errorId);
-    });
-    form.querySelector('.servico-grid')?.setAttribute('aria-describedby', 'erro-servico');
-  }
-
   function feedback(message, type = 'info') {
     const el = document.getElementById('booking-feedback');
     if (!el) return;
@@ -405,7 +307,6 @@ if (form) {
     return `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(message)}`;
   }
 
-  injectEnhancedFields();
   setMinDate();
   configureLocationFields();
 
