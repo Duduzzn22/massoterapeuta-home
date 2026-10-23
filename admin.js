@@ -404,7 +404,12 @@ logoutButton.addEventListener('click', async () => {
 });
 
 refreshButton.addEventListener('click', loadData);
-clientSearch?.addEventListener('input', event => renderClients(event.target.value));
+let clientSearchDebounce;
+clientSearch?.addEventListener('input', event => {
+  const value = event.target.value;
+  clearTimeout(clientSearchDebounce);
+  clientSearchDebounce = setTimeout(() => renderClients(value), 150);
+});
 
 document.querySelectorAll('.nav-item').forEach(button => button.addEventListener('click', () => switchView(button.dataset.view)));
 document.querySelector('.admin-nav')?.addEventListener('keydown', handleTabKey);
