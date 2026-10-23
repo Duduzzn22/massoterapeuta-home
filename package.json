@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "massoterapeuta-home",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-config.mjs && node scripts/build-static.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "html-minifier-terser": "^7.2.0"
+  }
+}
