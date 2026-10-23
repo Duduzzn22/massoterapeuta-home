@@ -15,7 +15,7 @@
 
 .agendamento-intro {
   position: sticky;
-  top: 100px;
+  top: calc(var(--header-height) + 1.5rem);
 }
 
 .agendamento-intro h2 {
