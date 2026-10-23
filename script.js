@@ -8,6 +8,21 @@ if (copyrightYear) {
 }
 
 /* =============================================
+   CARROSSEL DEPOIMENTOS — pausa fora da viewport
+   (hover, focus-within e prefers-reduced-motion já cobertos no CSS)
+   ============================================= */
+
+const carouselTrack = document.querySelector('.carousel-track');
+if (carouselTrack && 'IntersectionObserver' in window) {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      carouselTrack.style.animationPlayState = entry.isIntersecting ? '' : 'paused';
+    });
+  }, { threshold: 0 });
+  observer.observe(carouselTrack);
+}
+
+/* =============================================
    MENU MOBILE — toggle com acessibilidade
    ============================================= */
 
