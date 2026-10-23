@@ -93,6 +93,7 @@ function showDashboard() {
   loginShell.hidden = true;
   dashboardShell.hidden = false;
   document.getElementById('admin-user-name').textContent = state.profile?.full_name || 'Administrador';
+  switchView(viewFromHash(), { push: false });
 }
 
 function getLoginErrorMessage(error) {
@@ -369,7 +370,7 @@ async function updateAppointment(id, action) {
 const VIEW_ORDER = ['agenda', 'clientes', 'whatsapp', 'campanhas'];
 const VIEW_TITLES = { agenda: 'Agenda', clientes: 'Clientes', whatsapp: 'WhatsApp', campanhas: 'Campanhas' };
 
-function switchView(view, { focusTab = false } = {}) {
+function switchView(view, { focusTab = false, push = true } = {}) {
   if (!VIEW_ORDER.includes(view)) view = 'agenda';
   document.querySelectorAll('.nav-item').forEach(button => {
     const selected = button.dataset.view === view;
@@ -380,6 +381,14 @@ function switchView(view, { focusTab = false } = {}) {
   });
   document.querySelectorAll('.view-panel').forEach(panel => panel.classList.toggle('active', panel.dataset.panel === view));
   viewTitle.textContent = VIEW_TITLES[view];
+  if (push && window.location.hash !== `#${view}`) {
+    history.pushState({ view }, '', `#${view}`);
+  }
+}
+
+function viewFromHash() {
+  const hash = (window.location.hash || '').slice(1);
+  return VIEW_ORDER.includes(hash) ? hash : 'agenda';
 }
 
 function handleTabKey(event) {
@@ -441,6 +450,7 @@ clientSearch?.addEventListener('input', event => {
 
 document.querySelectorAll('.nav-item').forEach(button => button.addEventListener('click', () => switchView(button.dataset.view)));
 document.querySelector('.admin-nav')?.addEventListener('keydown', handleTabKey);
+window.addEventListener('popstate', () => switchView(viewFromHash(), { push: false }));
 
 document.getElementById('dashboard-shell')?.addEventListener('click', event => {
   const button = event.target.closest('[data-appointment-action]');
