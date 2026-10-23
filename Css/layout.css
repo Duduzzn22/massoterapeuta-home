@@ -31,7 +31,7 @@
   display: flex;
   gap: 1rem;
   justify-content: space-between;
-  min-height: 78px;
+  min-height: var(--header-height);
 }
 
 .brand {

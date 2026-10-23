@@ -86,7 +86,7 @@ body {
     left: 0;
     right: 0;
     width: 100%;
-    max-height: calc(100vh - 72px);
+    max-height: calc(100vh - var(--header-height));
     overflow-y: auto;
     background: #2b1d12;
     display: none;

@@ -16,6 +16,7 @@
   --radius-large: 20px;
   --radius-medium: 14px;
   --max-width: 1120px;
+  --header-height: 78px;
 }
 
 * {
