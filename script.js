@@ -1,4 +1,13 @@
 /* =============================================
+   FOOTER — ano dinâmico do copyright
+   ============================================= */
+
+const copyrightYear = document.getElementById('copyright-year');
+if (copyrightYear) {
+  copyrightYear.textContent = new Date().getFullYear();
+}
+
+/* =============================================
    MENU MOBILE — toggle com acessibilidade
    ============================================= */
 
