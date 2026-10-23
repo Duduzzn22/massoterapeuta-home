@@ -407,7 +407,7 @@ clientSearch?.addEventListener('input', event => renderClients(event.target.valu
 document.querySelectorAll('.nav-item').forEach(button => button.addEventListener('click', () => switchView(button.dataset.view)));
 document.querySelector('.admin-nav')?.addEventListener('keydown', handleTabKey);
 
-document.addEventListener('click', event => {
+document.getElementById('dashboard-shell')?.addEventListener('click', event => {
   const button = event.target.closest('[data-appointment-action]');
   if (button) updateAppointment(button.dataset.id, button.dataset.appointmentAction);
 });
