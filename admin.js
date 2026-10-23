@@ -288,6 +288,15 @@ async function updateAppointment(id, action) {
   const appointment = state.appointments.find(item => item.id === id);
   if (!appointment) return;
 
+  const clientForPrompt = Array.isArray(appointment.clients) ? appointment.clients[0] : appointment.clients;
+  const clientName = clientForPrompt?.full_name || 'o cliente';
+  const when = formatDateTime(appointment.starts_at);
+  const CONFIRMS = {
+    cancel: `Cancelar o agendamento de ${clientName} em ${when}? Isso também remove o evento no Google Calendar.`,
+    complete: `Marcar o agendamento de ${clientName} em ${when} como concluído?`,
+  };
+  if (CONFIRMS[action] && !window.confirm(CONFIRMS[action])) return;
+
   setGlobalFeedback('');
   try {
     let calendarWarning = '';
