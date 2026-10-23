@@ -21,11 +21,6 @@ if (toggle && nav) {
   });
 }
 
-/* Mantém a ação principal antes das dúvidas e da localização. */
-const bookingSection = document.getElementById('agendar');
-const faqSection = document.getElementById('faq');
-if (bookingSection && faqSection) faqSection.before(bookingSection);
-
 /* =============================================
    DÚVIDAS FREQUENTES — acordeão com movimento
    ============================================= */
