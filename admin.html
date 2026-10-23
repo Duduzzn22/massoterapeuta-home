@@ -9,7 +9,7 @@
   <title>Painel | Carla Lira</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Playfair+Display:wght@600..700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="stylesheet" href="Css/admin.css" />
   <link rel="stylesheet" href="Css/admin-mobile.css" />
@@ -18,7 +18,7 @@
   <main class="admin-page">
     <section class="login-shell" id="login-shell">
       <div class="login-card">
-        <a href="index.html" class="admin-brand" aria-label="Voltar para o site">
+        <a href="index.html" class="admin-brand" aria-label="Abrir o site público em nova aba" target="_blank" rel="noopener noreferrer">
           <span class="admin-brand-mark">✦</span>
           <span><strong>Carla Almeida Lira</strong><small>Massoterapia Spa</small></span>
         </a>
@@ -38,15 +38,15 @@
 
     <section class="dashboard-shell" id="dashboard-shell" hidden>
       <aside class="admin-sidebar">
-        <a href="index.html" class="admin-brand admin-brand-sidebar">
+        <a href="index.html" class="admin-brand admin-brand-sidebar" aria-label="Abrir o site público em nova aba" target="_blank" rel="noopener noreferrer">
           <span class="admin-brand-mark">✦</span>
           <span><strong>Carla Lira</strong><small>Gestão</small></span>
         </a>
         <nav class="admin-nav" role="tablist" aria-label="Navegação do painel">
-          <button class="nav-item active" role="tab" id="tab-agenda" aria-selected="true" aria-controls="view-agenda" tabindex="0" data-view="agenda">Agenda</button>
-          <button class="nav-item" role="tab" id="tab-clientes" aria-selected="false" aria-controls="view-clientes" tabindex="-1" data-view="clientes">Clientes</button>
-          <button class="nav-item" role="tab" id="tab-whatsapp" aria-selected="false" aria-controls="view-whatsapp" tabindex="-1" data-view="whatsapp">WhatsApp</button>
-          <button class="nav-item" role="tab" id="tab-campanhas" aria-selected="false" aria-controls="view-campanhas" tabindex="-1" data-view="campanhas">Campanhas</button>
+          <button class="nav-item active" role="tab" id="tab-agenda" aria-selected="true" aria-controls="view-agenda" tabindex="0" data-view="agenda" title="Agenda" aria-label="Agenda">Agenda</button>
+          <button class="nav-item" role="tab" id="tab-clientes" aria-selected="false" aria-controls="view-clientes" tabindex="-1" data-view="clientes" title="Clientes" aria-label="Clientes">Clientes</button>
+          <button class="nav-item" role="tab" id="tab-whatsapp" aria-selected="false" aria-controls="view-whatsapp" tabindex="-1" data-view="whatsapp" title="WhatsApp" aria-label="WhatsApp">WhatsApp</button>
+          <button class="nav-item" role="tab" id="tab-campanhas" aria-selected="false" aria-controls="view-campanhas" tabindex="-1" data-view="campanhas" title="Campanhas" aria-label="Campanhas">Campanhas</button>
         </nav>
         <div class="sidebar-footer">
           <span id="admin-user-name">Administrador</span>
@@ -100,7 +100,7 @@
 
         <section class="view-panel" id="view-campanhas" role="tabpanel" aria-labelledby="tab-campanhas" data-panel="campanhas">
           <div class="panel-card">
-            <div class="panel-heading"><div><h2>Campanhas</h2><p>Somente clientes com consentimento de marketing poderão receber envios.</p></div><button class="secondary-button" id="new-campaign-button" disabled>Nova campanha</button></div>
+            <div class="panel-heading"><div><h2>Campanhas</h2><p>Somente clientes com consentimento de marketing poderão receber envios.</p></div><button class="secondary-button" id="new-campaign-button" disabled aria-disabled="true" title="Disponível quando a Cloud API do WhatsApp estiver conectada">Nova campanha <small style="font-weight:400; opacity:.7">(em breve)</small></button></div>
             <div class="table-wrap"><table><thead><tr><th>Campanha</th><th>Template</th><th>Status</th><th>Programada</th></tr></thead><tbody id="campaigns-body"></tbody></table></div>
           </div>
         </section>
