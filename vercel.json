@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "node scripts/build-config.mjs",
-  "outputDirectory": ".",
+  "buildCommand": "node scripts/build-config.mjs && node scripts/build-static.mjs",
+  "outputDirectory": "dist",
   "headers": [
     {
       "source": "/admin.html",
