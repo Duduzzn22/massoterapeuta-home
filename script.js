@@ -140,9 +140,10 @@ faqItems.forEach(item => {
 const form = document.getElementById('form-agendamento');
 
 if (form) {
-  const FUNCTIONS_BASE = 'https://nmjssxbneqepqonvcvoe.supabase.co/functions/v1';
-  const BUSINESS_SLUG = 'massoterapia-spa';
-  const NUMERO_WHATSAPP = '5519993297780';
+  const appConfig = window.__APP_CONFIG__ || {};
+  const FUNCTIONS_BASE = appConfig.FUNCTIONS_BASE || 'https://nmjssxbneqepqonvcvoe.supabase.co/functions/v1';
+  const BUSINESS_SLUG = appConfig.BUSINESS_SLUG || 'massoterapia-spa';
+  const NUMERO_WHATSAPP = appConfig.WHATSAPP_NUMBER || '5519993297780';
 
   const SERVICE_SLUGS = {
     'Massagem Sueca': 'massagem-sueca',
