@@ -3,6 +3,18 @@ import { createAdminClient } from './supabase.ts'
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
 const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3'
 
+// Strip markup-ish characters and collapse whitespace so the description
+// is safe if copy-pasted into any innerHTML-rendering surface downstream.
+// 120-char cap on summary line keeps the string manageable and matches
+// the limit already applied to names on the booking form.
+function sanitizeCalendarField(value: string, maxLen = 500): string {
+  return String(value ?? '')
+    .replace(/[<>&]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxLen)
+}
+
 function env(name: string) {
   const value = Deno.env.get(name)
   if (!value) throw new Error(`${name} is not configured`)
@@ -52,6 +64,10 @@ export async function createBookingCalendarEvent(input: {
 }) {
   const token = await accessToken()
   const calendarId = encodeURIComponent(input.calendarId)
+  const businessName = sanitizeCalendarField(input.businessName, 120)
+  const clientName = sanitizeCalendarField(input.clientName, 120)
+  const serviceName = sanitizeCalendarField(input.serviceName, 120)
+  const phone = sanitizeCalendarField(input.phone, 32)
   const response = await fetch(`${GOOGLE_CALENDAR_API}/calendars/${calendarId}/events`, {
     method: 'POST',
     headers: {
@@ -59,8 +75,8 @@ export async function createBookingCalendarEvent(input: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      summary: `${input.serviceName} — ${input.clientName}`,
-      description: `Agendamento ${input.businessName}\nCliente: ${input.clientName}\nContato: ${input.phone}\nID: ${input.appointmentId}`,
+      summary: `${serviceName} — ${clientName}`,
+      description: `Agendamento ${businessName}\nCliente: ${clientName}\nContato: ${phone}\nID: ${input.appointmentId}`,
       location: input.location,
       start: { dateTime: input.startsAt, timeZone: input.timeZone },
       end: { dateTime: input.endsAt, timeZone: input.timeZone },

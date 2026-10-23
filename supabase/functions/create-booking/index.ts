@@ -51,7 +51,24 @@ async function enforceBookingRateLimit(
 
   if (phoneResult.error) throw phoneResult.error
   if (ipResult.error) throw ipResult.error
-  if ((phoneResult.count ?? 0) >= 3 || (ipResult.count ?? 0) >= 10) return false
+  const phoneCount = phoneResult.count ?? 0
+  const ipCount = ipResult.count ?? 0
+  if (phoneCount >= 3 || ipCount >= 10) {
+    const { error: auditError } = await supabase.from('audit_logs').insert({
+      business_id: businessId,
+      action: 'booking_rate_limit_exceeded',
+      entity_type: 'booking',
+      payload: {
+        phone_hash: phoneHash,
+        ip_hash: ipHash,
+        phone_count: phoneCount,
+        ip_count: ipCount,
+        limiter: phoneCount >= 3 ? 'phone' : 'ip',
+      },
+    })
+    if (auditError) console.warn('booking_rate_limit_audit_failed', auditError)
+    return false
+  }
 
   const { error } = await supabase.from('booking_rate_limits').insert({
     business_id: businessId,

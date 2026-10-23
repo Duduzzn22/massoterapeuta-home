@@ -3,11 +3,7 @@ import { json } from '../_shared/http.ts'
 import { createBookingCalendarEvent } from '../_shared/calendar-booking.ts'
 import { resolveBusiness } from '../_shared/business.ts'
 import { sendWhatsApp, toWaRecipient } from '../_shared/whatsapp.ts'
-
-async function sha256Hex(value: string) {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('')
-}
+import { sha256Hex, timingSafeEqualString } from '../_shared/crypto.ts'
 
 function errText(error: unknown) {
   return error instanceof Error ? error.message.slice(0, 700) : 'Unknown notification processing error'
@@ -164,7 +160,7 @@ async function authorized(req: Request, supabase: ReturnType<typeof createAdminC
     .maybeSingle()
   if (error || !data?.secret_hash) return false
 
-  return await sha256Hex(supplied) === data.secret_hash
+  return timingSafeEqualString(await sha256Hex(supplied), data.secret_hash)
 }
 
 Deno.serve(async (req: Request) => {
