@@ -1,18 +1,7 @@
 import { createAdminClient } from '../_shared/supabase.ts'
 import { json, normalizeBrazilPhone } from '../_shared/http.ts'
 import { resolveBusinessFromWhatsAppPhoneNumber } from '../_shared/business.ts'
-
-function hexToBytes(hex: string) {
-  if (!/^[0-9a-f]+$/i.test(hex) || hex.length % 2) return new Uint8Array()
-  return new Uint8Array(hex.match(/.{2}/g)!.map((byte) => parseInt(byte, 16)))
-}
-
-function equalBytes(a: Uint8Array, b: Uint8Array) {
-  if (a.length !== b.length) return false
-  let diff = 0
-  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i]
-  return diff === 0
-}
+import { equalBytes, hexToBytes } from '../_shared/crypto.ts'
 
 async function verifySignature(rawBody: string, header: string | null) {
   const appSecret = Deno.env.get('META_APP_SECRET')
@@ -84,13 +73,16 @@ Deno.serve(async (req: Request) => {
     const mode = (url.searchParams.get('hub.mode') ?? '').trim()
     const token = (url.searchParams.get('hub.verify_token') ?? '').trim()
     const challenge = url.searchParams.get('hub.challenge')
-    const expected = (
-      Deno.env.get('WHATSAPP_WEBHOOK_VERIFY_TOKEN') ??
-      Deno.env.get('META_WEBHOOK_VERIFY_TOKEN') ??
-      ''
-    ).trim()
+    const canonical = Deno.env.get('WHATSAPP_WEBHOOK_VERIFY_TOKEN')?.trim() ?? ''
+    const legacy = Deno.env.get('META_WEBHOOK_VERIFY_TOKEN')?.trim() ?? ''
+    if (canonical && legacy && canonical !== legacy) {
+      console.warn('whatsapp_webhook_verify_token_conflict', {
+        detail: 'both WHATSAPP_WEBHOOK_VERIFY_TOKEN and META_WEBHOOK_VERIFY_TOKEN are set with different values; using WHATSAPP_WEBHOOK_VERIFY_TOKEN. Unset META_WEBHOOK_VERIFY_TOKEN to silence this warning.',
+      })
+    }
+    const expected = canonical || legacy
 
-    if (mode === 'subscribe' && token && expected && token === expected && challenge) {
+    if (mode === 'subscribe' && token && expected && equalBytes(new TextEncoder().encode(token), new TextEncoder().encode(expected)) && challenge) {
       return new Response(challenge, {
         status: 200,
         headers: { 'Content-Type': 'text/plain; charset=utf-8' },
