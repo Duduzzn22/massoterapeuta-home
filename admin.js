@@ -19,6 +19,7 @@ const clientSearch = document.getElementById('client-search');
 
 let state = {
   profile: null,
+  currentBusinessId: null,
   appointments: [],
   clients: [],
   quickReplies: [],
@@ -119,7 +120,25 @@ async function ensureAdmin(session) {
     await supabase.auth.signOut();
     return false;
   }
+
+  // Resolve the business this admin belongs to from business_members
+  // instead of trusting whatever business_id a row-level record carries.
+  // RLS already blocks cross-tenant writes, but reading the tenant id
+  // from the session makes the client code stop relying on mutable state.
+  const { data: membership, error: membershipError } = await supabase
+    .from('business_members')
+    .select('business_id')
+    .eq('user_id', session.user.id)
+    .limit(1)
+    .maybeSingle();
+  if (membershipError) throw membershipError;
+  if (!membership?.business_id) {
+    await supabase.auth.signOut();
+    return false;
+  }
+
   state.profile = profile;
+  state.currentBusinessId = membership.business_id;
   return true;
 }
 
@@ -297,7 +316,7 @@ async function updateAppointment(id, action) {
     const { error: appointmentError } = await supabase
       .from('appointments')
       .update(patch)
-      .eq('business_id', appointment.business_id)
+      .eq('business_id', state.currentBusinessId)
       .eq('id', id);
     if (appointmentError) throw appointmentError;
 
@@ -306,13 +325,13 @@ async function updateAppointment(id, action) {
       const { error: clientError } = await supabase
         .from('clients')
         .update({ crm_stage: target.crm, updated_at: new Date().toISOString() })
-        .eq('business_id', appointment.business_id)
+        .eq('business_id', state.currentBusinessId)
         .eq('id', client.id);
       if (clientError) console.warn('client_crm_update_failed', clientError);
     }
 
     const { error: eventError } = await supabase.from('appointment_events').insert({
-      business_id: appointment.business_id,
+      business_id: state.currentBusinessId,
       appointment_id: id,
       event_type: target.event,
       actor_user_id: state.profile.id,
