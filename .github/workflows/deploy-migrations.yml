@@ -1,0 +1,70 @@
+name: Deploy Supabase Migrations
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Diff-only (true) ou aplicar as pendentes (false)"
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-migrations
+  cancel-in-progress: false
+
+env:
+  SUPABASE_PROJECT_REF: nmjssxbneqepqonvcvoe
+
+jobs:
+  push:
+    name: db push
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${SUPABASE_ACCESS_TOKEN:-}" ]]; then
+            echo "::error::SUPABASE_ACCESS_TOKEN não configurado nos secrets do repositório"
+            exit 1
+          fi
+          if [[ -z "${SUPABASE_DB_PASSWORD:-}" ]]; then
+            echo "::error::SUPABASE_DB_PASSWORD não configurado nos secrets do repositório. Vá em Supabase Dashboard → Project Settings → Database → Database password e adicione o valor como secret SUPABASE_DB_PASSWORD."
+            exit 1
+          fi
+          supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Dry-run (migration diff)
+        if: ${{ inputs.dry_run }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          echo "::notice::DRY RUN — listando migrations pendentes (nada será aplicado)"
+          supabase db push --linked --dry-run
+
+      - name: Apply migrations
+        if: ${{ !inputs.dry_run }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          echo "::notice::Aplicando migrations pendentes em ${SUPABASE_PROJECT_REF}"
+          supabase db push --linked
