@@ -396,9 +396,11 @@ loginForm.addEventListener('submit', async event => {
 });
 
 logoutButton.addEventListener('click', async () => {
-  await supabase.auth.signOut();
-  state.profile = null;
-  showLogin();
+  try {
+    await supabase.auth.signOut({ scope: 'global' });
+  } finally {
+    window.location.reload();
+  }
 });
 
 refreshButton.addEventListener('click', loadData);
