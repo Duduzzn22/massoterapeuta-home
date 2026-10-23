@@ -88,6 +88,25 @@
   </script>
 </head>
 <body>
+  <!-- SVG sprite: symbols reused via <use href="#icon-NAME"/>. aria-hidden since it is not visible by itself. -->
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" focusable="false">
+    <defs>
+      <!-- stroke-based icons share stroke="currentColor" fill="none" stroke-linecap/stroke-linejoin round via the <use> wrapper -->
+      <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+      <symbol id="icon-mappin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+      <symbol id="icon-star" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></symbol>
+      <symbol id="icon-service-sueca" viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><path d="M12 8c-1.5 1-2 2.5-2 4s.5 3 2 4c1.5-1 2-2.5 2-4s-.5-3-2-4z"/></symbol>
+      <symbol id="icon-service-terapeutica" viewBox="0 0 24 24"><path d="M4 19V8.5A4.5 4.5 0 0 1 8.5 4v0A4.5 4.5 0 0 1 13 8.5V14"/><path d="M13 14c1.5 0 3 .5 4 2l3 3"/><path d="M7 14h6"/></symbol>
+      <symbol id="icon-service-pedras" viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="8" ry="5"/><path d="M8 14c0-3 1.5-5.5 4-7 2.5 1.5 4 4 4 7"/><path d="M9 9.5c1-.8 2-1.3 3-1.5 1 .2 2 .7 3 1.5"/></symbol>
+      <symbol id="icon-service-ventoso" viewBox="0 0 24 24"><path d="M12 19a7 7 0 1 0 0-14 7 7 0 0 0 0 14z"/><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M12 5V3M12 21v-2M5 12H3M21 12h-2"/></symbol>
+      <symbol id="icon-service-drenagem" viewBox="0 0 24 24"><path d="M12 2c0 6-6 8-6 14a6 6 0 0 0 12 0c0-6-6-8-6-14z"/><path d="M9 16.5c.8 1 1.8 1.5 3 1.5"/></symbol>
+      <symbol id="icon-service-miracle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2.5"/><line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2.5"/><path d="M12 3c0 2-1.5 3-1.5 3M12 3c0 2 1.5 3 1.5 3"/></symbol>
+      <symbol id="icon-calendar" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" stroke-width="1.8"/></symbol>
+      <symbol id="icon-calendar-check" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" stroke-width="1.8"/><path d="m8 16 2.2 2L16 13" stroke-width="1.8"/></symbol>
+      <symbol id="icon-whatsapp" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></symbol>
+    </defs>
+  </svg>
+
   <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 
   <header class="site-header" id="inicio">
@@ -494,9 +513,7 @@
             <div class="agendamento-info-cards">
               <div class="agendamento-info-card">
                 <span class="agendamento-info-icon">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                  </svg>
+                  <svg class="icon" width="22" height="22" stroke-width="1.8" aria-hidden="true"><use href="#icon-clock"/></svg>
                 </span>
                 <div>
                   <strong>Retorno em horário comercial</strong>
@@ -505,9 +522,7 @@
               </div>
               <div class="agendamento-info-card">
                 <span class="agendamento-info-icon">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
-                  </svg>
+                  <svg class="icon" width="22" height="22" stroke-width="1.8" aria-hidden="true"><use href="#icon-mappin"/></svg>
                 </span>
                 <div>
                   <strong>Atendimento no local / home care</strong>
@@ -516,9 +531,7 @@
               </div>
               <div class="agendamento-info-card">
                 <span class="agendamento-info-icon">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
-                  </svg>
+                  <svg class="icon" width="22" height="22" stroke-width="1.8" aria-hidden="true"><use href="#icon-star"/></svg>
                 </span>
                 <div>
                   <strong>Sem compromisso</strong>
@@ -545,66 +558,42 @@
                   <label class="servico-card">
                     <input type="radio" name="servico" value="Massagem Sueca" required />
                     <span class="servico-card-icon">
-                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
-                        <path d="M12 8c-1.5 1-2 2.5-2 4s.5 3 2 4c1.5-1 2-2.5 2-4s-.5-3-2-4z"/>
-                      </svg>
+                      <svg class="icon" width="26" height="26" stroke-width="1.6" aria-hidden="true"><use href="#icon-service-sueca"/></svg>
                     </span>
                     <span class="servico-card-nome">Massagem Sueca</span>
                   </label>
                   <label class="servico-card">
                     <input type="radio" name="servico" value="Massagem Terapêutica" />
                     <span class="servico-card-icon">
-                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M4 19V8.5A4.5 4.5 0 0 1 8.5 4v0A4.5 4.5 0 0 1 13 8.5V14"/>
-                        <path d="M13 14c1.5 0 3 .5 4 2l3 3"/>
-                        <path d="M7 14h6"/>
-                      </svg>
+                      <svg class="icon" width="26" height="26" stroke-width="1.6" aria-hidden="true"><use href="#icon-service-terapeutica"/></svg>
                     </span>
                     <span class="servico-card-nome">Massagem Terapêutica</span>
                   </label>
                   <label class="servico-card">
                     <input type="radio" name="servico" value="Pedras Quentes" />
                     <span class="servico-card-icon">
-                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <ellipse cx="12" cy="14" rx="8" ry="5"/>
-                        <path d="M8 14c0-3 1.5-5.5 4-7 2.5 1.5 4 4 4 7"/>
-                        <path d="M9 9.5c1-.8 2-1.3 3-1.5 1 .2 2 .7 3 1.5"/>
-                      </svg>
+                      <svg class="icon" width="26" height="26" stroke-width="1.6" aria-hidden="true"><use href="#icon-service-pedras"/></svg>
                     </span>
                     <span class="servico-card-nome">Pedras Quentes</span>
                   </label>
                   <label class="servico-card">
                     <input type="radio" name="servico" value="Ventosoterapia" />
                     <span class="servico-card-icon">
-                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M12 19a7 7 0 1 0 0-14 7 7 0 0 0 0 14z"/>
-                        <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-                        <path d="M12 5V3M12 21v-2M5 12H3M21 12h-2"/>
-                      </svg>
+                      <svg class="icon" width="26" height="26" stroke-width="1.6" aria-hidden="true"><use href="#icon-service-ventoso"/></svg>
                     </span>
                     <span class="servico-card-nome">Ventosoterapia</span>
                   </label>
                   <label class="servico-card">
                     <input type="radio" name="servico" value="Drenagem Linfática" />
                     <span class="servico-card-icon">
-                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M12 2c0 6-6 8-6 14a6 6 0 0 0 12 0c0-6-6-8-6-14z"/>
-                        <path d="M9 16.5c.8 1 1.8 1.5 3 1.5"/>
-                      </svg>
+                      <svg class="icon" width="26" height="26" stroke-width="1.6" aria-hidden="true"><use href="#icon-service-drenagem"/></svg>
                     </span>
                     <span class="servico-card-nome">Drenagem Linfática</span>
                   </label>
                   <label class="servico-card">
                     <input type="radio" name="servico" value="Miracle Face" />
                     <span class="servico-card-icon">
-                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="12" cy="12" r="9"/>
-                        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-                        <line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2.5"/>
-                        <line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2.5"/>
-                        <path d="M12 3c0 2-1.5 3-1.5 3M12 3c0 2 1.5 3 1.5 3"/>
-                      </svg>
+                      <svg class="icon" width="26" height="26" stroke-width="1.6" aria-hidden="true"><use href="#icon-service-miracle"/></svg>
                     </span>
                     <span class="servico-card-nome">Miracle Face</span>
                   </label>
@@ -716,9 +705,7 @@
 
               <div class="agendamento-submit-info" id="agendamento-submit-info">
                 <span class="agendamento-submit-info-icon" aria-hidden="true">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
+                  <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#icon-calendar"/></svg>
                 </span>
                 <span><strong>Este botão registra o horário na agenda.</strong> O WhatsApp será usado somente para mensagens sobre o atendimento.</span>
               </div>
@@ -727,10 +714,7 @@
               <button type="submit" class="button button-primary button-full agendamento-btn" id="btn-agendar" aria-describedby="agendamento-submit-info">
                 <span class="btn-texto">Confirmar horário</span>
                 <span class="btn-icon" aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="m8 16 2.2 2L16 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
+                  <svg class="icon" width="20" height="20" aria-hidden="true"><use href="#icon-calendar-check"/></svg>
                 </span>
               </button>
 
@@ -888,9 +872,7 @@
     aria-label="Fale conosco pelo WhatsApp"
     title="Fale conosco pelo WhatsApp"
   >
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-    </svg>
+    <svg class="icon-filled" width="28" height="28" aria-hidden="true"><use href="#icon-whatsapp"/></svg>
     <span class="whatsapp-float-label">Fale conosco</span>
   </a>
 
