@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="Css/admin-mobile.css" />
 </head>
 <body>
+  <a class="skip-link" href="#view-title">Pular para o conteúdo</a>
   <main class="admin-page">
     <section class="login-shell" id="login-shell">
       <div class="login-card">
@@ -37,7 +38,7 @@
     </section>
 
     <section class="dashboard-shell" id="dashboard-shell" hidden>
-      <aside class="admin-sidebar">
+      <aside class="admin-sidebar" aria-label="Navegação do painel">
         <a href="index.html" class="admin-brand admin-brand-sidebar" aria-label="Abrir o site público em nova aba" target="_blank" rel="noopener noreferrer">
           <span class="admin-brand-mark">✦</span>
           <span><strong>Carla Lira</strong><small>Gestão</small></span>
@@ -54,11 +55,11 @@
         </div>
       </aside>
 
-      <div class="admin-content">
+      <div class="admin-content" role="region" aria-label="Painel de gestão">
         <header class="admin-topbar">
           <div>
             <p class="eyebrow">painel administrativo</p>
-            <h1 id="view-title">Agenda</h1>
+            <h1 id="view-title" tabindex="-1" aria-live="polite">Agenda</h1>
           </div>
           <button id="refresh-button" class="secondary-button">Atualizar</button>
         </header>
