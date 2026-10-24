@@ -521,45 +521,62 @@
 }
 
 .whatsapp-float {
+  /* Fechado: círculo de 56px com o ícone (28px) exatamente no centro —
+     padding horizontal de 14px dos dois lados (14 + 28 + 14 = 56). */
   align-items: center;
   background: #25d366;
   border-radius: 999px;
-  bottom: 1.75rem;
+  bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
   box-shadow: 0 8px 28px rgb(0 0 0 / 22%);
+  box-sizing: border-box;
   color: #fff;
-  display: flex;
-  gap: 0.6rem;
-  padding: 0.85rem 1.3rem 0.85rem 1.1rem;
-  position: fixed;
-  right: 1.75rem;
-  text-decoration: none;
-  z-index: 999;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.2s ease, padding 0.3s ease;
+  display: inline-flex;
+  height: 56px;
+  justify-content: center;
+  line-height: 1;
+  min-width: 56px;
   overflow: hidden;
-  max-width: 56px;
+  padding: 0 14px;
+  position: fixed;
+  right: calc(1.75rem + env(safe-area-inset-right, 0px));
+  text-decoration: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.2s ease, padding 0.3s ease;
+  z-index: 999;
+}
+
+.whatsapp-float svg {
+  flex: 0 0 28px;
+  height: 28px;
+  width: 28px;
 }
 
 .whatsapp-float-label {
   font-size: 0.88rem;
   font-weight: 600;
-  white-space: nowrap;
-  opacity: 0;
+  margin-left: 0;
   max-width: 0;
+  opacity: 0;
   overflow: hidden;
-  transition: opacity 0.25s ease, max-width 0.3s ease;
+  white-space: nowrap;
+  transition: opacity 0.25s ease, max-width 0.3s ease, margin-left 0.3s ease;
 }
 
-.whatsapp-float:hover {
-  background: #20ba5a;
-  box-shadow: 0 12px 36px rgb(37 211 102 / 38%);
-  transform: translateY(-3px);
-  max-width: 220px;
-  padding: 0.85rem 1.3rem 0.85rem 1.1rem;
-}
+/* Expande com o texto "Fale conosco" só em telas grandes com mouse. */
+@media (hover: hover) and (min-width: 641px) {
+  .whatsapp-float:hover,
+  .whatsapp-float:focus-visible {
+    background: #20ba5a;
+    box-shadow: 0 12px 36px rgb(37 211 102 / 38%);
+    padding-right: 1.25rem;
+    transform: translateY(-3px);
+  }
 
-.whatsapp-float:hover .whatsapp-float-label {
-  opacity: 1;
-  max-width: 160px;
+  .whatsapp-float:hover .whatsapp-float-label,
+  .whatsapp-float:focus-visible .whatsapp-float-label {
+    margin-left: 0.6rem;
+    max-width: 160px;
+    opacity: 1;
+  }
 }
 
 @keyframes wpp-pulse {
@@ -602,7 +619,11 @@
   }
 
   .whatsapp-float {
-    bottom: 1.25rem;
-    right: 1.25rem;
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    right: calc(1rem + env(safe-area-inset-right, 0px));
+  }
+
+  .whatsapp-float-label {
+    display: none;
   }
 }

@@ -36,13 +36,37 @@ if (toggle && nav) {
     toggle.textContent = isOpen ? '✕' : '☰';
   });
 
+  const closeMenu = () => {
+    if (!nav.classList.contains('active')) return;
+    nav.classList.remove('active');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.textContent = '☰';
+  };
+
   nav.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-      nav.classList.remove('active');
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.textContent = '☰';
-    });
+    link.addEventListener('click', closeMenu);
   });
+
+  // Fecha ao tocar fora do menu ou apertar Esc
+  document.addEventListener('click', event => {
+    if (!nav.contains(event.target) && !toggle.contains(event.target)) closeMenu();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeMenu();
+  });
+}
+
+/* =============================================
+   HEADER FIXO — sombra suave depois de rolar
+   ============================================= */
+
+const siteHeader = document.querySelector('.site-header');
+if (siteHeader) {
+  const updateHeaderShadow = () => {
+    siteHeader.classList.toggle('is-scrolled', window.scrollY > 8);
+  };
+  updateHeaderShadow();
+  window.addEventListener('scroll', updateHeaderShadow, { passive: true });
 }
 
 /* =============================================

@@ -20,6 +20,17 @@ const PUBLIC_CSS_IN_ORDER = [
   'Css/agendamento.css',
 ];
 
+// mobile.css starts with `@import url("./responsive-hardening.css")`.
+// Concatenated into the bundle that @import would land mid-file, where
+// browsers silently ignore it (an @import is only valid at the top), so
+// we inline the imported file in its place instead.
+const IMPORT_RE = /@import\s+url\(\s*["']?\.\/([^"')]+)["']?\s*\)\s*;?/g;
+function readCssInlined(file) {
+  const dir = file.slice(0, file.lastIndexOf('/') + 1);
+  return readFileSync(file, 'utf8').replace(IMPORT_RE, (_, rel) =>
+    `/* inlined ${dir}${rel} */\n${readFileSync(dir + rel, 'utf8')}`);
+}
+
 const PUBLIC_HTML_FILES = ['index.html', 'privacidade.html'];
 
 // Directories/files to exclude from the dist copy. supabase/ ships
@@ -48,8 +59,11 @@ for (const entry of readdirSync('.', { withFileTypes: true })) {
 // the whole thing in one shot (dedupes nothing semantic, just strips
 // whitespace/comments — safe for hand-authored CSS).
 const concatenated = PUBLIC_CSS_IN_ORDER
-  .map(f => `/* ${f} */\n${readFileSync(f, 'utf8')}`)
+  .map(f => `/* ${f} */\n${readCssInlined(f)}`)
   .join('\n\n');
+if (/@import/.test(concatenated)) {
+  throw new Error('[build-static] bundle.css still contains an @import — it would be ignored by browsers');
+}
 const { code: minifiedCss } = await transform(concatenated, {
   loader: 'css',
   minify: true,

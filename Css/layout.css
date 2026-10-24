@@ -18,12 +18,19 @@
 }
 
 .site-header {
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  background: rgb(247 245 242 / 88%);
+  background: rgb(247 245 242 / 92%);
   border-bottom: 1px solid var(--color-border);
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
-  z-index: 90;
+  z-index: 1000;
+  transition: box-shadow 0.25s ease;
+}
+
+.site-header.is-scrolled {
+  box-shadow: 0 6px 20px rgb(60 38 21 / 10%);
 }
 
 .header-content {

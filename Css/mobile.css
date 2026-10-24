@@ -1,9 +1,24 @@
 @import url("./responsive-hardening.css");
 
+/* Evita rolagem horizontal SEM quebrar o header sticky.
+   overflow-x: hidden em html E body transforma o body num contêiner de
+   rolagem e o position: sticky do header para de funcionar.
+   - fallback: só no body (propaga para a viewport, sticky continua ok)
+   - navegadores modernos: clip (corta sem criar contêiner de rolagem) */
 html,
 body {
   max-width: 100%;
+}
+
+body {
   overflow-x: hidden;
+}
+
+@supports (overflow-x: clip) {
+  html,
+  body {
+    overflow-x: clip;
+  }
 }
 
 .menu-toggle {
@@ -23,10 +38,14 @@ body {
 }
 
 @media (max-width: 960px) {
+  :root {
+    --header-height: 72px;
+  }
+
   .header-content {
     flex-wrap: nowrap;
     justify-content: space-between;
-    min-height: 72px;
+    min-height: var(--header-height);
     padding: 0.7rem 1.25rem;
   }
 
@@ -87,7 +106,9 @@ body {
     right: 0;
     width: 100%;
     max-height: calc(100vh - var(--header-height));
+    max-height: calc(100dvh - var(--header-height));
     overflow-y: auto;
+    overscroll-behavior: contain;
     background: #2b1d12;
     display: none;
     flex-direction: column;

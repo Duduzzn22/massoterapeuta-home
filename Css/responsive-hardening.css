@@ -132,23 +132,8 @@ iframe {
     --carousel-gap: 1rem;
   }
 
-  .whatsapp-float {
-    width: 56px;
-    height: 56px;
-    max-width: 56px;
-    padding: 0;
-    justify-content: center;
-  }
-
   .whatsapp-float-label {
     display: none;
-  }
-
-  .whatsapp-float:hover {
-    width: 56px;
-    max-width: 56px;
-    padding: 0;
-    transform: none;
   }
 }
 
