@@ -160,6 +160,17 @@ body {
     padding: 2.5rem 0 3rem;
   }
 
+  /* Fundo "plantas-luz": presença menor e véu mais firme pra manter
+     texto legível com a imagem rolando pra 1 coluna. */
+  .hero-section::before {
+    background-position: 26% center;
+    opacity: 0.58;
+  }
+
+  .hero-section::after {
+    background: rgb(247 243 235 / 35%);
+  }
+
   .hero-section .hero-grid {
     align-items: start;
     gap: 2rem;
@@ -234,6 +245,15 @@ body {
 
   .hero-section {
     padding: 1.5rem 0 3rem;
+  }
+
+  .hero-section::before {
+    background-position: 23% center;
+    opacity: 0.38;
+  }
+
+  .hero-section::after {
+    background: rgb(247 243 235 / 48%);
   }
 
   .hero-copy h1 {

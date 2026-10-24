@@ -6,8 +6,41 @@
 
 .hero-section {
   background: var(--cream);
+  isolation: isolate;
+  overflow: hidden;
   padding: 48px 0 56px;
   position: relative;
+}
+
+/* Fundo decorativo "plantas-luz": folhagens discretas nas bordas e
+   luz quente, com desfoque natural da própria imagem. Fica atrás do
+   conteúdo (z-index: -1 + isolation: isolate na seção). */
+.hero-section::before {
+  background: url("../assets/plantas-luz.webp") center center / cover no-repeat;
+  content: "";
+  inset: 0;
+  opacity: 0.9;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+}
+
+/* Véu creme sutil só pra manter o contraste do título e textos à
+   esquerda — mais forte na coluna de texto, dissipa à direita para
+   não encobrir a foto da sessão. */
+.hero-section::after {
+  background: linear-gradient(
+    90deg,
+    rgb(247 243 235 / 24%) 0%,
+    rgb(247 243 235 / 34%) 30%,
+    rgb(247 243 235 / 7%) 58%,
+    transparent 100%
+  );
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
 }
 
 /* .hero-overlay existe no HTML por legado — não é mais usado. */
@@ -23,6 +56,7 @@
   min-height: 575px;
   position: relative;
   width: 100%;
+  z-index: 1;
 }
 
 .hero-copy {
