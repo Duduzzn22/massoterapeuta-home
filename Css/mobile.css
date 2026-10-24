@@ -76,8 +76,12 @@ body {
     overflow: visible;
   }
 
-  .header-content > .button {
+  .header-desktop-cta {
     display: none;
+  }
+
+  .header-cta {
+    display: inline-flex;
   }
 
   .main-nav {
@@ -107,6 +111,23 @@ body {
 
   .main-nav a:last-child {
     border-bottom: 0;
+  }
+
+  .main-nav .main-nav-cta {
+    background: var(--color-primary);
+    border-radius: 12px;
+    color: #fff;
+    display: inline-flex;
+    justify-content: center;
+    margin-top: 0.6rem;
+    padding: 0.95rem 1rem;
+    font-weight: 600;
+    box-shadow: 0 8px 18px rgb(0 0 0 / 25%);
+    border-bottom: 0;
+  }
+
+  .main-nav .main-nav-cta:hover {
+    background: var(--color-primary-dark);
   }
 
   .main-nav.active {
@@ -166,7 +187,7 @@ body {
   }
 
   .brand-text {
-    max-width: min(66vw, 240px);
+    max-width: min(42vw, 220px);
   }
 
   .hero-section {
@@ -232,14 +253,24 @@ body {
     padding-inline: 0.85rem;
   }
 
+  .header-content {
+    gap: 0.5rem;
+    padding: 0.6rem 0.85rem;
+  }
+
   .brand-mark {
     width: 26px;
     height: 26px;
   }
 
   .brand-text {
-    max-width: 62vw;
+    max-width: 38vw;
     font-size: 0.78rem;
+  }
+
+  .header-cta {
+    font-size: 0.82rem;
+    padding: 0 0.75rem;
   }
 
   .hero-panel {
