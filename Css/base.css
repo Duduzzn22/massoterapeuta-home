@@ -16,7 +16,8 @@
   --radius-large: 20px;
   --radius-medium: 14px;
   --max-width: 1120px;
-  --header-height: 78px;
+  --header-height: 72px;
+  --header-height-mobile: 64px;
 }
 
 * {
@@ -27,6 +28,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-height) + 12px);
 }
 
 body {
