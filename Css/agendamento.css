@@ -3,84 +3,89 @@
    ============================================= */
 
 .agendamento-section {
-  background: linear-gradient(160deg, #faf9f7 0%, #f1ece6 100%);
+  background: var(--cream);
 }
 
 .agendamento-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1.15fr;
-  gap: 4rem;
   align-items: start;
+  display: grid;
+  gap: 5rem;
+  grid-template-columns: 0.85fr 1.15fr;
 }
 
 .agendamento-intro {
+  padding-top: 20px;
   position: sticky;
   top: calc(var(--header-height) + 1.5rem);
 }
 
 .agendamento-intro h2 {
+  color: var(--ink);
   margin-top: 0.25rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.4rem;
 }
 
 .agendamento-intro > p {
-  color: var(--color-text-soft);
+  color: var(--muted);
+  font-size: 0.95rem;
   line-height: 1.75;
   margin-bottom: 2rem;
+  max-width: 360px;
 }
 
 .agendamento-info-cards {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.75rem;
 }
 
 .agendamento-info-card {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  background: #fff;
-  border: 1px solid var(--color-border);
+  align-items: flex-start;
+  background: var(--paper);
+  border: 1px solid #e5e4d8;
   border-radius: var(--radius-medium);
-  padding: 0.9rem 1.1rem;
-  box-shadow: 0 4px 12px rgb(60 38 21 / 6%);
+  box-shadow: none;
+  display: flex;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .agendamento-info-card:hover {
-  box-shadow: 0 8px 24px rgb(60 38 21 / 10%);
+  box-shadow: 0 10px 24px rgb(40 50 30 / 8%);
   transform: translateY(-1px);
 }
 
 .agendamento-info-icon {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  background: var(--color-surface-alt);
-  border-radius: 10px;
-  display: flex;
   align-items: center;
+  background: var(--sage);
+  border-radius: 10px;
+  color: var(--green);
+  display: flex;
+  flex-shrink: 0;
+  height: 38px;
   justify-content: center;
-  color: var(--color-primary);
+  width: 38px;
 }
 
 .agendamento-info-card strong {
+  color: var(--ink);
   display: block;
   font-size: 0.9rem;
-  color: var(--color-text);
   font-weight: 600;
+  margin-bottom: 0.15rem;
 }
 
 .agendamento-info-card span {
+  color: var(--muted);
   font-size: 0.82rem;
-  color: var(--color-text-soft);
 }
 
 .agendamento-form-wrap {
-  background: #fff;
-  border: 1px solid var(--color-border);
+  background: var(--paper);
+  border: 1px solid #dedfd1;
   border-radius: var(--radius-large);
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 15px 50px rgb(40 50 30 / 6%);
   padding: 2.25rem;
 }
 
@@ -91,10 +96,10 @@
 }
 
 .selected-plan {
-  background: #f5ece5;
-  border: 1px solid #ddc8b9;
-  border-radius: 10px;
-  color: var(--color-primary-dark);
+  background: var(--sage);
+  border: 1px solid #c6cebb;
+  border-radius: 8px;
+  color: var(--green-dark);
   font-size: 0.9rem;
   font-weight: 600;
   line-height: 1.5;
@@ -118,25 +123,27 @@
 }
 
 .form-label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--color-text);
-  letter-spacing: 0.01em;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .form-label-opt {
+  color: var(--muted);
+  font-size: 0.72rem;
   font-weight: 400;
-  color: var(--color-text-soft);
-  font-size: 0.82rem;
 }
 
 .form-input {
-  background: var(--color-surface-alt);
-  border: 1.5px solid var(--color-border);
-  border-radius: 10px;
-  color: var(--color-text);
+  background: var(--cream);
+  border: 1px solid #d6dbcc;
+  border-radius: 5px;
+  color: var(--ink);
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  min-height: 47px;
   padding: 0.75rem 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   width: 100%;
@@ -144,27 +151,27 @@
 }
 
 .form-input:focus {
-  background: #fff;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgb(122 74 43 / 12%);
+  background: var(--paper);
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgb(66 89 72 / 15%);
 }
 
 .form-input.input-error {
-  border-color: #c0392b;
-  box-shadow: 0 0 0 3px rgb(192 57 43 / 12%);
+  border-color: #93422e;
+  box-shadow: 0 0 0 3px rgb(147 66 46 / 12%);
 }
 
 .form-input.input-ok {
-  border-color: #27ae60;
+  border-color: var(--green);
 }
 
 .form-select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235b6470' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2367685e' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-position: right 0.9rem center;
-  padding-right: 2.5rem;
+  background-repeat: no-repeat;
   cursor: pointer;
+  padding-right: 2.5rem;
 }
 
 .form-select:disabled {
@@ -179,10 +186,10 @@
 }
 
 .form-error {
-  font-size: 0.8rem;
-  color: #c0392b;
-  display: none;
   align-items: center;
+  color: #93422e;
+  display: none;
+  font-size: 0.8rem;
   gap: 0.3rem;
 }
 
@@ -197,69 +204,71 @@
 }
 
 .servico-card {
+  align-items: center;
+  background: var(--cream);
+  border: 1px solid #d6dbcc;
+  border-radius: 8px;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.8rem 0.5rem;
-  background: var(--color-surface-alt);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-medium);
-  cursor: pointer;
+  gap: 0.4rem;
+  padding: 0.95rem 0.5rem;
   text-align: center;
   transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
   user-select: none;
 }
 
 .servico-card:hover {
-  border-color: var(--color-primary);
-  background: #fff;
+  background: var(--paper);
+  border-color: var(--green);
+  box-shadow: 0 6px 18px rgb(66 89 72 / 10%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgb(122 74 43 / 12%);
 }
 
 .servico-card input[type="radio"] {
-  position: absolute;
+  height: 0;
   opacity: 0;
   pointer-events: none;
+  position: absolute;
   width: 0;
-  height: 0;
 }
 
 .servico-card:has(input:checked) {
-  border-color: var(--color-primary);
-  background: linear-gradient(135deg, #fff 0%, #f5ece5 100%);
-  box-shadow: 0 6px 20px rgb(122 74 43 / 16%);
+  background: var(--sage);
+  border-color: var(--green);
+  box-shadow: 0 6px 18px rgb(66 89 72 / 12%);
 }
 
 .servico-card:has(input:focus-visible),
 .booking-choice:has(input:focus-visible),
 .booking-consent:has(input:focus-visible) {
-  outline: 3px solid rgb(122 74 43 / 28%);
+  outline: 3px solid var(--clay);
   outline-offset: 3px;
 }
 
 .servico-card-icon {
-  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  background: var(--color-surface-alt);
+  background: var(--paper);
+  border: 1px solid #d6dbcc;
   border-radius: 50%;
-  color: var(--color-primary);
-  transition: background 0.18s ease, color 0.18s ease;
+  color: var(--green);
+  display: flex;
+  height: 48px;
+  justify-content: center;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  width: 48px;
 }
 
 .servico-card:has(input:checked) .servico-card-icon {
-  background: var(--color-primary);
-  color: #fff;
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--paper);
 }
 
 .servico-card-nome {
+  color: var(--ink);
   font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--color-text);
+  font-weight: 500;
   line-height: 1.3;
 }
 
@@ -272,30 +281,30 @@
 
 .booking-choice,
 .booking-consent {
-  display: flex;
   align-items: flex-start;
-  gap: 0.65rem;
-  border: 1.5px solid var(--color-border);
-  border-radius: 10px;
-  background: var(--color-surface-alt);
-  padding: 0.8rem 0.9rem;
+  background: var(--cream);
+  border: 1px solid #d6dbcc;
+  border-radius: 6px;
+  color: var(--ink);
   cursor: pointer;
-  color: var(--color-text);
-  font-size: 0.88rem;
+  display: flex;
+  font-size: 0.85rem;
+  gap: 0.7rem;
   line-height: 1.45;
+  padding: 0.9rem 1rem;
+  transition: border-color 0.18s ease, background 0.18s ease;
 }
 
 .booking-choice:has(input:checked) {
-  border-color: var(--color-primary);
-  background: #fff;
-  box-shadow: 0 0 0 3px rgb(122 74 43 / 8%);
+  background: var(--sage);
+  border-color: var(--green);
 }
 
 .booking-choice input,
 .booking-consent input {
-  accent-color: var(--color-primary);
-  margin-top: 0.18rem;
+  accent-color: var(--green);
   flex: 0 0 auto;
+  margin-top: 0.18rem;
 }
 
 .booking-home-fields {
@@ -311,12 +320,12 @@
 }
 
 .booking-consent {
+  background: var(--paper);
   cursor: pointer;
-  background: #fff;
 }
 
 .booking-consent strong {
-  color: var(--color-text-soft);
+  color: var(--muted);
   font-weight: 500;
 }
 
@@ -334,25 +343,26 @@
 }
 
 .booking-feedback-info {
-  background: #f5f5f5;
+  background: #eceee5;
+  color: var(--muted);
 }
 
 .booking-feedback-success {
-  background: #f1f8f3;
-  border-color: #bcd9c5 !important;
-  color: #235b33;
+  background: var(--sage);
+  border-color: #bcc9ad !important;
+  color: var(--green-dark);
 }
 
 .booking-feedback-warning {
-  background: #fff8e8;
-  border-color: #ead49a !important;
-  color: #6d5614;
+  background: #f5efdc;
+  border-color: #ddd0a3 !important;
+  color: #5f4e18;
 }
 
 .booking-feedback-error {
-  background: #fff1ef;
-  border-color: #e5b8b1 !important;
-  color: #8f3024;
+  background: #f4e3df;
+  border-color: #dcb7ae !important;
+  color: #7c3521;
 }
 
 .booking-feedback a {
@@ -362,43 +372,43 @@
 }
 
 .agendamento-submit-info {
-  display: flex;
   align-items: flex-start;
+  background: var(--sage-soft);
+  border: 1px solid #cfd3c5;
+  border-radius: 6px;
+  color: var(--muted);
+  display: flex;
+  font-size: 0.82rem;
   gap: 0.65rem;
-  padding: 0.8rem 0.9rem;
-  border: 1px solid rgba(139, 82, 47, 0.2);
-  border-radius: 0.75rem;
-  background: rgba(139, 82, 47, 0.06);
-  color: var(--color-text-soft);
-  font-size: 0.88rem;
-  line-height: 1.45;
+  line-height: 1.5;
+  padding: 0.85rem 1rem;
 }
 
 .agendamento-submit-info strong {
-  color: var(--color-text);
-  font-weight: 700;
+  color: var(--ink);
+  font-weight: 600;
 }
 
 .agendamento-submit-info-icon {
+  color: var(--clay);
   display: inline-flex;
   flex: 0 0 auto;
   margin-top: 0.08rem;
-  color: var(--color-primary);
 }
 
 .agendamento-btn {
-  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  font-size: 1rem;
-  padding: 1rem 1.5rem;
-  border-radius: 999px;
-  border: none;
+  border: 1px solid var(--green);
+  border-radius: 6px;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-  position: relative;
+  display: flex;
+  font-size: 0.95rem;
+  gap: 0.6rem;
+  justify-content: center;
   overflow: hidden;
+  padding: 1rem 1.5rem;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
 .agendamento-btn:hover {
@@ -421,10 +431,19 @@
 }
 
 .agendamento-disclaimer {
+  color: var(--muted);
   font-size: 0.78rem;
-  color: var(--color-text-soft);
-  text-align: center;
   margin-top: -0.5rem;
+  text-align: center;
+}
+
+.agendamento-disclaimer a {
+  color: var(--green);
+  text-decoration: underline;
+}
+
+.agendamento-disclaimer a:hover {
+  color: var(--clay);
 }
 
 .faq-list {
@@ -435,34 +454,39 @@
 }
 
 .faq-list details {
-  background: #fff;
-  border: 1px solid var(--color-border);
-  border-radius: 30px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #cfd3c5;
+  border-radius: 0;
+  box-shadow: none;
   overflow: hidden;
-  transform: scale(0.985);
-  transform-origin: 50% 0;
-  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  transition: background 0.2s ease;
+}
+
+.faq-list details:first-child {
+  border-top: 1px solid #cfd3c5;
 }
 
 .faq-list details[open] {
-  border-color: rgb(139 80 43 / 22%);
-  box-shadow: 0 8px 24px rgb(60 38 21 / 8%);
+  background: transparent;
+  box-shadow: none;
 }
 
 .faq-list summary {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  min-height: 76px;
-  padding: 1.2rem 1.75rem;
+  color: var(--ink);
   cursor: pointer;
-  font-weight: 600;
-  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-  color: var(--color-text);
+  display: flex;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 500;
+  gap: 1rem;
+  justify-content: space-between;
   list-style: none;
+  min-height: 68px;
+  padding: 1.3rem 0;
+  transition: color 0.15s ease;
   user-select: none;
-  transition: background 0.15s ease;
 }
 
 .faq-list summary::-webkit-details-marker {
@@ -470,26 +494,28 @@
 }
 
 .faq-list summary:hover {
-  background: var(--color-surface-alt);
+  background: transparent;
+  color: var(--clay);
 }
 
 .faq-icon {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
   align-items: center;
+  background: transparent;
+  border-radius: 50%;
+  color: var(--green);
+  display: flex;
+  flex-shrink: 0;
+  font-size: 1.5rem;
+  font-weight: 400;
+  height: 32px;
   justify-content: center;
-  font-size: 1.35rem;
-  font-weight: 500;
-  color: var(--color-primary);
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s ease;
   line-height: 1;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  width: 32px;
 }
 
 .faq-list details[open] .faq-icon {
-  transform: rotate(180deg) scale(1.05);
+  transform: rotate(45deg);
 }
 
 .faq-answer {
@@ -504,11 +530,11 @@
 }
 
 .faq-list details p {
-  padding: 0 1.75rem 1.65rem;
-  font-size: 1rem;
+  color: var(--muted);
+  font-size: 0.95rem;
   line-height: 1.75;
-  color: var(--color-text-soft);
   max-width: 68ch;
+  padding: 0 0 1.65rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -525,18 +551,18 @@
   background: #25d366;
   border-radius: 999px;
   bottom: 1.75rem;
-  box-shadow: 0 8px 28px rgb(0 0 0 / 22%);
+  box-shadow: 0 10px 28px rgb(37 211 102 / 28%);
   color: #fff;
   display: flex;
   gap: 0.6rem;
+  max-width: 56px;
+  overflow: hidden;
   padding: 0.85rem 1.3rem 0.85rem 1.1rem;
   position: fixed;
   right: 1.75rem;
   text-decoration: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.2s ease, padding 0.3s ease, max-width 0.3s ease;
   z-index: 999;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.2s ease, padding 0.3s ease;
-  overflow: hidden;
-  max-width: 56px;
 }
 
 .whatsapp-float-label {
