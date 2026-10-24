@@ -5,33 +5,34 @@
 }
 
 .section {
-  padding: 5rem 0;
+  padding: 6.5rem 0;
 }
 
 .section-muted {
-  background: var(--color-surface-alt);
+  background: var(--sage-soft);
 }
 
 .section-head {
-  margin-bottom: 2.2rem;
+  margin-bottom: 2.8rem;
   max-width: 720px;
 }
 
 .site-header {
-  -webkit-backdrop-filter: saturate(160%) blur(14px);
-  backdrop-filter: saturate(160%) blur(14px);
-  background: rgb(250 248 245 / 86%);
-  border-bottom: 1px solid rgb(122 74 43 / 10%);
+  -webkit-backdrop-filter: saturate(140%) blur(14px);
+  backdrop-filter: saturate(140%) blur(14px);
+  background: rgb(247 243 235 / 92%);
+  border-bottom: 1px solid #e7e6da;
   position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 90;
-  transition: box-shadow 0.25s ease, background 0.25s ease;
+  transition: box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
 }
 
 .site-header.is-scrolled {
-  background: rgb(250 248 245 / 94%);
-  box-shadow: 0 6px 24px rgb(60 38 21 / 8%);
+  background: rgb(247 243 235 / 97%);
+  border-bottom-color: #ded8c8;
+  box-shadow: 0 6px 24px rgb(40 50 30 / 6%);
 }
 
 .header-content {
@@ -48,19 +49,20 @@
   align-items: center;
   display: inline-flex;
   flex-shrink: 0;
-  gap: 0.75rem;
+  gap: 13px;
 }
 
 .brand-mark {
-  background: linear-gradient(145deg, #8a5634, #5d3a1a);
-  border-radius: 999px;
-  box-shadow: 0 4px 10px rgb(93 58 26 / 25%), inset 0 1px 0 rgb(255 255 255 / 15%);
-  color: #f3e4d4;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--clay);
   display: grid;
-  font-size: 0.85rem;
+  font-size: 2.1rem;
   height: 36px;
+  line-height: 1;
   place-items: center;
-  width: 36px;
+  width: 32px;
 }
 
 .brand-text {
@@ -70,20 +72,22 @@
 }
 
 .brand-text strong {
-  color: #2a1d14;
-  font-family: "Playfair Display", Georgia, serif;
-  font-size: 1.08rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.2;
   white-space: nowrap;
 }
 
 .brand-text > span {
-  color: var(--bronze);
-  font-size: 0.64rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  margin-top: 3px;
+  color: var(--clay);
+  font-family: var(--font-sans);
+  font-size: 0.55rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  margin-top: 6px;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -91,34 +95,36 @@
 .main-nav {
   align-items: center;
   display: flex;
-  gap: 4px;
+  gap: 28px;
   margin-inline: auto;
 }
 
 .main-nav a {
   align-items: center;
-  border-radius: 999px;
-  color: #4b4f55;
+  border-radius: 0;
+  color: var(--ink);
   display: inline-flex;
-  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
   font-weight: 500;
   gap: 2px;
   height: 40px;
-  padding: 0 12px;
+  letter-spacing: 0.02em;
+  padding: 0;
   position: relative;
-  transition: background 0.18s ease, color 0.18s ease;
+  transition: color 0.18s ease;
   white-space: nowrap;
 }
 
 .main-nav a:hover {
-  background: rgb(122 74 43 / 6%);
-  color: var(--color-primary);
+  background: transparent;
+  color: var(--clay);
 }
 
 .main-nav a::after {
-  background: var(--color-primary);
+  background: var(--green);
   border-radius: 50%;
-  bottom: 6px;
+  bottom: 8px;
   content: "";
   height: 4px;
   left: 50%;
@@ -130,7 +136,7 @@
 
 .main-nav a.active,
 .main-nav a[aria-current="true"] {
-  color: var(--color-primary);
+  color: var(--green);
 }
 
 .main-nav a.active::after,
@@ -150,14 +156,30 @@
   grid-template-columns: 1.2fr 0.8fr;
 }
 
+.site-footer {
+  background: var(--sage);
+  color: var(--ink);
+  padding-top: 2.5rem;
+}
+
 .footer-content {
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid #c9cebf;
+  color: var(--muted);
   display: flex;
   flex-wrap: wrap;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   gap: 0.5rem 1rem;
   justify-content: space-between;
   padding: 2rem 1.25rem 2.4rem;
+}
+
+.site-footer a {
+  color: var(--green);
+  text-decoration: underline;
+}
+
+.site-footer a:hover {
+  color: var(--green-dark);
 }
 
 form {
@@ -172,7 +194,7 @@ form {
    ============================================= */
 
 .sobre-section {
-  background: #faf9f7;
+  background: var(--sage-soft);
 }
 
 .sobre-grid {
@@ -194,9 +216,9 @@ form {
   width: 100%;
   object-fit: cover;
   object-position: 50% 39%;
-  border-radius: 2px 120px 2px 2px; /* canto superior direito arredondado — toque elegante */
+  border-radius: 8px 100px 8px 8px;
   display: block;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 20px 60px rgb(40 50 30 / 12%);
 }
 
 /* Badge flutuante de anos de experiência */
@@ -204,8 +226,8 @@ form {
   position: absolute;
   bottom: -1.5rem;
   left: -1.5rem;
-  background: var(--color-primary, #c9a87c);
-  color: #fff;
+  background: var(--green);
+  color: var(--paper);
   border-radius: 50%;
   width: 110px;
   height: 110px;
@@ -270,7 +292,7 @@ form {
 }
 
 .credencial-icone {
-  color: var(--color-primary, #c9a87c);
+  color: var(--clay);
   font-size: 0.7rem;
   flex-shrink: 0;
 }
@@ -291,7 +313,7 @@ form {
   }
 
   .sobre-imagem {
-    border-radius: 2px 80px 2px 2px;
+    border-radius: 8px 80px 8px 8px;
     object-position: 50% 38%;
   }
 

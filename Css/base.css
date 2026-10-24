@@ -1,24 +1,43 @@
 :root {
-  --bronze: #b09074;
-  --marrom-escuro: #5d3a1a;
-  --primary-color: #faf9f6;
-  --secondary-color: #dfc8bc;
-  --text-color: #4a4a4a;
-  --color-bg: #f7f5f2;
-  --color-surface: #ffffff;
-  --color-surface-alt: #f1ece6;
-  --color-text: #1f2428;
-  --color-text-soft: #5b6470;
-  --color-primary: #7a4a2b;
-  --color-primary-dark: #60381f;
-  --color-border: #ddd4cc;
-  --shadow-soft: 0 16px 40px rgb(60 38 21 / 10%);
-  --radius-large: 20px;
-  --radius-medium: 14px;
-  --max-width: 1120px;
-  --header-height: 72px;
+  /* Paleta Areia & Sálvia */
+  --cream: #f7f3eb;
+  --paper: #fcfaf5;
+  --sage: #e3e7dd;
+  --sage-soft: #eceee4;
+  --green: #425948;
+  --green-dark: #314637;
+  --ink: #302c26;
+  --muted: #67685e;
+  --line: #d9d9cd;
+  --clay: #94613e;
+
+  /* Tipografia */
+  --font-serif: "DM Serif Display", Georgia, serif;
+  --font-sans: "DM Sans", "Inter", Arial, sans-serif;
+
+  /* Aliases antigos → nova paleta (mantém o CSS existente funcional) */
+  --bronze: var(--clay);
+  --marrom-escuro: var(--green-dark);
+  --primary-color: var(--paper);
+  --secondary-color: var(--sage);
+  --text-color: var(--muted);
+  --color-bg: var(--cream);
+  --color-surface: var(--paper);
+  --color-surface-alt: var(--cream);
+  --color-text: var(--ink);
+  --color-text-soft: var(--muted);
+  --color-primary: var(--green);
+  --color-primary-dark: var(--green-dark);
+  --color-border: var(--line);
+  --shadow-soft: 0 15px 50px rgb(40 50 30 / 8%);
+  --radius-large: 12px;
+  --radius-medium: 8px;
+  --max-width: 1200px;
+  --header-height: 80px;
   --header-height-mobile: 64px;
 }
+
+/* Fontes DM Sans + DM Serif Display vêm via <link> no index.html. */
 
 * {
   box-sizing: border-box;
@@ -28,14 +47,15 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--header-height) + 12px);
+  scroll-padding-top: calc(var(--header-height) + 16px);
 }
 
 body {
-  background: radial-gradient(circle at top right, #fff 0%, var(--color-bg) 45%);
-  color: var(--color-text);
-  font-family: "Inter", "Segoe UI", sans-serif;
-  line-height: 1.6;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.65;
 }
 
 img,
@@ -55,36 +75,47 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 summary:focus-visible {
-  outline: 3px solid rgb(122 74 43 / 32%);
-  outline-offset: 3px;
+  outline: 3px solid var(--clay);
+  outline-offset: 4px;
 }
 
 h1,
 h2,
 h3 {
-  color: #171717;
-  font-family: "Playfair Display", Georgia, serif;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 1.12;
 }
 
 h1 {
-  font-size: clamp(2.1rem, 4vw, 3.7rem);
-  margin-bottom: 1.25rem;
+  font-size: clamp(2.75rem, 5.25vw, 4.75rem);
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+  margin-bottom: 1.4rem;
 }
 
 h2 {
-  font-size: clamp(1.7rem, 3vw, 2.7rem);
-  margin-bottom: 0.9rem;
+  font-size: clamp(2.2rem, 3.7vw, 3.25rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
 }
 
 h3 {
-  font-size: 1.3rem;
-  margin-bottom: 0.6rem;
+  font-size: 1.55rem;
+  margin-bottom: 0.65rem;
+}
+
+h1 em,
+h2 em,
+h3 em {
+  color: var(--green);
+  font-style: italic;
+  font-weight: 400;
 }
 
 p {
-  color: var(--color-text-soft);
+  color: var(--muted);
 }
 
 ul,
@@ -107,11 +138,11 @@ ol {
 }
 
 .eyebrow {
-  color: var(--color-primary);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  margin-bottom: 0.7rem;
+  color: var(--clay);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  margin-bottom: 1.1rem;
   text-transform: uppercase;
 }
 

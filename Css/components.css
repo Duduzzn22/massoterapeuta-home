@@ -1,11 +1,17 @@
 .button {
-  border-radius: 999px;
+  align-items: center;
+  border: 1px solid var(--green);
+  border-radius: 6px;
   display: inline-flex;
-  font-size: 0.93rem;
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  gap: 14px;
   justify-content: center;
-  padding: 0.8rem 1.25rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  padding: 15px 24px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .button:hover {
@@ -13,23 +19,26 @@
 }
 
 .button-primary {
-  background: var(--color-primary);
-  box-shadow: 0 8px 20px rgb(122 74 43 / 24%);
-  color: #fff;
+  background: var(--green);
+  box-shadow: 0 10px 24px rgb(66 89 72 / 20%);
+  color: var(--paper);
 }
 
 .button-primary:hover {
-  background: var(--color-primary-dark);
+  background: var(--green-dark);
+  border-color: var(--green-dark);
 }
 
 .button-secondary {
-  background: #fff;
-  border: 1px solid var(--color-border);
-  color: #2f3438;
+  background: transparent;
+  border-color: var(--green);
+  color: var(--green);
 }
 
 .button-secondary:hover {
-  box-shadow: 0 8px 20px rgb(0 0 0 / 9%);
+  background: var(--sage);
+  color: var(--green-dark);
+  box-shadow: none;
 }
 
 .button-full {
@@ -41,18 +50,19 @@
 .faq-list details,
 .hero-panel,
 .cta-box {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--paper);
+  border: 1px solid #e5e4d8;
   border-radius: var(--radius-large);
   box-shadow: var(--shadow-soft);
 }
 
 .card {
-  padding: 1.4rem;
+  padding: 1.6rem;
 }
 
 .card-accent {
-  background: linear-gradient(135deg, #fff 0%, #f5ece5 100%);
+  background: linear-gradient(135deg, var(--paper) 0%, var(--sage) 100%);
+  border-color: #c8d0bf;
 }
 
 .benefit-list {
@@ -61,57 +71,64 @@
 }
 
 .benefit-list li {
-  background: #f3eee8;
-  margin-top: 10px;
-  padding: 12px;
+  background: var(--paper);
+  border: 1px solid #e5e4d8;
   border-radius: 10px;
+  color: var(--ink);
+  margin-top: 10px;
+  padding: 14px 16px;
 }
 
 /* Compact header CTA for mobile — intentionally NOT using .button
    class to avoid inheriting width:100% from the 640px breakpoint. */
 .header-cta {
   align-items: center;
-  background: var(--color-primary);
-  border-radius: 999px;
-  box-shadow: 0 6px 14px rgb(122 74 43 / 22%);
-  color: #fff;
+  background: var(--green);
+  border: 1px solid var(--green);
+  border-radius: 6px;
+  box-shadow: 0 6px 14px rgb(66 89 72 / 18%);
+  color: var(--paper);
   display: none;
   flex: 0 0 auto;
-  font-size: 0.88rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 500;
   justify-content: center;
+  letter-spacing: 0.01em;
   line-height: 1;
   min-height: 40px;
   padding: 0 1rem;
   white-space: nowrap;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
 .header-cta:hover {
-  background: var(--color-primary-dark);
+  background: var(--green-dark);
+  border-color: var(--green-dark);
   transform: translateY(-1px);
 }
 
 /* Desktop CTA with calendar icon */
 .header-desktop-cta {
   align-items: center;
+  border-radius: 6px;
   display: inline-flex;
   flex-shrink: 0;
-  gap: 8px;
+  gap: 10px;
   height: 44px;
-  padding: 0 20px 0 18px;
-  border-radius: 999px;
-  font-size: 0.875rem;
-  font-weight: 600;
+  padding: 0 22px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   white-space: nowrap;
-  box-shadow: 0 6px 16px rgb(122 74 43 / 25%);
-  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.25s ease;
+  box-shadow: 0 8px 18px rgb(66 89 72 / 18%);
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease;
 }
 
 .header-desktop-cta:hover {
-  background: var(--color-primary-dark);
+  background: var(--green-dark);
+  border-color: var(--green-dark);
   transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgb(122 74 43 / 30%);
+  box-shadow: 0 12px 24px rgb(66 89 72 / 24%);
 }
 
 .header-cta-icon {
