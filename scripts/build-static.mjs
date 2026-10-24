@@ -5,9 +5,24 @@
 // Local dev: unchanged — devs open index.html from the project root
 // (6 separate CSS files, source HTML). Only Vercel runs this script.
 import { readFileSync, writeFileSync, mkdirSync, cpSync, existsSync, rmSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, resolve, join } from 'node:path';
 import { transform } from 'esbuild';
 import { minify } from 'html-minifier-terser';
+
+// Resolve top-level `@import url("./relative.css");` statements by inlining
+// the referenced file content. Prevents @import from surviving into the
+// public bundle (prod only serves bundle.css).
+function inlineCssImports(path, seen = new Set()) {
+  const absolute = resolve(path);
+  if (seen.has(absolute)) return '';
+  seen.add(absolute);
+  const content = readFileSync(absolute, 'utf8');
+  const dir = dirname(absolute);
+  return content.replace(
+    /@import\s+url\(\s*["']?([^"')]+)["']?\s*\)\s*;?/g,
+    (_, importPath) => inlineCssImports(join(dir, importPath), seen),
+  );
+}
 
 const OUT = 'dist';
 
@@ -48,7 +63,7 @@ for (const entry of readdirSync('.', { withFileTypes: true })) {
 // the whole thing in one shot (dedupes nothing semantic, just strips
 // whitespace/comments — safe for hand-authored CSS).
 const concatenated = PUBLIC_CSS_IN_ORDER
-  .map(f => `/* ${f} */\n${readFileSync(f, 'utf8')}`)
+  .map(f => `/* ${f} */\n${inlineCssImports(f)}`)
   .join('\n\n');
 const { code: minifiedCss } = await transform(concatenated, {
   loader: 'css',

@@ -66,3 +66,41 @@
   padding: 12px;
   border-radius: 10px;
 }
+
+/* Compact header CTA for mobile — intentionally NOT using .button
+   class to avoid inheriting width:100% from the 640px breakpoint. */
+.header-cta {
+  align-items: center;
+  background: var(--color-primary);
+  border-radius: 999px;
+  box-shadow: 0 6px 14px rgb(122 74 43 / 22%);
+  color: #fff;
+  display: none;
+  flex: 0 0 auto;
+  font-size: 0.88rem;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1;
+  min-height: 44px;
+  padding: 0 1rem;
+  white-space: nowrap;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.header-cta:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+.menu-icon {
+  display: inline-block;
+}
+
+.menu-toggle[aria-expanded="false"] .menu-icon-close,
+.menu-toggle[aria-expanded="true"] .menu-icon-open {
+  display: none;
+}
+
+.main-nav-cta {
+  display: none;
+}
