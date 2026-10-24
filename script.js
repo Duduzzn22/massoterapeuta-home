@@ -23,6 +23,60 @@ if (carouselTrack && 'IntersectionObserver' in window) {
 }
 
 /* =============================================
+   HEADER — sombra ao rolar e seção ativa
+   ============================================= */
+
+const siteHeader = document.querySelector('.site-header');
+if (siteHeader) {
+  const applyScrolled = () => {
+    siteHeader.classList.toggle('is-scrolled', window.scrollY > 8);
+  };
+  applyScrolled();
+  window.addEventListener('scroll', applyScrolled, { passive: true });
+}
+
+const navLinks = Array.from(document.querySelectorAll('.main-nav a[href^="#"]'));
+const sectionIds = navLinks
+  .map(a => a.getAttribute('href'))
+  .filter(h => h && h.length > 1)
+  .map(h => h.slice(1));
+const sectionEls = sectionIds
+  .map(id => document.getElementById(id))
+  .filter(Boolean);
+
+if (sectionEls.length && 'IntersectionObserver' in window) {
+  const setActive = (id) => {
+    navLinks.forEach(link => {
+      const match = link.getAttribute('href') === `#${id}`;
+      link.classList.toggle('active', match);
+      if (match) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
+    });
+  };
+
+  const visibleRatios = new Map();
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      visibleRatios.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
+    });
+    let topId = null;
+    let topRatio = 0;
+    visibleRatios.forEach((ratio, id) => {
+      if (ratio > topRatio) {
+        topRatio = ratio;
+        topId = id;
+      }
+    });
+    if (topId) setActive(topId);
+  }, {
+    rootMargin: '-30% 0px -55% 0px',
+    threshold: [0, 0.25, 0.5, 0.75, 1],
+  });
+
+  sectionEls.forEach(el => sectionObserver.observe(el));
+}
+
+/* =============================================
    MENU MOBILE — toggle com acessibilidade
    ============================================= */
 
