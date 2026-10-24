@@ -20,7 +20,11 @@ function inlineCssImports(path, seen = new Set()) {
   const dir = dirname(absolute);
   return content.replace(
     /@import\s+url\(\s*["']?([^"')]+)["']?\s*\)\s*;?/g,
-    (_, importPath) => inlineCssImports(join(dir, importPath), seen),
+    (match, importPath) => {
+      // Preserva imports absolutos (ex.: Google Fonts) — o navegador resolve.
+      if (/^(https?:)?\/\//i.test(importPath)) return match;
+      return inlineCssImports(join(dir, importPath), seen);
+    },
   );
 }
 
