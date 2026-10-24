@@ -25,6 +25,9 @@ jobs:
           node --check script.js
           node --check admin.js
 
+      - name: Run unit tests
+        run: node --experimental-strip-types --test tests/*.test.*
+
       - name: Check local HTML references
         run: |
           node <<'NODE'

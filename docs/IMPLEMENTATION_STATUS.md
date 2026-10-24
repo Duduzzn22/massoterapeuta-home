@@ -71,6 +71,7 @@
 - App Secret.
 - Verify Token para o webhook.
 - Templates aprovados pela Meta.
+- Antes de ativar: a fila já descarta sozinha confirmações obsoletas (sessão passada, agendamento cancelado/concluído ou pedido com mais de 24h), marcando-as como `skipped` em `notification_jobs`. Não haverá disparo em massa do acúmulo.
 - Configuração do catálogo e perfil comercial no WhatsApp Business.
 
 ### Google Calendar / iPhone
