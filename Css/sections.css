@@ -465,11 +465,11 @@
 
 .carousel-track {
   --carousel-gap: 1.5rem;
-  display: flex;
   align-items: stretch;
+  animation: slide-loop 34s linear infinite;
+  display: flex;
   gap: var(--carousel-gap);
   width: max-content;
-  animation: slide-loop 34s linear infinite;
 }
 
 .carousel-track:hover,
@@ -490,6 +490,40 @@
   padding: 1.6rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   width: 330px;
+}
+
+/* Mobile: reduz um pouco o card e mantém scroll horizontal com snap
+   caso a animação pare (p.ex. prefers-reduced-motion), para o usuário
+   continuar enxergando o conteúdo como carrossel e não como lista. */
+@media (max-width: 640px) {
+  .carousel-track-wrap {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .carousel-track-wrap::-webkit-scrollbar {
+    display: none;
+  }
+
+  .carousel-track {
+    --carousel-gap: 1rem;
+    padding-inline: 1rem;
+  }
+
+  .testimonial {
+    min-height: 240px;
+    scroll-snap-align: start;
+    width: min(80vw, 300px);
+  }
+}
+
+@media (max-width: 390px) {
+  .testimonial {
+    width: 82vw;
+  }
 }
 
 .testimonial:hover,
@@ -553,15 +587,23 @@
   100% { transform: translateX(calc(-50% - (var(--carousel-gap) / 2))); }
 }
 
-/* Respeita preferência de movimento reduzido (acessibilidade) */
+/* Respeita preferência de movimento reduzido (acessibilidade):
+   pausa a animação, mas mantém a faixa horizontal para o usuário
+   deslizar por conta própria — nunca empilha vertical. */
 @media (prefers-reduced-motion: reduce) {
+  .carousel-track-wrap {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+
   .carousel-track {
     animation: none;
-    flex-wrap: wrap;
-    width: 100%;
   }
 
   .testimonial {
-    width: 100%;
+    scroll-snap-align: start;
   }
 }
