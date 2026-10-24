@@ -4,6 +4,7 @@ import { createBookingCalendarEvent } from '../_shared/calendar-booking.ts'
 import { resolveBusiness } from '../_shared/business.ts'
 import { sendWhatsApp, toWaRecipient } from '../_shared/whatsapp.ts'
 import { sha256Hex, timingSafeEqualString } from '../_shared/crypto.ts'
+import { whatsappConfirmationSkipReason } from '../_shared/notification-rules.ts'
 
 function errText(error: unknown) {
   return error instanceof Error ? error.message.slice(0, 700) : 'Unknown notification processing error'
@@ -32,6 +33,15 @@ async function markJobProcessed(supabase: ReturnType<typeof createAdminClient>, 
     status: 'processed',
     processed_at: new Date().toISOString(),
     last_error: null,
+  }).eq('business_id', job.business_id).eq('id', job.id)
+  if (error) throw error
+}
+
+async function markJobSkipped(supabase: ReturnType<typeof createAdminClient>, job: any, reason: string) {
+  const { error } = await supabase.from('notification_jobs').update({
+    status: 'skipped',
+    processed_at: new Date().toISOString(),
+    last_error: `skipped: ${reason}`,
   }).eq('business_id', job.business_id).eq('id', job.id)
   if (error) throw error
 }
@@ -174,6 +184,7 @@ Deno.serve(async (req: Request) => {
     if (claimError) throw claimError
 
     let processed = 0
+    let skipped = 0
     let retried = 0
     let failed = 0
 
@@ -191,6 +202,19 @@ Deno.serve(async (req: Request) => {
           .eq('id', job.appointment_id)
           .maybeSingle()
         if (appointmentError) throw appointmentError
+
+        // Never send a stale "booking received" message (past session,
+        // cancelled/completed appointment, or queued for too long). The SQL
+        // claim already filters these; this re-check covers retries and
+        // anything that changed between claim and send.
+        if (job.job_type === 'whatsapp_booking_confirmation') {
+          const skipReason = whatsappConfirmationSkipReason(job, appointment)
+          if (skipReason) {
+            await markJobSkipped(supabase, job, skipReason)
+            skipped += 1
+            continue
+          }
+        }
 
         if (!appointment || appointment.status === 'cancelled') {
           await markJobProcessed(supabase, job)
@@ -279,7 +303,7 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    return json({ ok: true, claimed: (jobs ?? []).length, processed, retried, failed })
+    return json({ ok: true, claimed: (jobs ?? []).length, processed, skipped, retried, failed })
   } catch (error) {
     console.error('process_notifications_error', error)
     return json({ error: 'Falha ao processar a fila de notificações.' }, 500)
